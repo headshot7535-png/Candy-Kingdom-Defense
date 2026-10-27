@@ -107,8 +107,8 @@ C.DEFAULTS = {
     hubMinPulls = 3,           -- a lobby trip just to summon needs gems for at least this many 10-pulls (a trip costs ~22s vs `next`)
     traitChaseAt = 20,         -- with this many crystals, chase Legendary+ traits on the strongest heroes
     traitChaseKeep = 4,        -- chase until this trait rarity: 4 Legendary (Hero of Ooo) · 5 Mythic (Oh My Glob)
-    traitChaseTop = 2,         -- how many of the strongest team heroes get chased to Legendary (sim: more don't help the raid)
-    traitRollsPerVisit = 40,   -- crystals spent per lobby visit while chasing Legendary
+    traitChaseTop = 3,         -- how many of the strongest team heroes get chased to Legendary
+    traitRollsPerVisit = 1000, -- a Legendary chase runs to the end in one visit (a half-done chase leaves a Common trait)
     globChase = true,          -- then save up and chase Oh My Glob (+200% dmg) on the strongest hero
     globChaseAt = 700,         -- start a Glob chase with this many crystals (~70% chance at 0.2%/roll)
     globFloor = 150,           -- stop a Glob chase here (enough to re-roll a Legendary if it misses)
@@ -194,10 +194,11 @@ do
     if (tonumber(saved.cfgv) or 1) < 6 then saved.traitChaseTop = nil end
     if (tonumber(saved.cfgv) or 1) < 8 then saved.evoFocus = nil end
     if (tonumber(saved.cfgv) or 1) < 9 then saved.globRollsPerVisit = nil end
+    if (tonumber(saved.cfgv) or 1) < 10 then saved.traitRollsPerVisit = nil; saved.traitChaseTop = nil end
     for k, v in pairs(C.DEFAULTS) do
         if saved[k] ~= nil and type(saved[k]) == type(v) then CFG[k] = saved[k] else CFG[k] = v end
     end
-    CFG.cfgv = 9
+    CFG.cfgv = 10
 end
 SF.saveAt = nil
 function SF.saveSoon() SF.saveAt = U.now() + 1.5 end
@@ -1260,8 +1261,12 @@ function HUB.traits()
     local luck = C.Catalog.traitLuck and C.Catalog.traitLuck(p) or nil
     local ev = 0
     for _, t in ipairs(C.Catalog.TRAIT_ORDER) do ev = ev + C.Catalog.traitChance(t, luck) * C.M.traitValue(t) end
+    -- the heroes the farm actually plays with (the normal best team), not whatever is equipped right now:
+    -- the raid / tournament teams are swapped in before launches, and their heroes shouldn't get chased
+    local okT, teamSlots = pcall(HUB.bestTeam)
+    teamSlots = okT and teamSlots or p.slots or {}
     local best, bestG
-    for _, id in ipairs(p.slots or {}) do
+    for _, id in ipairs(teamSlots) do
         local u = p.units[id]
         if u and C.M.traitOrder(u.trait) < CFG.traitKeep then
             local gain = (ev - C.M.traitValue(u.trait)) * C.M.unitScore(u)
@@ -1272,7 +1277,7 @@ function HUB.traits()
     -- Legendary+ trait (Hero of Ooo / Oh My Glob), one hero at a time, many rolls per lobby visit
     if crystals - CFG.crystalReserve >= CFG.traitChaseAt then
         local ranked = {}
-        for _, id in ipairs(p.slots or {}) do
+        for _, id in ipairs(teamSlots) do
             local u = p.units[id]
             if u then table.insert(ranked, { id = id, u = u, s = C.M.unitScore({ kind = u.kind, level = u.level, g = u.g }, true) }) end
         end
