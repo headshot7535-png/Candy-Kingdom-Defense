@@ -2095,6 +2095,19 @@ function MT.options()
         end
     end
     for _, o in ipairs(opts) do o.ratio = math.max(o.gain / math.max(1, o.cost or 1), o.ratio2 or 0) end
+    -- spread first: damage per coin can't see that one hero only hits so many enemies per second. A huge
+    -- single-target hitter (King Man + Oh My Glob) soaked the whole tournament budget to L5 while 3 heroes
+    -- stood on the road, and a swarm walked past. Until 4 different heroes are placed, deep upgrades
+    -- (to L3+) count half, so the road gets covered before one hero is maxed.
+    local kinds = {}
+    for _, t in pairs(MT.towers) do if MT.mine(t) then kinds[t.kind] = true end end
+    local placedKinds, teamKinds = U.count(kinds), 0
+    for _, k in ipairs(info.slots or {}) do if k ~= "" and MT.levels(k) then teamKinds = teamKinds + 1 end end
+    if placedKinds < math.min(4, teamKinds) then
+        for _, o in ipairs(opts) do
+            if o.kind == "upgrade" and (o.level or 0) >= 3 then o.ratio = o.ratio * 0.5; o.spread = true end
+        end
+    end
     table.sort(opts, function(a, b) return a.ratio > b.ratio end)
     return opts
 end
