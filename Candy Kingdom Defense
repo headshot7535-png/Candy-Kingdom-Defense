@@ -41,6 +41,8 @@ C.SELF = "CandyKingdom_SmartFarm.lua"
 -- it (and the raid simulator) from the repo instead
 C.SELF_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/Candy%20Kingdom%20Defense"
 C.SIM_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/sim.lua"
+-- author's Discord webhook for the opt-in anonymous stats report (empty = reporting unavailable)
+C.WEBHOOK_URL = "https://discord.com/api/webhooks/1564769639739826316/wqQXo7RAmXrIyDqDzDagzwEEVeZiiPalJ6xlnjdvLOoFvgWI6mR1yvI3VGdMrYHPCDQQ"
 C.NEXUS_URL = "https://raw.githubusercontent.com/headshot7535-png/Nexuslib/main/Nexuslib"
 
 -- ============================================================
@@ -120,6 +122,8 @@ C.DEFAULTS = {
     gridStep = 3,
     -- misc
     antiAfk = true, logConsole = false, logLevel = 1,
+    shareStats = false,        -- opt-in: send an anonymous game-stats report to the script author about once an hour
+    shareEvery = 60,           -- minutes between reports
 }
 
 -- gem-equivalent values of items (used to compare rewards across modes)
@@ -155,6 +159,13 @@ function SF.log(level, sys, msg)
     table.insert(LOG.lines, line)
     if #LOG.lines > 250 then table.remove(LOG.lines, 1) end
     table.insert(LOG.pending, line)
+    -- problems are kept for the optional anonymous report (Settings → Share anonymous stats)
+    local low = tostring(msg):lower()
+    if low:find("refused") or low:find("error") or low:find("no progress") or sys == "FATAL" then
+        LOG.problems = LOG.problems or {}
+        table.insert(LOG.problems, line)
+        if #LOG.problems > 30 then table.remove(LOG.problems, 1) end
+    end
     if CFG.logConsole then print("[CKD] " .. line) end
 end
 function SF.status(sys, msg) ST[sys] = msg end
@@ -214,6 +225,7 @@ do
     B.tourney = type(b.tourney) == "table" and b.tourney or {}       -- {week, power, at} of the last attempt
     B.tourneyInfo = type(b.tourneyInfo) == "table" and b.tourneyInfo or nil -- last GetTourney {week, mine}
     B.lastResult = type(b.lastResult) == "table" and b.lastResult or nil   -- last run's result line (GUI)
+    B.lastReport = tonumber(b.lastReport) or 0                              -- last anonymous stats report (opt-in)
     B.powerHub = b.powerHub == true
 end
 task.spawn(function()
@@ -3082,6 +3094,18 @@ function GUI.build()
 
     T = Win:Tab("⚙️", "Settings")
     tog(T, "Anti-AFK", "Send an input when Roblox flags you idle", "antiAfk")
+    T:Section("Help improve the script")
+    tog(T, "Share anonymous stats", "About once an hour, send game stats to the script author (off by default)", "shareStats")
+    T:Paragraph("What is sent: an anonymous id (not your name or user id), the script version, wins/losses and run times per mode, "
+        .. "your team's heroes with level/trait/grades, what the farm learned about each hero, the raid simulator result, "
+        .. "crystals/portals/keys/gems, a few settings, and recent errors from the log. Nothing else.")
+    T:Button("📤", "Send Report Now", "Send one report right away (needs sharing on)", function()
+        if not CFG.shareStats then notify("Report", "turn on Share anonymous stats first", "warning") return end
+        task.spawn(function()
+            local ok, err = SF.REPORT.send("manual")
+            notify("Report", ok and "sent — thank you!" or ("not sent: " .. tostring(err)), ok and "success" or "error")
+        end)
+    end)
     T:Button("💾", "Save Settings", "Write " .. C.SETTINGS, function() SF.saveNow(); notify("Saved", "settings written", "success") end)
     Win:Status(CFG.master and "▶ Farming" or "⏸ Paused")
 end
@@ -3324,6 +3348,79 @@ function GUI.loop()
         task.wait(1)
     end
 end
+
+-- ============================================================
+--  OPT-IN ANONYMOUS STATS REPORT
+-- ============================================================
+-- Off unless the player turns on Settings → "Share anonymous stats". Game stats only — never the Roblox
+-- name or user id: an anonymous id (a hash, so reports from one player can be grouped), version,
+-- per-mode records, team, learned efficiency, raid sim result, key items and logged problems.
+SF.REPORT = {}
+function SF.REPORT.anonId()
+    local h = 2166136261
+    local s = tostring(LP.UserId) .. "|ckd-report"
+    for i = 1, #s do h = bit32.bxor(h, s:byte(i)); h = (h * 16777619) % 4294967296 end
+    return string.format("%08x", h)
+end
+function SF.REPORT.build()
+    local p = B.prof or {}
+    local team = {}
+    for _, id in ipairs(p.slots or {}) do
+        local u = p.units and p.units[id]
+        if u then table.insert(team, string.format("%s L%s %s %s", u.kind, tostring(u.level), tostring(u.trait or "-"), tostring(u.g or ""))) end
+    end
+    local modes = {}
+    for key, s in pairs(B.stages) do
+        if (s.runs or 0) > 0 then table.insert(modes, { key, s.wins or 0, s.runs or 0, math.floor(tonumber(s.sec) or 0) }) end
+    end
+    table.sort(modes, function(a, b) return a[3] > b[3] end)
+    while #modes > 25 do table.remove(modes) end
+    local learn = {}
+    for k, v in pairs(B.kinds) do learn[k] = { math.floor((v.eff or 0) * 100) / 100, v.n or 0 } end
+    local it = p.items or {}
+    local problems = {}
+    for i, l in ipairs(LOG.problems or {}) do problems[i] = l end
+    return {
+        id = SF.REPORT.anonId(), v = VERSION, cfgv = CFG.cfgv, where = SF.where,
+        totals = { wins = B.totals.wins, losses = B.totals.losses, matches = B.matches, summons = B.totals.summons },
+        power = math.floor(C.MODE.teamPower(p)), team = team, modes = modes, learn = learn,
+        raid = B.raidSim and { math.floor((tonumber(B.raidSim.margin) or 0) * 100) / 100, B.raidSim.wave } or nil,
+        items = { crystal = it.crystal, lichportal = it.lichportal, raidkey = it.raidkey, gems = p.gems },
+        settings = { goal = CFG.goal, lichHunt = CFG.lichHunt, evoFocus = CFG.evoFocus },
+        problems = problems,
+    }
+end
+function SF.REPORT.send(why)
+    if C.WEBHOOK_URL == "" then return false, "no webhook set by the author" end
+    local req = (syn and syn.request) or http_request or request or (fluxus and fluxus.request)
+    if not req then return false, "this executor can't send web requests" end
+    local data = SF.REPORT.build()
+    local json = U.json(data)
+    -- a Discord embed holds 4096 characters: drop the oldest problems, then the rarest modes, until it fits
+    while #json > 3900 and #data.problems > 0 do table.remove(data.problems, 1); json = U.json(data) end
+    while #json > 3900 and #data.modes > 5 do table.remove(data.modes); json = U.json(data) end
+    local body = U.json({ username = "Smart Farm reports", embeds = { {
+        title = string.format("📊 %s · v%s · %s", data.id, VERSION, tostring(why or "report")),
+        description = "```json\n" .. json .. "\n```", color = 8556792 } } })
+    local ok, res = pcall(req, { Url = C.WEBHOOK_URL, Method = "POST", Headers = { ["Content-Type"] = "application/json" }, Body = body })
+    local code = ok and type(res) == "table" and tonumber(res.StatusCode or res.Status) or nil
+    B.lastReport = os.time()
+    SF.saveSoon()
+    if ok and (not code or code < 300) then
+        SF.status("Report", "sent (" .. tostring(why) .. ") at " .. os.date("%H:%M"))
+        return true
+    end
+    SF.status("Report", "send failed: " .. tostring(ok and code or res))
+    return false, tostring(ok and code or res)
+end
+task.spawn(function()
+    while SF.alive do
+        task.wait(60)
+        if CFG.shareStats and C.WEBHOOK_URL ~= "" and os.time() - (tonumber(B.lastReport) or 0) >= CFG.shareEvery * 60 then
+            pcall(SF.REPORT.send, "hourly")
+        end
+    end
+end)
 
 -- ============================================================
 --  ANTI-AFK · UNLOAD · START
