@@ -110,7 +110,8 @@ C.DEFAULTS = {
     globChase = true,          -- then save up and chase Oh My Glob (+200% dmg) on the strongest hero
     globChaseAt = 700,         -- start a Glob chase with this many crystals (~70% chance at 0.2%/roll)
     globFloor = 150,           -- stop a Glob chase here (enough to re-roll a Legendary if it misses)
-    globRollsPerVisit = 120,   -- rolls per lobby visit during a Glob chase
+    globRollsPerVisit = 2000,  -- rolls per lobby visit during a Glob chase: finish it in one visit, so the hero never
+                               -- plays matches on a half-chased (often Common) trait; the floor stops it
     callAlive = 8,             -- ... at most this many enemies alive
     callReach = 0.5,           -- ... and the furthest enemy is at most this far down the road
     smartTarget = true,        -- heavy hitters target the strongest enemy, fast hitters the first
@@ -181,10 +182,11 @@ do
     if (tonumber(saved.cfgv) or 1) < 5 then saved.raidTeam = nil end
     if (tonumber(saved.cfgv) or 1) < 6 then saved.traitChaseTop = nil end
     if (tonumber(saved.cfgv) or 1) < 8 then saved.evoFocus = nil end
+    if (tonumber(saved.cfgv) or 1) < 9 then saved.globRollsPerVisit = nil end
     for k, v in pairs(C.DEFAULTS) do
         if saved[k] ~= nil and type(saved[k]) == type(v) then CFG[k] = saved[k] else CFG[k] = v end
     end
-    CFG.cfgv = 8
+    CFG.cfgv = 9
 end
 SF.saveAt = nil
 function SF.saveSoon() SF.saveAt = U.now() + 1.5 end
@@ -1265,8 +1267,18 @@ function HUB.traits()
         table.sort(ranked, function(a, b) return a.s > b.s end)
         -- a Glob chase in progress keeps going (across visits) until Glob or the floor
         if B.globChasing and p.units[B.globChasing] then
-            if p.units[B.globChasing].trait == "glob" or crystals <= CFG.globFloor then B.globChasing = nil; SF.saveSoon()
-            else return HUB.chaseTrait(B.globChasing, 5, CFG.globFloor) end
+            local id = B.globChasing
+            if p.units[id].trait ~= "glob" and crystals > CFG.globFloor then HUB.chaseTrait(id, 5, CFG.globFloor) end
+            -- done: Glob landed, or the floor is reached → roll straight back to Legendary+ in this same visit
+            -- (the hero must not play matches on whatever Common trait the last roll left)
+            local u = HUB.prof.units[id]
+            if u and u.trait ~= "glob" and C.M.traitOrder(u.trait) < CFG.traitChaseKeep then
+                SF.log(1, "TRAIT", string.format("no Oh My Glob this time — rolling %s back to Legendary+ with the %d crystals kept", u.kind, HUB.items("crystal")))
+                HUB.chaseTrait(id, CFG.traitChaseKeep, CFG.crystalReserve, 1000)
+            end
+            B.globChasing = nil
+            SF.saveSoon()
+            return
         end
         for i = 1, math.min(CFG.traitChaseTop, #ranked) do
             local r = ranked[i]
@@ -1312,14 +1324,14 @@ function HUB.traits()
 end
 
 -- roll one hero's trait until it reaches CFG.traitChaseKeep (or the per-visit roll budget / crystals run out)
-function HUB.chaseTrait(id, keep, floor)
+function HUB.chaseTrait(id, keep, floor, budget)
     keep, floor = keep or CFG.traitChaseKeep, floor or CFG.crystalReserve
     local u0 = HUB.prof.units[id]
     if not u0 then return end
     local start = u0.trait
     local rolls = 0
     local seen = {}
-    local budget = keep >= 5 and CFG.globRollsPerVisit or CFG.traitRollsPerVisit
+    budget = budget or (keep >= 5 and CFG.globRollsPerVisit or CFG.traitRollsPerVisit)
     while rolls < budget and HUB.items("crystal") - floor >= (C.Catalog.REROLL_COST or 1) do
         local res, err = SF.request("RerollTrait", C.R("RerollTrait"), id)
         SF.req.back["RerollTrait"] = nil
