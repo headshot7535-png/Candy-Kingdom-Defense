@@ -672,11 +672,12 @@ function C.MODE.candidates(prof, now)
     end
     return list
 end
--- priority tiers (your order): new story maps > raid (with a key) > unbeaten challenges > Infinite for keys > farming
+-- priority tiers: new story maps > unbeaten challenges (they expire after 30 min) > raid / Lich Lair /
+-- tournament rewards (keys and portals keep until the event ends) > Infinite for keys > farming
 function C.MODE.tier(m)
     if m.first then return 5 end
-    if m.raid then return 4 end
-    if m.challenge then return 3 end
+    if m.challenge then return 4 end
+    if m.raid then return 3 end
     -- a held Lich Portal and the tournament's missing rewards rank with challenges
     if m.portal then return 3 end
     if m.tourney then return (m.why or ""):find("^rewards") and 3 or 2 end
