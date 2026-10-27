@@ -144,6 +144,7 @@ function SIM.run(stageId, team, opts)
     end
     local function economy()
         for _ = 1, 4 do
+            local opts = {}
             local best
             for kind, U in pairs(units) do
                 if U.n < U.cap then
@@ -162,10 +163,15 @@ function SIM.run(stageId, team, opts)
                             spent = spent + math.floor((rw.cost or 0) * U.m.cost + 0.5)
                             ratio = math.max(ratio, MT.rowDps(rw, U.m) * norm / spent)
                         end
-                        if not best or ratio > best.ratio then best = { place = true, kind = kind, s = s, cost = cost, ratio = ratio } end
+                        table.insert(opts, { place = true, kind = kind, s = s, cost = cost, ratio = ratio })
                     end
                 end
             end
+            local placedKinds = {}
+            for _, tw in ipairs(towers) do placedKinds[tw.kind] = true end
+            local nPlaced, nTeam = 0, 0
+            for _ in pairs(placedKinds) do nPlaced = nPlaced + 1 end
+            for _ in pairs(units) do nTeam = nTeam + 1 end
             for _, tw in ipairs(towers) do
                 local U = units[tw.kind]
                 local nxt = U.L[tw.level + 1]
@@ -176,10 +182,23 @@ function SIM.run(stageId, team, opts)
                     local nxt2 = U.L[tw.level + 2]
                     local ratio = g / cost
                     if nxt2 then ratio = math.max(ratio, math.max(0, MT.rowDps(nxt2, U.m) - now) / (cost + (nxt2.cost or 0) * U.m.cost)) end
-                    if not best or ratio > best.ratio then best = { tw = tw, cost = cost, ratio = ratio } end
+                    -- same "spread first" rule as the farm: deep upgrades count half until 4 kinds are placed
+                    if tw.level + 1 >= 3 and nPlaced < math.min(4, nTeam) then ratio = ratio * 0.5 end
+                    table.insert(opts, { tw = tw, cost = cost, ratio = ratio })
                 end
             end
-            if not best or best.cost > money then return end
+            for _, o in ipairs(opts) do if not best or o.ratio > best.ratio then best = o end end
+            if not best then return end
+            -- same saving rule as the farm: while saving for the best, still buy a cheap option that's
+            -- reasonably good (≤20% of the cost, ≥40% of the value per coin)
+            if best.cost > money then
+                local cheap
+                for _, o in ipairs(opts) do
+                    if o.cost <= money and o.cost <= best.cost * 0.2 and o.ratio >= best.ratio * 0.4 and (not cheap or o.ratio > cheap.ratio) then cheap = o end
+                end
+                if not cheap then return end
+                best = cheap
+            end
             money = money - best.cost
             if best.place then
                 table.insert(towers, { kind = best.kind, level = 1, x = best.s.x, z = best.s.z, cool = 0 })
