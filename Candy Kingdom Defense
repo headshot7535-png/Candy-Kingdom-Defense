@@ -37,6 +37,10 @@ C.SETTINGS = C.FOLDER .. "/settings.json"
 C.BRAIN = C.FOLDER .. "/brain.json"
 C.LOGFILE = C.FOLDER .. "/log.txt"
 C.SELF = "CandyKingdom_SmartFarm.lua"
+-- public copies: people who run the script from a loadstring have no local files, so teleports re-load
+-- it (and the raid simulator) from the repo instead
+C.SELF_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/Candy%20Kingdom%20Defense"
+C.SIM_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/sim.lua"
 C.NEXUS_URL = "https://raw.githubusercontent.com/headshot7535-png/Nexuslib/main/Nexuslib"
 
 -- ============================================================
@@ -2646,7 +2650,11 @@ function MT.raidCheck()
     local sig = table.concat(sigT, ",") .. "|" .. tostring(CFG.raidTeam)
     local s = B.raidSim
     if s and s.sig == sig and s.team == C.MODE.raidTeamKey(B.prof) and os.time() - (tonumber(s.at) or 0) < 7200 then return end
-    local okS, SIM = pcall(function() return loadstring(readfile(C.FOLDER .. "/sim.lua"), "=sim")() end)
+    local okS, SIM = pcall(function()
+        local src = isfile(C.FOLDER .. "/sim.lua") and readfile(C.FOLDER .. "/sim.lua") or nil
+        if not src then src = game:HttpGet(C.SIM_URL) end -- loadstring users: the copy in the repo
+        return loadstring(src, "=sim")()
+    end)
     if not okS or type(SIM) ~= "table" then SF.log(1, "RAID", "simulator missing: " .. tostring(SIM)) return end
     local function entries(kinds)
         local t = {}
@@ -3328,9 +3336,12 @@ end)
 -- keep running across hub <-> match teleports (the autoexec loader covers rejoins). Queue once per game
 -- session, so hot reloads don't stack extra loaders.
 pcall(function()
-    if queue_on_teleport and isfile(C.SELF) and not _G.CKD_SF_QUEUED then
+    -- local copy first (your own edits), else the public repo (loadstring users have no file)
+    if queue_on_teleport and not _G.CKD_SF_QUEUED then
         _G.CKD_SF_QUEUED = true
-        queue_on_teleport("task.wait(0.5) local ok,s=pcall(readfile,'" .. C.SELF .. "') if ok and s then loadstring(s,'=CKD_SmartFarm')() end")
+        queue_on_teleport("task.wait(0.5) local s if isfile and isfile('" .. C.SELF .. "') then s=readfile('" .. C.SELF .. "') end "
+            .. "if not s then local ok,r=pcall(game.HttpGet,game,'" .. C.SELF_URL .. "') if ok then s=r end end "
+            .. "if s then loadstring(s,'=CKD_SmartFarm')() end")
     end
 end)
 
