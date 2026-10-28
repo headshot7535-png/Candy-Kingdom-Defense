@@ -41,6 +41,8 @@ C.SELF = "CandyKingdom_SmartFarm.lua"
 -- it (and the raid simulator) from the repo instead
 C.SELF_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/Candy%20Kingdom%20Defense"
 C.SIM_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/sim.lua"
+-- community Discord (Main tab → "Join Discord" copies it)
+C.DISCORD_INVITE = "https://discord.gg/q2VsNj6xi"
 -- author's Discord webhook for the opt-in anonymous stats report (empty = reporting unavailable)
 C.WEBHOOK_URL = "https://discord.com/api/webhooks/1564769639739826316/wqQXo7RAmXrIyDqDzDagzwEEVeZiiPalJ6xlnjdvLOoFvgWI6mR1yvI3VGdMrYHPCDQQ"
 C.NEXUS_URL = "https://raw.githubusercontent.com/headshot7535-png/Nexuslib/main/Nexuslib"
@@ -3204,6 +3206,11 @@ function GUI.build()
         CFG.master = false; pcall(function() UI.master.Set(false, true) end); SF.saveNow(); notify("Stopped", "Smart Farm paused", "warning")
     end)
     T:Button("❌", "Unload", "Stop and remove the window", Color3.fromRGB(239, 68, 68), function() SF.unload() end)
+    T:Button("💬", "Join Discord", "Copy the community Discord invite", function()
+        if C.DISCORD_INVITE == "" then return notify("Discord", "No invite set", "warning") end
+        local ok = pcall(setclipboard, C.DISCORD_INVITE)
+        notify("Discord", ok and "Invite copied — paste it in your browser" or C.DISCORD_INVITE, ok and "success" or "info")
+    end)
 
     local f2 = function(v) return string.format("%.2f", v) end
     local pct = function(v) return string.format("%.0f%%", v * 100) end
