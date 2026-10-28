@@ -1941,6 +1941,7 @@ function MT.findMap()
     end
 end
 function MT.initMap()
+    MT.badSpots = {} -- refused spots belong to one map
     MT.ToonKit = require(C.root:WaitForChild("ToonKit"))
     for _ = 1, 40 do
         MT.map = MT.findMap()
@@ -2030,7 +2031,13 @@ function MT.bestSpot(range, kind, baseDps)
         local i = order[n]
         local s = MT.spots[i]
         if covT[i] <= 0 then break end
-        local ok = MT.map:canPlace(Vector3.new(s.x, 0.25, s.z) * W, towers)
+        -- spots the server refused this match ("Something is in the way": an obstacle our map check
+        -- doesn't see, or a bigger hero) are skipped, along with anything right next to them
+        local bad = false
+        for _, b in ipairs(MT.badSpots or {}) do
+            if (b.x - s.x) ^ 2 + (b.z - s.z) ^ 2 <= 16 then bad = true break end
+        end
+        local ok = not bad and MT.map:canPlace(Vector3.new(s.x, 0.25, s.z) * W, towers)
         if ok then
             valid = valid + 1
             if not hasPassive then return s, covT[i], 0 end
@@ -2165,6 +2172,12 @@ function MT.economy()
                 (pick.ratio2 and pick.ratio2 >= pick.gain / math.max(1, pick.cost)) and (" counting L" .. tostring(pick.ahead)) or "")
             SF.log(1, "PLACE", msg)
             SF.status("Placement", msg)
+        elseif tostring(err):find("in the way") then
+            -- the spot is blocked: remember it and try the next best spot right away
+            MT.badSpots = MT.badSpots or {}
+            table.insert(MT.badSpots, { x = pick.spot.x, z = pick.spot.z })
+            SF.req.back["Act:place:" .. pick.unit] = nil
+            SF.log(1, "PLACE", string.format("%s refused at (%d,%d): %s — trying another spot", pick.unit, pick.spot.x, pick.spot.z, tostring(err)))
         else
             MT.blockedKind[pick.unit] = U.now() + 20
             SF.log(1, "PLACE", pick.unit .. " refused: " .. tostring(err))
