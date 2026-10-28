@@ -91,6 +91,10 @@ C.DEFAULTS = {
     evolve = true,             -- evolve heroes when the items + gems are in
     evoItemValue = 100,        -- gem-equivalent value of an evolution item you still need
     evoFocus = "JakeTheLich",  -- the one evolution to rush (its items, crafted ones included, count 3x): Lich Lord → Lich Dog
+    sTierEvolve = true,        -- evolutions into S-tier heroes (Story tier list) are always done, even when raw stats miss their abilities
+    sTierItemValue = 1000,     -- ... and their missing items are worth this much (Sandwiches → Ice Kingdom Act 5 for Cosmic Dog)
+    teller = true,             -- Teller's candy shop: Elder Vampire + 5 Vampire Essence (→ The Dark Cloud) once 20,000 Halloween Candy is in
+    sTierCandyValue = 3,       -- ... until then each Halloween Candy is worth this many gems (raids keep running after the Demon Lord)
     -- modes
     goal = 1,                  -- 1 Progress (clear maps fast, farm only to break walls) · 2 Gems per minute
     play = true, story = true, farm = true, challenges = true, infinite = false,
@@ -398,6 +402,10 @@ function C.M.ownsAny(kinds)
     end
     return false
 end
+-- still saving Halloween Candy for the Teller's Elder Vampire → The Dark Cloud (event running, not owned)
+function C.M.candyGoal()
+    return CFG.teller and CFG.sTierEvolve and C.Catalog.eventOn and C.Catalog.eventOn() and not C.M.ownsAny({ "VampireKingCloud" })
+end
 function C.M.itemsValue(items)
     local v = 0
     local needs = B.evoNeeds or {}
@@ -419,6 +427,13 @@ function C.M.itemsValue(items)
         if needs[k] then each = math.max(each, k == "page" and CFG.evoItemValue * 0.4 or CFG.evoItemValue) end
         local held = tonumber(B.prof and B.prof.items and B.prof.items[k]) or 0
         if needs[k] and fItems[k] and held < fItems[k] and k ~= "page" then each = each * 3 end
+        if (B.sTierNeeds or {})[k] then each = math.max(each, CFG.sTierItemValue) end
+        -- saving for The Dark Cloud: candy counts, and a raid key is worth the candy its raid pays
+        if C.M.candyGoal() then
+            local RAID = C.Catalog.RAID
+            if k == "hwcandy" then each = CFG.sTierCandyValue end
+            if k == "raidkey" and RAID then each = math.max(each, (RAID.perWave or 25) * (RAID.waves or 15) * CFG.sTierCandyValue) end
+        end
         -- a needed Lich Portal is the only gate to Lich Ooze: twice a focus item, plus the Lich Lord chance
         if k == "lichportal" and needs.lichportal then each = CFG.evoItemValue * 6 + CFG.secretValue * 0.05 end
         -- Lich Lord hunt: each portal is a 5% shot at the base of Lich Dog
@@ -481,6 +496,10 @@ function C.EVO.list(prof)
             -- level-1 base stats miss late-level area attacks/curses; the battle sim's pick always counts as a gain
             local e = out[#out]
             if target == CFG.evoFocus then e.gain = math.max(e.gain, 1) + 1e5; e.focus = true end
+            -- S-tier targets: their strength is mostly in abilities the stat score can't see
+            if CFG.sTierEvolve and not e.focus and not owned[target] and C.M.tierMult(target, "Story") >= 1.25 then
+                e.gain = math.max(e.gain, 1) + 5e4; e.sTier = true
+            end
             end
         end
     end
@@ -488,14 +507,19 @@ function C.EVO.list(prof)
     return out
 end
 function C.EVO.refreshNeeds(prof)
-    local needs = {}
+    local needs, sNeeds, needFor = {}, {}, {}
     for _, e in ipairs(C.EVO.list(prof)) do
         if e.gain > 0 and not e.itemsReady then
             for k, n in pairs(e.flat or e.def.items or {}) do
-                if (tonumber(prof.items and prof.items[k]) or 0) < n then needs[k] = true end
+                if (tonumber(prof.items and prof.items[k]) or 0) < n then
+                    needs[k] = true
+                    if e.sTier and k ~= "page" then sNeeds[k] = true end
+                    if not needFor[k] or e.focus or e.sTier then needFor[k] = e.target end
+                end
             end
         end
     end
+    B.sTierNeeds, B.evoNeedFor = sNeeds, needFor
     -- Lich Ooze only drops in the Lich Lair, which takes a Lich Portal (Infinite drops those)
     if needs.lichooze then needs.lichportal = true end
     B.evoNeeds = needs
@@ -679,7 +703,8 @@ function C.MODE.tier(m)
     if m.challenge then return 4 end
     -- the raid's big prize is its secret hero (Demon Lord); once owned, raids compete on value like farming
     local raidSecretOwned = C.M.ownsAny({ "Hunson", "HunsonDemon" })
-    if m.raid then return raidSecretOwned and 1 or 3 end
+    -- ... or while its candy still buys The Dark Cloud
+    if m.raid then return (raidSecretOwned and not C.M.candyGoal()) and 1 or 3 end
     if m.kind == "keys" and raidSecretOwned then return 1 end
     -- a held Lich Portal and the tournament's missing rewards rank with challenges
     if m.portal then return 3 end
@@ -752,6 +777,9 @@ function C.MODE.score(m, prof, power, cap, totalRuns)
         local gems = m.first and C.Catalog.STAGE_GEMS.first or C.Catalog.STAGE_GEMS.again
         local okW, items = pcall(C.Catalog.winItems, m.stage, m.first)
         R = gems * (C.Catalog.gemsMult and C.Catalog.gemsMult(prof) or 1) + C.M.itemsValue(okW and items or nil)
+        -- the raid pays Halloween Candy per wave cleared (not part of its win items)
+        local RAID = C.Catalog.RAID
+        if m.raid and RAID then R = R + C.M.itemsValue({ [RAID.candy or "hwcandy"] = (RAID.perWave or 25) * (RAID.waves or 15) }) end
         if m.first then
             -- Progress goal: clearing the next map is the point; gems/items only decide between farm modes
             R = R + (CFG.goal == 1 and 1500 or CFG.progressValue)
@@ -824,7 +852,10 @@ function C.MODE.purpose(m)
     if not m then return "" end
     local p = B.prof or {}
     if m.tourney then return "Weekly tournament: 10-minute survival for gems, crystals and a spot on the board" .. (m.why and (" (" .. tostring(m.why) .. ")") or "") end
-    if m.raid then return "Halloween raid: Halloween candy, raid drops and a 3% shot at the Demon Lord" end
+    if m.raid then
+        if C.M.ownsAny({ "Hunson", "HunsonDemon" }) and C.M.candyGoal() then return "Halloween raid: Halloween Candy for The Dark Cloud (bought at the Teller)" end
+        return "Halloween raid: Halloween candy, raid drops and a 3% shot at the Demon Lord"
+    end
     if m.portal then
         local hunt = CFG.lichHunt and not C.M.ownsAny({ "Lich", "JakeTheLich" })
         return "Lich Lair: 2 Lich Ooze" .. (hunt and " + a 5% roll for Lich Lord (→ Lich Dog, the strongest hero)" or "")
@@ -840,14 +871,16 @@ function C.MODE.purpose(m)
     if m.first then return "New map: first clear unlocks the next stage" end
     -- farm: name the items it drops that an evolution still needs
     local okW, items = pcall(C.Catalog.winItems, m.stage, false)
-    local want = {}
+    local want, forWho = {}, nil
     for k in pairs(okW and items or {}) do
         if (B.evoNeeds or {})[k] then
             local it = C.Catalog.ITEMS and C.Catalog.ITEMS[k]
             table.insert(want, it and it.name or k)
+            forWho = forWho or (B.evoNeedFor or {})[k]
         end
     end
-    if #want > 0 then return "Farming " .. table.concat(want, ", ") .. " for " .. tostring(CFG.evoFocus) end
+    forWho = forWho or CFG.evoFocus
+    if #want > 0 then return "Farming " .. table.concat(want, ", ") .. " for " .. tostring((C.Catalog.UNITS[forWho or ""] or {}).name or forWho) end
     return "Farming gems and items (best value per minute)"
 end
 function C.MODE.describe(m)
@@ -1465,6 +1498,56 @@ function HUB.travel(moduleName)
     hrp.AssemblyLinearVelocity = Vector3.zero
     task.wait(1.2) -- let the server see the new position
     return true
+end
+
+-- the Teller's candy shop (Halloween): the Elder Vampire + 5 Vampire Essence evolve into The Dark Cloud
+-- (S tier). Buys only once the whole price is in, so candy never sits in the weak half-step; Evolve does the rest
+function HUB.teller()
+    if not (CFG.teller and CFG.sTierEvolve) then return SF.status("Teller", "off") end
+    local p = HUB.refresh()
+    if not p then return end
+    local TR = RS:FindFirstChild("TellerRemotes")
+    local buy = TR and TR:FindFirstChild("Buy")
+    if not buy then return SF.status("Teller", "shop closed") end
+    local own = {}
+    for _, u in pairs(p.units or {}) do own[u.kind] = true end
+    if own.VampireKingCloud then return SF.status("Teller", "The Dark Cloud owned ✓") end
+    local okT, T = pcall(function() return require(C.root:FindFirstChild("HubTeller")) end)
+    local function price(id) return okT and type(T) == "table" and T.price and T.price(id, 1) or (id == "VampireKing" and 15000 or 1000) end
+    local candy = HUB.items("hwcandy")
+    local needEss = math.max(0, 5 - HUB.items("vampessence"))
+    local cost = (own.VampireKing and 0 or price("VampireKing")) + needEss * price("vampessence")
+    if cost == 0 then return SF.status("Teller", "Elder Vampire + 5 Vampire Essence in: evolving into The Dark Cloud") end
+    if candy < cost then
+        return SF.status("Teller", string.format("saving Halloween Candy for The Dark Cloud: %s/%s", U.fmt(candy), U.fmt(cost)))
+    end
+    HUB.travel("HubTeller") -- "The Teller only serves at his shop!"
+    local function get(id, n)
+        local res, err = SF.request("TellerBuy", buy, id, n)
+        if type(res) == "table" and res.ok then
+            if type(res.profile) == "table" then HUB.setProfile(res.profile) else HUB.refresh(true) end
+            SF.log(1, "TELLER", string.format("bought %dx %s", n, id))
+            return true
+        end
+        local why = tostring(err or (type(res) == "table" and (res.reason or res.msg)) or "no answer")
+        SF.log(1, "TELLER", id .. " refused: " .. why)
+        SF.status("Teller", id .. " refused: " .. why)
+        SF.backoff("TellerBuy", 300)
+        return false
+    end
+    if not own.VampireKing and not get("VampireKing", 1) then return end
+    if needEss > 0 then
+        task.wait(0.6)
+        if needEss == 5 then
+            if not get("vampessence", 5) then return end
+        else
+            for _ = 1, needEss do
+                if not get("vampessence", 1) then return end
+                task.wait(0.6)
+            end
+        end
+    end
+    SF.status("Teller", "bought the Elder Vampire + Vampire Essence: evolving into The Dark Cloud")
 end
 
 -- evolve: when an evolution's items + gems are in and the evolved hero scores higher, do it
@@ -2893,6 +2976,7 @@ end
 -- ============================================================
 HUB.SYSTEMS = {
     { name = "Rewards", fn = HUB.rewards, every = 30 },
+    { name = "Teller", fn = HUB.teller, every = 30 },
     { name = "Evolve", fn = HUB.evolve, every = 10 },
     { name = "Cleanup", fn = HUB.cleanup, every = 30 },
     { name = "Summon", fn = HUB.summon, every = 6 },
@@ -3027,6 +3111,8 @@ function GUI.build()
     T:Section("Evolution")
     tog(T, "Auto Evolve", "Evolve (crafting first) when the items and gems are in", "evolve")
     sld(T, "Evolution Item Value", "Gem value of an item an evolution still needs (focus items ×3)", "evoItemValue", { min = 0, max = 400, step = 10, format = int })
+    tog(T, "Get S-Tier Evolutions", "Always evolve into S-tier heroes (Cosmic Dog, The Dark Cloud, Metal Reaper...) and farm their items", "sTierEvolve")
+    tog(T, "Teller's Candy Shop", "Buy the Elder Vampire + 5 Vampire Essence (The Dark Cloud) once 20,000 Halloween Candy is saved", "teller")
     T:Section("Traits (Crystals)")
     tog(T, "Auto Trait Reroll", "Reroll the strongest team heroes up to the keep rarity", "traits")
     UI.traitKeep = T:Dropdown("Keep Traits At", "Stop rerolling at this trait rarity", { "Common", "Rare", "Epic", "Legendary", "Mythic" }, CFG.traitKeep, function(_, _, i) setCfg("traitKeep", tonumber(i) or 3) end)
