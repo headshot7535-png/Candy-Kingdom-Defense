@@ -168,7 +168,7 @@ function SF.log(level, sys, msg)
     table.insert(LOG.pending, line)
     -- problems are kept for the optional anonymous report (Settings → Share anonymous stats)
     local low = tostring(msg):lower()
-    if low:find("refused") or low:find("error") or low:find("no progress") or sys == "FATAL" then
+    if low:find("refused") or low:find("error") or low:find("no progress") or low:find("crashed") or low:find("problem:") or sys == "FATAL" then
         LOG.problems = LOG.problems or {}
         table.insert(LOG.problems, line)
         if #LOG.problems > 30 then table.remove(LOG.problems, 1) end
@@ -231,6 +231,7 @@ do
     B.rows = type(b.rows) == "table" and b.rows or {}
     B.codes = type(b.codes) == "table" and b.codes or {}
     B.raidSim = type(b.raidSim) == "table" and b.raidSim or nil -- {margin, team, at, wave}
+    B.raidSimNote = type(b.raidSimNote) == "table" and b.raidSimNote or nil -- {text, at}: what the raid gate last did
     B.globChasing = b.globChasing                                 -- unit id mid Oh-My-Glob chase
     B.statChase = type(b.statChase) == "table" and b.statChase or nil -- {id, stat} mid stat chase
     B.raidBest = type(b.raidBest) == "string" and b.raidBest or nil  -- sim-picked raid team kinds
@@ -2895,9 +2896,17 @@ end
 -- raid gate: simulate the raid (CKD_SmartFarm/sim.lua, the game's own data). The sim also picks the raid
 -- team itself (single swaps from the 9 strongest owned heroes, kept while they raise the margin), so the
 -- gate scores the team the raid will really bring. Re-run when the roster changes or every 2h.
+-- what the raid gate last did, in plain words (GUI + the optional report): a player with keys and no
+-- raids needs this to tell "never ran" from "couldn't load" from "ran and said no"
+function MT.raidNote(text)
+    B.raidSimNote = { text = tostring(text):sub(1, 300), at = os.time() }
+    SF.saveSoon()
+end
 function MT.raidCheck()
     local RAID = C.Catalog.RAID
-    if not (CFG.raids and RAID and C.Catalog.eventOn and C.Catalog.eventOn()) then return end
+    if not (CFG.raids and RAID and C.Catalog.eventOn and C.Catalog.eventOn()) then
+        return MT.raidNote(not CFG.raids and "raids switched off" or "no raid event running")
+    end
     -- best copy of each owned kind the sim can model, strongest 9
     local bestOf = {}
     for _, u in pairs(B.prof.units or {}) do
@@ -2908,18 +2917,29 @@ function MT.raidCheck()
     for k, b in pairs(bestOf) do table.insert(pool, { kind = k, s = b.s, u = b.u }) end
     table.sort(pool, function(a, b) return a.s > b.s end)
     while #pool > 9 do table.remove(pool) end
+    if #pool == 0 then
+        SF.log(1, "RAID", "simulator problem: no hero stat tables found in this match")
+        return MT.raidNote("no hero stat tables found in the match (nothing to simulate)")
+    end
     local sigT = {}
     for _, c in ipairs(pool) do table.insert(sigT, string.format("%s:%s:%s:%s", c.kind, tostring(c.u.level), tostring(c.u.trait), tostring(c.u.g))) end
     table.sort(sigT)
     local sig = table.concat(sigT, ",") .. "|" .. tostring(CFG.raidTeam)
     local s = B.raidSim
     if s and s.sig == sig and s.team == C.MODE.raidTeamKey(B.prof) and os.time() - (tonumber(s.at) or 0) < 7200 then return end
+    local from = "local file"
     local okS, SIM = pcall(function()
         local src = isfile(C.FOLDER .. "/sim.lua") and readfile(C.FOLDER .. "/sim.lua") or nil
-        if not src then src = game:HttpGet(C.SIM_URL) end -- loadstring users: the copy in the repo
-        return loadstring(src, "=sim")()
+        if not src then from = "GitHub"; src = game:HttpGet(C.SIM_URL) end -- loadstring users: the copy in the repo
+        local fn, cerr = loadstring(src, "=sim")
+        if not fn then error("compile: " .. tostring(cerr)) end
+        return fn()
     end)
-    if not okS or type(SIM) ~= "table" then SF.log(1, "RAID", "simulator missing: " .. tostring(SIM)) return end
+    if not okS or type(SIM) ~= "table" then
+        SF.log(1, "RAID", "simulator problem: couldn't load it from " .. from .. ": " .. tostring(SIM))
+        return MT.raidNote("couldn't load the simulator from " .. from .. ": " .. tostring(SIM))
+    end
+    MT.raidNote("simulating (loaded from " .. from .. ")")
     local function entries(kinds)
         local t = {}
         for _, k in ipairs(kinds) do local b = bestOf[k]; if b then table.insert(t, { kind = k, level = b.u.level, trait = b.u.trait, g = b.u.g }) end end
@@ -2928,7 +2948,11 @@ function MT.raidCheck()
     local function marginOf(kinds, steps)
         task.wait()
         local okM, m, base = pcall(SIM.margin, RAID.stage, entries(kinds), { steps = steps or 3 })
-        if not okM then SF.log(1, "RAID", "sim error: " .. tostring(m)) return 0, nil end
+        if not okM then
+            SF.log(1, "RAID", "sim error: " .. tostring(m))
+            MT.raidNote("simulator crashed: " .. tostring(m))
+            return 0, nil
+        end
         return m, base
     end
     local team
@@ -2972,6 +2996,12 @@ function MT.raidCheck()
     SF.saveSoon()
     SF.log(1, "RAID", string.format("raid sim%s %s: %s (wave %s) · margin x%.2f → %s", fixed and " with your raid team" or " picked", key, base.won and "WIN" or "lose",
         tostring(base.wave), margin, margin >= CFG.raidMinMargin and "raids allowed" or "raids held, keys saved"))
+    -- a crash inside a swap trial already left its note; only a clean finish overwrites it
+    local last = B.raidSimNote and B.raidSimNote.text or ""
+    if not last:find("crashed", 1, true) then
+        MT.raidNote(string.format("ran: %s on wave %s, margin x%.2f → %s", base.won and "wins" or "loses", tostring(base.wave), margin,
+            margin >= CFG.raidMinMargin and "raids allowed" or "raids held"))
+    end
 end
 
 -- match info (team kinds, levels, traits, grades). The server sometimes answers before the team is in:
@@ -3035,7 +3065,13 @@ function MT.run()
     MT.teamDmgAt = MT.teamDmg or 0
     MT.initMap()
     MT.resetRun()
-    task.delay(15, function() pcall(MT.raidCheck) end)
+    task.delay(15, function()
+        local ok, err = pcall(MT.raidCheck)
+        if not ok then
+            SF.log(1, "RAID", "simulator crashed: " .. tostring(err))
+            pcall(MT.raidNote, "simulator crashed: " .. tostring(err))
+        end
+    end)
     local st = C.Catalog.stage(MT.stage)
     SF.log(1, "BATTLE", string.format("in %s (stage %s)%s · team %s", st and st.name or "?", tostring(MT.stage), MT.challenge and (" challenge " .. MT.challenge) or "", table.concat(MT.info.slots or {}, ",")))
     if MT.over then
@@ -3538,7 +3574,7 @@ function GUI.updateMain()
         local mg = rs and tonumber(rs.margin) or 0
         local need = math.floor((CFG.raidMinMargin - 1) * 100 + 0.5)
         local raidV, raidS
-        if not rs then raidV, raidS = "untested", "simulator runs in a match"
+        if not rs then raidV, raidS = "untested", B.raidSimNote and B.raidSimNote.text or "simulator runs in a match"
         elseif mg >= CFG.raidMinMargin then raidV, raidS = "Ready ✓", string.format("%d%% to spare · %s keys", math.floor((mg - 1) * 100 + 0.5), tostring(items.raidkey or 0))
         elseif mg >= 1 then raidV, raidS = "Not ready", string.format("only just wins · needs %d%% to spare", need)
         else raidV, raidS = "Too weak", string.format("would lose · %s keys saved", tostring(items.raidkey or 0)) end
@@ -3625,6 +3661,10 @@ function SF.REPORT.build()
         totals = { wins = B.totals.wins, losses = B.totals.losses, matches = B.matches, summons = B.totals.summons },
         power = math.floor(C.MODE.teamPower(p)), team = team, modes = modes, learn = learn,
         raid = B.raidSim and { math.floor((tonumber(B.raidSim.margin) or 0) * 100) / 100, B.raidSim.wave } or nil,
+        -- why raids are or aren't running: the simulator's last outcome (minutes ago) and the gate in plain words
+        raidSim = B.raidSimNote and { B.raidSimNote.text, math.floor((os.time() - (tonumber(B.raidSimNote.at) or os.time())) / 60) } or "never ran",
+        raidGate = C.MODE.raidGate,
+        mode = ST.Mode, next = C.MODE.lastTop and tostring(C.MODE.lastTop):sub(1, 200) or nil,
         items = { crystal = it.crystal, lichportal = it.lichportal, raidkey = it.raidkey, gems = p.gems },
         settings = { goal = CFG.goal, lichHunt = CFG.lichHunt, evoFocus = CFG.evoFocus },
         problems = problems,
