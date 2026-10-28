@@ -2662,7 +2662,10 @@ function MT.learnCommit()
     end
     local rate = MT.learnRate or 0.1
     local function ema(rec, ratio)
-        rec.eff = (rec.n or 0) == 0 and (1 + (ratio - 1) * 0.5) or (rec.eff * (1 - rate) + ratio * rate)
+        -- the more waves a hero has, the less one wave moves it: a new hero learns in a few waves, a veteran
+        -- (500+ waves) averages over ~40-50, so one odd Infinite run or a new teammate can't flip its rating
+        local r = math.max(0.02, rate * math.sqrt(30 / (30 + (rec.n or 0))))
+        rec.eff = (rec.n or 0) == 0 and (1 + (ratio - 1) * 0.5) or (rec.eff * (1 - r) + ratio * r)
         rec.n = (rec.n or 0) + 1
     end
     -- ratios only matter relative to each other (kindEff divides by the average), so no tight clamp
