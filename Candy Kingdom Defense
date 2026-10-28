@@ -232,6 +232,7 @@ do
     B.lastResult = type(b.lastResult) == "table" and b.lastResult or nil   -- last run's result line (GUI)
     B.lastReport = tonumber(b.lastReport) or 0                              -- last anonymous stats report (opt-in)
     B.powerHub = b.powerHub == true
+    B.traitLog = type(b.traitLog) == "table" and b.traitLog or nil         -- trait chases {at, clock, kind, goal, rolls, spent, from, to, hit}
 end
 task.spawn(function()
     while SF.alive do
@@ -1371,6 +1372,7 @@ function HUB.traits()
         end
         local after = HUB.prof.units[best] and HUB.prof.units[best].trait
         B.totals.rerolls = B.totals.rerolls + 1
+        HUB.traitRecord(u.kind, "single reroll", 1, crystals - HUB.items("crystal"), before, after, C.M.traitValue(after) > C.M.traitValue(before))
         local msg = string.format("%s: %s → %s%s", u.kind, tostring(before or "none"), tostring(after or res.trait or "?"), chasing and " (chasing Epic+)" or "")
         SF.log(1, "TRAIT", msg)
         SF.status("Traits", msg)
@@ -1379,12 +1381,84 @@ function HUB.traits()
     end
 end
 
+-- where the crystals went: one entry per chase / single reroll, newest last (Lobby tab → Trait History)
+function HUB.traitRecord(kind, goal, rolls, spent, from, to, hit)
+    if (rolls or 0) <= 0 then return end
+    B.traitLog = B.traitLog or {}
+    table.insert(B.traitLog, { at = os.time(), clock = os.date("%H:%M"), kind = kind, goal = goal, rolls = rolls, spent = spent, from = from, to = to, hit = hit })
+    while #B.traitLog > 25 do table.remove(B.traitLog, 1) end
+    SF.saveSoon()
+end
+-- first run with the history: rebuild it from the TRAIT lines already in the log file
+function HUB.traitBackfill()
+    if B.traitLog then return end
+    B.traitLog = {}
+    local ok, src = pcall(function() return isfile(C.LOGFILE) and readfile(C.LOGFILE) or "" end)
+    if not ok then return end
+    local cost = C.Catalog.REROLL_COST or 1
+    local nextGoal
+    for line in tostring(src):gmatch("[^\n]+") do
+        local clock = line:match("^%[(%d+:%d+)")
+        if line:find("TRAIT", 1, true) then
+            if line:find("starting an Oh My Glob chase", 1, true) then nextGoal = "Oh My Glob"
+            elseif line:find("no Oh My Glob this time", 1, true) then nextGoal = "back to Legendary+"
+            else
+                local kind, name, rolls = line:match("TRAIT%s+(%w+) got (.-) after (%d+) rolls")
+                if kind then
+                    table.insert(B.traitLog, { clock = clock, kind = kind, goal = nextGoal or "Legendary+", rolls = tonumber(rolls), spent = tonumber(rolls) * cost, to = name, hit = true })
+                    nextGoal = nil
+                else
+                    local k2, r2, now, was, goal = line:match("TRAIT%s+(%w+): (%d+) rolls, still (%S+) %(was (%S+)%).-chasing (.+)$")
+                    if k2 then
+                        table.insert(B.traitLog, { clock = clock, kind = k2, goal = goal, rolls = tonumber(r2), spent = tonumber(r2) * cost, from = was, to = now, hit = false })
+                    end
+                end
+            end
+        end
+    end
+    while #B.traitLog > 25 do table.remove(B.traitLog, 1) end
+    SF.saveSoon()
+end
+-- the Trait History text: totals, then the newest entries in plain words
+function HUB.traitText()
+    local log = B.traitLog or {}
+    if #log == 0 then return "no trait rolls yet" end
+    local function heroName(k) return (C.Catalog.UNITS[k or ""] or {}).name or tostring(k) end
+    local function traitName(t)
+        local def = C.Catalog.TRAITS and C.Catalog.TRAITS[t or ""]
+        return def and def.name or tostring(t or "none")
+    end
+    local spent, globTry, globHit = 0, 0, 0
+    for i, e in ipairs(log) do
+        spent = spent + (tonumber(e.spent) or 0)
+        if e.goal == "Oh My Glob" then
+            -- a chase spread over several lobby visits is one chase: a miss that the same hero's next entry continues doesn't count
+            local cont = false
+            if not e.hit then
+                for j = i + 1, #log do
+                    if log[j].kind == e.kind then cont = log[j].goal == "Oh My Glob"; break end
+                end
+            end
+            if e.hit then globTry = globTry + 1; globHit = globHit + 1 elseif not cont then globTry = globTry + 1 end
+        end
+    end
+    local rows = { string.format("%d crystals spent over the last %d entries · Oh My Glob chases: %d won of %d", spent, #log, globHit, globTry) }
+    for i = #log, math.max(1, #log - 9), -1 do
+        local e = log[i]
+        local result = e.hit and ("got " .. traitName(e.to) .. " ✓") or ("missed, left on " .. traitName(e.to))
+        table.insert(rows, string.format("%s  %s · %s · %d rolls · %d crystals · %s", tostring(e.clock or "?"), heroName(e.kind),
+            tostring(e.goal), tonumber(e.rolls) or 0, tonumber(e.spent) or 0, result))
+    end
+    return table.concat(rows, "\n")
+end
 -- roll one hero's trait until it reaches CFG.traitChaseKeep (or the per-visit roll budget / crystals run out)
 function HUB.chaseTrait(id, keep, floor, budget)
     keep, floor = keep or CFG.traitChaseKeep, floor or CFG.crystalReserve
     local u0 = HUB.prof.units[id]
     if not u0 then return end
     local start = u0.trait
+    local c0 = HUB.items("crystal")
+    local goalName = keep >= 5 and "Oh My Glob" or (floor == CFG.crystalReserve and B.globChasing == id and "back to Legendary+" or "Legendary+")
     local rolls = 0
     local seen = {}
     budget = budget or (keep >= 5 and CFG.globRollsPerVisit or CFG.traitRollsPerVisit)
@@ -1403,6 +1477,7 @@ function HUB.chaseTrait(id, keep, floor, budget)
                 local def = C.Catalog.TRAITS[t]
                 SF.log(1, "TRAIT", string.format("%s got %s after %d rolls (%d crystals left)", u0.kind, def and def.name or tostring(t), rolls, HUB.items("crystal")))
                 SF.status("Traits", string.format("%s → %s!", u0.kind, def and def.name or tostring(t)))
+                HUB.traitRecord(u0.kind, goalName, rolls, c0 - HUB.items("crystal"), start, def and def.name or tostring(t), true)
                 return
             end
             task.wait(0.3)
@@ -1412,6 +1487,7 @@ function HUB.chaseTrait(id, keep, floor, budget)
     local goal = keep >= 5 and "Oh My Glob" or "Legendary+"
     SF.log(1, "TRAIT", string.format("%s: %d rolls, still %s (was %s) · %d crystals left · chasing %s", u0.kind, rolls, tostring(now), tostring(start), HUB.items("crystal"), goal))
     SF.status("Traits", string.format("chasing %s on %s: %d rolls this visit, now %s", goal, u0.kind, rolls, tostring(now)))
+    HUB.traitRecord(u0.kind, goalName, rolls, c0 - HUB.items("crystal"), start, now, false)
 end
 
 -- stats: a reroll replaces every unlocked grade with a fresh roll (bell curve, mean ~10.5 of 20), so
@@ -3123,6 +3199,8 @@ function GUI.build()
     sld(T, "Start Glob Chase At", "Crystals needed before a chase starts", "globChaseAt", { min = 200, max = 1500, step = 50, format = int })
     sld(T, "Glob Chase Floor", "Stop the chase here (enough to roll a Legendary back)", "globFloor", { min = 0, max = 400, step = 10, format = int })
     sld(T, "Crystal Reserve", "Never spend below this", "crystalReserve", { min = 0, max = 100, step = 1, format = int })
+    T:Section("Trait History (where the crystals went)")
+    LIVE.traitLog = T:Paragraph("no trait rolls yet")
     T:Section("Stats (Juice)")
     tog(T, "Auto Stat Reroll", "Lock two stats, reroll DMG then SPA up to the goal", "stats")
     sld(T, "Stat Goal", "Target grade (13 B+ · 14 A- · 15 A)", "statGoal", { min = 12, max = 17, step = 1, format = int })
@@ -3434,6 +3512,7 @@ function GUI.updateMain()
 end
 function GUI.loop()
     local LIVE = GUI.LIVE
+    pcall(HUB.traitBackfill)
     while SF.alive do
         pcall(GUI.updateMain)
         pcall(GUI.updateTabs)
@@ -3451,6 +3530,7 @@ function GUI.loop()
             table.sort(rows)
             pcall(LIVE.kinds.Set, #rows > 0 and table.concat(rows, "\n") or "no measurements yet")
         end
+        if LIVE.traitLog then pcall(LIVE.traitLog.Set, HUB.traitText()) end
         if LIVE.modes then
             local rows = {}
             for key, s in pairs(B.stages) do table.insert(rows, string.format("%s: %d/%d wins · %.0fs", key, s.wins or 0, s.runs or 0, s.sec or 0)) end
