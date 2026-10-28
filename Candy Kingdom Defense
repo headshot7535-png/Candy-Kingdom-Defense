@@ -222,6 +222,10 @@ do
     B.pending = type(b.pending) == "table" and b.pending or nil -- mode we launched (for the result)
     B.lastPower = tonumber(b.lastPower)
     B.evoNeeds = type(b.evoNeeds) == "table" and b.evoNeeds or {}
+    -- S-tier items + who needs them: the match ranks modes with these too (else a Sandwich farm run looks
+    -- worthless from the match and every run ends with a lobby trip just to pick it again)
+    B.sTierNeeds = type(b.sTierNeeds) == "table" and b.sTierNeeds or {}
+    B.evoNeedFor = type(b.evoNeedFor) == "table" and b.evoNeedFor or {}
     B.rows = type(b.rows) == "table" and b.rows or {}
     B.codes = type(b.codes) == "table" and b.codes or {}
     B.raidSim = type(b.raidSim) == "table" and b.raidSim or nil -- {margin, team, at, wave}
