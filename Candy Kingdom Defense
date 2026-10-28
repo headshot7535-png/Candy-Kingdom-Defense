@@ -677,7 +677,10 @@ end
 function C.MODE.tier(m)
     if m.first then return 5 end
     if m.challenge then return 4 end
-    if m.raid then return 3 end
+    -- the raid's big prize is its secret hero (Demon Lord); once owned, raids compete on value like farming
+    local raidSecretOwned = C.M.ownsAny({ "Hunson", "HunsonDemon" })
+    if m.raid then return raidSecretOwned and 1 or 3 end
+    if m.kind == "keys" and raidSecretOwned then return 1 end
     -- a held Lich Portal and the tournament's missing rewards rank with challenges
     if m.portal then return 3 end
     if m.tourney then return (m.why or ""):find("^rewards") and 3 or 2 end
