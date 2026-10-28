@@ -1307,7 +1307,9 @@ function HUB.traits()
         end
         -- Oh My Glob (+200% damage, 0.2%/roll): the battle sim's raid key. Each roll replaces the trait, so only
         -- start with a stock that gives a real chance, and stop at a floor that can re-roll a Legendary
-        local top = ranked[1]
+        -- the strongest hero that doesn't have Glob yet (King Man has it → Lord of Evil is next)
+        local top
+        for _, r in ipairs(ranked) do if r.u.trait ~= "glob" then top = r break end end
         if CFG.globChase and top and top.u.trait ~= "glob" and crystals >= CFG.globChaseAt then
             B.globChasing = top.id
             SF.saveSoon()
