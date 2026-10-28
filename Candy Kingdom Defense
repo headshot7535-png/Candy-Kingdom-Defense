@@ -1566,13 +1566,15 @@ function HUB.evolve()
         if e.ready and e.gain > 0 and not clash and (not best or e.gain > best.gain) then best = e end
     end
     if not best then
-        local near = focus or list[1]
+        local near = focus
+        if not near then for _, e in ipairs(list) do if e.sTier and not e.ready then near = e break end end end
+        near = near or list[1]
         local missing = {}
         for k, n in pairs(near and near.flat or {}) do
             local have = tonumber(p.items and p.items[k]) or 0
             if have < n then table.insert(missing, string.format("%s %d/%d", k, have, n)) end
         end
-        return SF.status("Evolve", near and string.format("%s: %s from %s · items %.0f%%%s%s", near.focus and "focus" or "closest", near.target, near.def.from, near.progress * 100,
+        return SF.status("Evolve", near and string.format("%s: %s from %s · items %.0f%%%s%s", near.focus and "focus" or (near.sTier and "S-tier goal" or "closest"), near.target, near.def.from, near.progress * 100,
             #missing > 0 and (" · need " .. table.concat(missing, ", ")) or "",
             (near.def.gems or 0) > 0 and (" · " .. near.def.gems .. " gems") or "") or "no evolutions available")
     end
