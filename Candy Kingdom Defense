@@ -111,7 +111,7 @@ C.DEFAULTS = {
     battle = true, place = true, upgrade = true, abilities = true, autoStart = true,
     abilityTiming = true,      -- hold a ready ability for a crowd or a boss in its range
     abilityHold = 25,          -- ... but never longer than this many seconds while anything is in range
-    earlyCall = false,         -- call the next wave early (measured: the server's wave clock keeps runs ~4.5 min anyway)
+    earlyCall = true,          -- call the next wave early (measured Oct 2026: Gumdrop Gauntlet ~210s → 130–154s, 0 leaks; some maps keep their clock)
     passives = true,           -- use pair passives (team pick + placing partners within range of each other)
     scorePath = true,          -- hero score counts the whole upgrade path (late-level area attacks, stuns, burns), not just level 1
     hubMinPulls = 3,           -- a lobby trip just to summon needs gems for at least this many 10-pulls (a trip costs ~22s vs `next`)
@@ -210,12 +210,13 @@ do
     if (tonumber(saved.cfgv) or 1) < 8 then saved.evoFocus = nil end
     if (tonumber(saved.cfgv) or 1) < 9 then saved.globRollsPerVisit = nil end
     if (tonumber(saved.cfgv) or 1) < 10 then saved.traitRollsPerVisit = nil; saved.traitChaseTop = nil end
+    if (tonumber(saved.cfgv) or 1) < 11 then saved.earlyCall = nil end -- early calls are on by default now
     -- sharing became on by default: only players who never touched the toggle get the new default
     if saved.shareChosen ~= true then saved.shareStats = nil end
     for k, v in pairs(C.DEFAULTS) do
         if saved[k] ~= nil and type(saved[k]) == type(v) then CFG[k] = saved[k] else CFG[k] = v end
     end
-    CFG.cfgv = 10
+    CFG.cfgv = 11
 end
 SF.saveAt = nil
 function SF.saveSoon() SF.saveAt = U.now() + 1.5 end
@@ -3659,7 +3660,7 @@ function GUI.build()
     tog(T, "Pair Passives", "Pick and place partners so pair passives switch on", "passives")
     tog(T, "Score Upgrade Attacks", "Rate heroes by their upgraded attacks (area hits, stuns, burns), not just the first one", "scorePath")
     T:Section("Waves")
-    tog(T, "Early Wave Calls", "Off: the server's wave clock keeps runs ~4.5 min anyway", "earlyCall")
+    tog(T, "Early Wave Calls", "Send the next wave while the defense is well ahead (faster clears; turns itself off for the run after a leak)", "earlyCall")
     sld(T, "Call With ≤ Enemies", "× learned boldness", "callAlive", { min = 1, max = 30, step = 1, format = int })
     sld(T, "Call With Front ≤", "How far the lead enemy may be (× boldness)", "callReach", { min = 0.1, max = 0.9, step = 0.05, format = pct })
     T:Section("Targeting & Selling")
