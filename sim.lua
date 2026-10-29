@@ -52,11 +52,20 @@ local function coverage(E, x, z, r, wf)
     end
     return s
 end
-local function covOrder(E, r, strat)
+-- "crowd": weight each stretch of road by how much enemy HP sat there in an earlier run (occ = 0..1 per
+-- road bin, SIM.run's result.occ), so heroes go where the waves really pile up
+SIM.OCC_BINS = 40
+function SIM.crowdWeight(occ)
+    return function(f)
+        local i = math.clamp(math.floor(f * #occ) + 1, 1, #occ)
+        return 0.2 + 1.3 * (occ[i] or 0)
+    end
+end
+local function covOrder(E, r, strat, occ)
     strat = strat or "even"
-    local key = math.floor(r + 0.5) .. ":" .. strat
+    local key = math.floor(r + 0.5) .. ":" .. strat .. (strat == "crowd" and occ and (":" .. tostring(occ)) or "")
     if E.cov[key] then return E.cov[key] end
-    local wf = SIM.STRATS[strat]
+    local wf = strat == "crowd" and occ and SIM.crowdWeight(occ) or SIM.STRATS[strat] or SIM.STRATS.even
     local t = {}
     for i, s in ipairs(E.spots) do t[i] = coverage(E, s.x, s.z, math.floor(r + 0.5), wf); if i % 500 == 0 then task.wait() end end
     local order = {}
@@ -82,7 +91,36 @@ local function mults(u, opts)
         have.range = (base.range and base.range > 0) and L[1].range / base.range or 1
         have.speed = (L[1].cd and L[1].cd > 0 and base.cd) and base.cd / L[1].cd or 1
     end
-    return { dmg = want.dmg / have.dmg * (opts.dmg or 1), range = want.range / have.range, speed = want.speed / have.speed, cost = tm.cost }
+    -- tournament week: the buffed element hits x2, the debuffed x0.5 (applied live, not in the LEVELS tables)
+    local elem = opts.tourney and (Cat.tourneyMult(opts.tourney, u.kind) or 1) or 1
+    return { dmg = want.dmg / have.dmg * (opts.dmg or 1) * elem, range = want.range / have.range, speed = want.speed / have.speed, cost = tm.cost }
+end
+
+-- tournament schedule: a wave every TOURNEY.every seconds after the build phase, whatever is still alive.
+-- A wave's whole HP is week.hp × growth^(wave-1), shared out by each enemy type's own HP
+local function tourneySpawns(week, hpMult)
+    local T = Cat.TOURNEY
+    local spawns = {}
+    local nW = math.max(1, T.length // T.every)
+    for w = 1, nW do
+        local groups = Cat.tourneyWave(week.world, w)
+        local weight = 0
+        for _, g in ipairs(groups) do
+            local ET = Enemies.TYPES[g[1]]
+            if ET then weight = weight + (tonumber(g[2]) or 1) * (ET.hp or 1) end
+        end
+        local per = (week.hp or T.hp) * (week.growth or T.growth) ^ (w - 1) / math.max(weight, 1) * (hpMult or 1)
+        local t0 = T.build + (w - 1) * T.every
+        for _, g in ipairs(groups) do
+            local ET = Enemies.TYPES[g[1]]
+            if ET then
+                for i = 1, tonumber(g[2]) or 1 do
+                    table.insert(spawns, { t = t0 + (tonumber(g[4]) or 0) + (i - 1) * (tonumber(g[3]) or 1), type = ET, hp = (ET.hp or 1) * per, w = w })
+                end
+            end
+        end
+    end
+    return spawns, nW
 end
 
 function SIM.run(stageId, team, opts)
@@ -91,16 +129,19 @@ function SIM.run(stageId, team, opts)
     opts.cash = opts.cash or Cat.STAGE_CASH or 1.5
     local stage = Cat.stage(stageId)
     local E = SIM.layout(stageId)
-    local waves = Cat.stageWaves(stage)
+    local TR = opts.tourney and Cat.TOURNEY
+    local waves = TR and {} or Cat.stageWaves(stage)
     local nW = #waves
-    local clock = (stage.minutes or Cat.WAVE_CLOCK.minutes or 5) * 60 / nW
-    local money, lives = stage.money or 1000, stage.lives or 10
+    local clock = TR and TR.every or (stage.minutes or Cat.WAVE_CLOCK.minutes or 5) * 60 / nW
+    local money, lives = TR and TR.money or stage.money or 1000, TR and TR.lives or stage.lives or 10
+    local dealt = 0 -- tournament score: damage that landed (no overkill)
     local units = {}
     for _, u in ipairs(team) do
         local L = MT.levels(u.kind)
-        if L then units[u.kind] = { u = u, L = L, m = mults(u, opts), cap = Cat.placeCap(u.kind), n = 0 } end
+        if L then units[u.kind] = { u = u, L = L, m = mults(u, opts), cap = Cat.placeCap(u.kind), n = 0, ab = Cat.abilityOf and Cat.abilityOf(u.kind) } end
     end
     local towers, enemies, spawns = {}, {}, {}
+    if TR then spawns, nW = tourneySpawns(opts.tourney, opts.hp) end
     -- spawn schedule from the stage's own wave list
     for w, groups in ipairs(waves) do
         local t0 = 3 + (w - 1) * clock
@@ -127,14 +168,62 @@ function SIM.run(stageId, team, opts)
         return k
     end
     local function rowOf(tw) return units[tw.kind].L[tw.level] end
+    local function rangeOf(tw) return (rowOf(tw).range or 20) * units[tw.kind].m.range end
+    local function abilityOn(tw, id) local ab = units[tw.kind].ab; return ab and ab.id == id and (tw.abUntil or 0) > t end
+    -- Encore: heroes inside an active Marshall Lee's range attack ×haste faster
+    local function hasteAt(tw)
+        for _, o in ipairs(towers) do
+            if abilityOn(o, "mlEncore") then
+                local r = rangeOf(o)
+                if (o.x - tw.x) ^ 2 + (o.z - tw.z) ^ 2 <= r * r then return units[o.kind].ab.haste or 1.25 end
+            end
+        end
+        return 1
+    end
     local function stats(tw)
         local U, row = units[tw.kind], rowOf(tw)
         local pm = C.M.passiveMult(tw.kind, kindsNear(tw.x, tw.z, tw))
         return row, (row.range or 20) * U.m.range, (row.dmg or 0) * U.m.dmg * pm * ((row.lemon or row.summon or row.guards) and 1.3 or 1),
-            math.max(0.1, (row.cd or 1) / U.m.speed), MT.targets(row)
+            math.max(0.1, (row.cd or 1) / U.m.speed / hasteAt(tw)), MT.targets(row)
     end
+    -- abilities, on the farm's own timing (MT.abilities): a crowd or a boss in range, else after holding it
+    -- CFG.abilityHold seconds with anything in range. Soul Tax / Rent Day pay money, Encore hastes (above).
+    -- (Decorpsinator's zombies aren't modelled: their bite lives on the server)
+    local CROWD = MT.ABILITY_CROWD or {}
+    local holdFor = (SF.CFG and SF.CFG.abilityHold) or 8
+    local function abilities()
+        for _, tw in ipairs(towers) do
+            local ab = units[tw.kind].ab
+            if ab and tw.level >= (ab.unlock or 3) and t >= (tw.abAt or 0) then
+                local r2 = rangeOf(tw) ^ 2
+                local cnt, bosses = 0, 0
+                for _, e in ipairs(enemies) do
+                    if e.x and (e.x - tw.x) ^ 2 + (e.z - tw.z) ^ 2 <= r2 then cnt = cnt + 1; if e.boss then bosses = bosses + 1 end end
+                end
+                tw.abReady = tw.abReady or t
+                if bosses > 0 or cnt >= (CROWD[ab.id] or 4) or (cnt > 0 and t - tw.abReady >= holdFor) then
+                    tw.abReady = nil
+                    tw.abUntil = t + (ab.duration or 0)
+                    tw.abAt = t + (ab.cooldown or 60)
+                    if ab.id == "rentday" then
+                        money = money + math.min(ab.cap or 500, (cnt - bosses) * (ab.rent or 25)) + bosses * (ab.bossRent or 250)
+                    end
+                end
+            end
+        end
+    end
+    local function killPay(e)
+        local mult = 1
+        for _, tw in ipairs(towers) do
+            if abilityOn(tw, "soultax") and (e.x - tw.x) ^ 2 + (e.z - tw.z) ^ 2 <= rangeOf(tw) ^ 2 then mult = units[tw.kind].ab.mult or 2; break end
+        end
+        return e.reward * (opts.cash or 1) * mult
+    end
+    -- where enemy HP sits along the road (enemy-HP-seconds per bin): the "crowd" placement style
+    local occ = {}
+    for i = 1, SIM.OCC_BINS do occ[i] = 0 end
     local function freeSpot(r)
-        local tab = covOrder(E, r, opts.strat)
+        local tab = covOrder(E, r, opts.strat, opts.occ)
         local list = {}
         for _, tw in ipairs(towers) do table.insert(list, { pos = Vector3.new(tw.x, 0.25, tw.z) * W }) end
         for k = 1, math.min(#tab.order, 500) do
@@ -201,21 +290,33 @@ function SIM.run(stageId, team, opts)
             end
             money = money - best.cost
             if best.place then
-                table.insert(towers, { kind = best.kind, level = 1, x = best.s.x, z = best.s.z, cool = 0 })
+                local ab = units[best.kind].ab
+                table.insert(towers, { kind = best.kind, level = 1, x = best.s.x, z = best.s.z, cool = 0, abAt = t + (ab and ab.firstDelay or 20) })
                 units[best.kind].n = units[best.kind].n + 1
             else
                 best.tw.level = best.tw.level + 1
             end
         end
     end
+    local function occOut()
+        local top = 0
+        for _, v in ipairs(occ) do top = math.max(top, v) end
+        local o = {}
+        for i, v in ipairs(occ) do o[i] = top > 0 and math.floor(v / top * 100 + 0.5) / 100 or 0 end
+        return o
+    end
     local steps = 0
     while true do
         t = t + dt
         steps = steps + 1
         -- wave clear bonus (paid around when the next wave is due)
-        local due = math.floor((t - 3) / clock)
+        local due = math.floor((t - (TR and TR.build or 3)) / clock)
         for w = 1, math.min(due, nW) do
-            if not bonusPaid[w] then bonusPaid[w] = true; money = money + (Cat.stageBonus(stage, w) or 0) end
+            if not bonusPaid[w] then
+                bonusPaid[w] = true
+                -- tournament: TOURNEY.cash = {base, per wave}
+                money = money + (TR and ((TR.cash and TR.cash[1] or 0) + (TR.cash and TR.cash[2] or 0) * (w - 1)) or (Cat.stageBonus(stage, w) or 0))
+            end
         end
         economy()
         while spawns[si] and spawns[si].t <= t do
@@ -234,15 +335,22 @@ function SIM.run(stageId, team, opts)
                 e.dist = e.dist + e.speed * slow * dt
             end
             if e.dist >= E.length then
-                lives = lives - e.leak
-                leaks = leaks + e.leak
+                local leak = TR and math.min(e.leak, TR.leakMax or 5) or e.leak
+                lives = lives - leak
+                leaks = leaks + leak
                 table.remove(enemies, i)
             else
                 local p = E.path:at(e.dist)
                 e.x, e.z = p.X, p.Z
+                local bin = math.clamp(math.floor(e.dist / E.length * SIM.OCC_BINS) + 1, 1, SIM.OCC_BINS)
+                occ[bin] = occ[bin] + math.max(0, e.hp) * dt
             end
         end
-        if lives <= 0 then return { won = false, lives = lives, leaks = leaks, wave = lastWave, t = t } end
+        abilities()
+        if lives <= 0 then return { won = false, lives = lives, leaks = leaks, wave = lastWave, t = t, score = dealt, occ = occOut() } end
+        if TR and t >= TR.build + TR.length then
+            return { won = true, survived = true, lives = lives, leaks = leaks, wave = lastWave, t = t, score = dealt, left = #enemies, occ = occOut() }
+        end
         -- towers fire
         for _, tw in ipairs(towers) do
             tw.cool = tw.cool - dt
@@ -279,18 +387,22 @@ function SIM.run(stageId, team, opts)
                     end
                     for _, h in ipairs(hit) do
                         local e = h.e
-                        e.hp = e.hp - dmg * h.f - (h.f >= 1 and burn or 0)
+                        local amt = dmg * h.f + (h.f >= 1 and burn or 0)
+                        if e.hp > 0 then dealt = dealt + math.min(amt, e.hp) end
+                        e.hp = e.hp - amt
                         -- crowd control (raid bosses shrug off stuns: stage.antiStun)
                         local stun = (row.stun or 0) + ((row.statues and 1.5) or 0)
                         if stun > 0 and not (e.boss and stage.antiStun) then e.stunT = math.max(e.stunT or 0, stun) end
                         if row.slow then e.slowT = math.max(e.slowT or 0, row.slow) end
+                        -- knockback: pushed back up the road (bosses that shrug off stuns shrug this off too)
+                        if row.back and not (e.boss and stage.antiStun) then e.dist = math.max(0, e.dist - row.back * h.f) end
                     end
                 end
             end
         end
         for i = #enemies, 1, -1 do
             if enemies[i].hp <= 0 then
-                money = money + enemies[i].reward * (opts.cash or 1)
+                money = money + killPay(enemies[i])
                 -- how far down the road kills happen (for placement analysis)
                 killDist = killDist + enemies[i].dist / E.length; kills = kills + 1
                 table.remove(enemies, i)
@@ -298,7 +410,7 @@ function SIM.run(stageId, team, opts)
         end
         if not spawns[si] and #enemies == 0 then
             -- tail = seconds from the last spawn to the last kill (the only part of a run placement can shorten)
-            return { won = true, lives = lives, leaks = leaks, wave = nW, t = t, tail = t - lastSpawnT, killAt = kills > 0 and killDist / kills or 0 }
+            return { won = true, survived = TR and true or nil, lives = lives, leaks = leaks, wave = nW, t = t, tail = t - lastSpawnT, killAt = kills > 0 and killDist / kills or 0, score = dealt, occ = occOut() }
         end
         if t > 3600 then return { won = false, lives = lives, leaks = leaks, wave = lastWave, t = t, timeout = true } end
         if steps % 40 == 0 then task.wait() end
@@ -317,6 +429,14 @@ function SIM.margin(stageId, team, opts)
         if r.won then lo = mid else hi = mid end
     end
     return lo, base
+end
+
+-- tournament run for a team: {score, survived, wave, leaks}. week = Catalog.tourneyAt(now); the layout is the
+-- week's world (its infinite stage)
+function SIM.tourney(week, team, opts)
+    opts = opts or {}
+    local stageId = type(week.stage) == "table" and week.stage.id or week.stage
+    return SIM.run(stageId, team, { tourney = week, strat = opts.strat, occ = opts.occ, hp = opts.hp, cash = opts.cash, dmg = opts.dmg })
 end
 
 -- teams from the cached profile: the current slots, optionally with evolutions applied (kind swapped, same level/trait/grade)
