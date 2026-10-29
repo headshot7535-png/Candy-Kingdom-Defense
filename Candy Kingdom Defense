@@ -45,7 +45,7 @@ C.SIM_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-De
 C.HIVE_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/hive.json"
 C.HIVE_CACHE = C.FOLDER .. "/hive.json"
 -- community Discord (Main tab → "Join Discord" copies it)
-C.DISCORD_INVITE = "https://discord.gg/q2VsNj6xi"
+C.DISCORD_INVITE = "https://discord.com/invite/q2VsNj6x"
 -- author's Discord webhook for the opt-in anonymous stats report (empty = reporting unavailable)
 C.WEBHOOK_URL = "https://discord.com/api/webhooks/1564769639739826316/wqQXo7RAmXrIyDqDzDagzwEEVeZiiPalJ6xlnjdvLOoFvgWI6mR1yvI3VGdMrYHPCDQQ"
 C.NEXUS_URL = "https://raw.githubusercontent.com/headshot7535-png/Nexuslib/main/Nexuslib"
