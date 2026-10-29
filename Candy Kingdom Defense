@@ -256,6 +256,8 @@ do
     B.tourney = type(b.tourney) == "table" and b.tourney or {}       -- {week, power, at} of the last attempt
     B.tourneyInfo = type(b.tourneyInfo) == "table" and b.tourneyInfo or nil -- last GetTourney {week, mine}
     B.tourneySim = type(b.tourneySim) == "table" and b.tourneySim or nil   -- planner {week, team, strat, score, sig, at, cal}
+    B.blocked = type(b.blocked) == "table" and b.blocked or {}               -- [map] = {"x,z" = runs it refused a hero}
+    B.raidAggrReset = b.raidAggrReset                                        -- raid early-call boldness re-learned once
     B.lastResult = type(b.lastResult) == "table" and b.lastResult or nil   -- last run's result line (GUI)
     B.lastReport = tonumber(b.lastReport) or 0                              -- last anonymous stats report (opt-in)
     B.powerHub = b.powerHub == true
@@ -1415,6 +1417,26 @@ function HUB.traits()
             if gain > 0 and (not bestG or gain > bestG) then best, bestG = id, gain end
         end
     end
+    -- the tournament plan's heroes aren't always on the normal team (Hunson is, for the board): one with no
+    -- trait or a Common one rolls up to Rare+ (~2 crystals, at most 20) even while saving for a Glob, since
+    -- the board counts every bit of its damage. Not the Glob hero mid-chase
+    local ts = B.tourneySim
+    local okW, wk = pcall(C.Catalog.tourneyWeekOf, os.time())
+    if CFG.tourney and ts and okW and ts.week == tostring(wk) and crystals - CFG.crystalReserve >= 3 then
+        local bestId = {}
+        for id, u in pairs(p.units) do
+            local s = C.M.unitScore(u)
+            if not bestId[u.kind] or s > bestId[u.kind].s then bestId[u.kind] = { id = id, s = s } end
+        end
+        for k in tostring(ts.team):gmatch("[%w_]+") do
+            local b = bestId[k]
+            local u = b and p.units[b.id]
+            if u and b.id ~= B.globChasing and C.M.traitOrder(u.trait) < 2 then
+                SF.log(1, "TRAIT", string.format("%s is on the tournament plan with %s: rolling it to Rare+", k, u.trait and ("a " .. tostring(u.trait) .. " trait") or "no trait"))
+                return HUB.chaseTrait(b.id, 2, math.max(CFG.crystalReserve, crystals - 20), 20)
+            end
+        end
+    end
     -- chase: with a crystal stock, roll the strongest heroes (by their trait-free score) until each has a
     -- Legendary+ trait (Hero of Ooo / Oh My Glob), one hero at a time, many rolls per lobby visit
     if crystals - CFG.crystalReserve >= CFG.traitChaseAt then
@@ -1571,7 +1593,8 @@ function HUB.chaseTrait(id, keep, floor, budget)
     if not u0 then return end
     local start = u0.trait
     local c0 = HUB.items("crystal")
-    local goalName = keep >= 5 and "Oh My Glob" or (floor == CFG.crystalReserve and B.globChasing == id and "back to Legendary+" or "Legendary+")
+    local goal = keep >= 5 and "Oh My Glob" or (keep >= 4 and "Legendary+" or "Rare+")
+    local goalName = (keep < 5 and floor == CFG.crystalReserve and B.globChasing == id) and ("back to " .. goal) or goal
     local rolls = 0
     local seen = {}
     budget = budget or (keep >= 5 and CFG.globRollsPerVisit or CFG.traitRollsPerVisit)
@@ -1597,7 +1620,6 @@ function HUB.chaseTrait(id, keep, floor, budget)
         end
     end
     local now = HUB.prof.units[id] and HUB.prof.units[id].trait
-    local goal = keep >= 5 and "Oh My Glob" or "Legendary+"
     SF.log(1, "TRAIT", string.format("%s: %d rolls, still %s (was %s) · %d crystals left · chasing %s", u0.kind, rolls, tostring(now), tostring(start), HUB.items("crystal"), goal))
     SF.status("Traits", string.format("chasing %s on %s: %d rolls this visit, now %s", goal, u0.kind, rolls, tostring(now)))
     HUB.traitRecord(u0.kind, goalName, rolls, c0 - HUB.items("crystal"), start, now, false)
@@ -2335,6 +2357,13 @@ function MT.initMap()
         task.wait(0.5)
     end
     if not MT.map then SF.log(0, "BATTLE", "map object not found — placement disabled"); return false end
+    -- spots this map refused ("in the way") in 2+ separate runs are skipped from the start
+    MT.mapName = tostring(MT.map.root and MT.map.root.Name or "?")
+    MT.badCounted = {}
+    for key, n in pairs(B.blocked[MT.mapName] or {}) do
+        local x, z = key:match("^(-?%d+),(-?%d+)$")
+        if x and n >= 2 then table.insert(MT.badSpots, { x = tonumber(x), z = tonumber(z) }) end
+    end
     local path = MT.map.layout.designPath
     MT.pathPts = path.pts
     MT.pathStep = path.step
@@ -2562,6 +2591,18 @@ function MT.economy()
             -- the spot is blocked: remember it and try the next best spot right away
             MT.badSpots = MT.badSpots or {}
             table.insert(MT.badSpots, { x = pick.spot.x, z = pick.spot.z })
+            -- remember it for this map (counted once per run; skipped for good from the second run on)
+            local key = string.format("%d,%d", pick.spot.x, pick.spot.z)
+            local m = MT.mapName and B.blocked
+            if m and not (MT.badCounted or {})[key] then
+                MT.badCounted = MT.badCounted or {}
+                MT.badCounted[key] = true
+                m[MT.mapName] = m[MT.mapName] or {}
+                local list = m[MT.mapName]
+                list[key] = (list[key] or 0) + 1
+                if U.count(list) > 40 then list[next(list)] = nil end
+                SF.saveSoon()
+            end
             SF.req.back["Act:place:" .. pick.unit] = nil
             SF.log(1, "PLACE", string.format("%s refused at (%d,%d): %s — trying another spot", pick.unit, pick.spot.x, pick.spot.z, tostring(err)))
         else
@@ -2947,6 +2988,16 @@ function MT.resetRun()
     MT.runLeaks, MT.earlyCalls, MT.runReach, MT.waveReach = 0, 0, 0, 0
     table.clear(MT.idleWaves); table.clear(MT.expo); table.clear(MT.pred); table.clear(MT.atkDmg)
     local rec = B.stages[MT.modeKey()] or {}
+    -- raid caution learned while the team was weak (losses → x0.36) kept early calls off for good. Once the
+    -- raid sim says the team wins with x2+ to spare, start over from x1 (once) and let clean wins re-learn it
+    if MT.raid and not B.raidAggrReset and (tonumber(rec.aggr) or 1) < 1 and B.raidSim and (tonumber(B.raidSim.margin) or 0) >= 2 then
+        SF.log(1, "WAVES", string.format("raid boldness x%.2f was learned with a weaker team; the sim's margin is x%.2f → starting over at x1",
+            tonumber(rec.aggr) or 1, B.raidSim.margin))
+        rec.aggr = 1
+        B.stages[MT.modeKey()] = rec
+        B.raidAggrReset = os.time()
+        SF.saveSoon()
+    end
     MT.aggr = tonumber(rec.aggr) or 1
     MT.updateReachCut()
     table.clear(MT.cov)
