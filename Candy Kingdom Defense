@@ -1,5 +1,5 @@
 --[[
-    🍬 Candy Kingdom Defense — Smart Farm v1.0  (NexusLib)
+    🍬 Candy Kingdom Defense — Smart Farm v1.1  (NexusLib)
 
     One script for both places of the game:
       • Lobby (Tree Fort):  rewards → best team → feed → traits/stats → summon → pick the best mode → launch
@@ -13,7 +13,7 @@
 
 -- claim the "running" slot synchronously, before any yield, so two queued loaders can't both start
 if _G.CKD_SF and _G.CKD_SF.alive then return end
-local VERSION = "1.0"
+local VERSION = "1.1"
 local SF = { alive = true, conns = {} }
 _G.CKD_SF = SF
 if not game:IsLoaded() then game.Loaded:Wait() end
