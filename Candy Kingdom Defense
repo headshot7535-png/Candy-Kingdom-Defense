@@ -115,6 +115,7 @@ C.DEFAULTS = {
     traitChaseAt = 20,         -- with this many crystals, chase Legendary+ traits on the strongest heroes
     traitChaseKeep = 4,        -- chase until this trait rarity: 4 Legendary (Hero of Ooo) · 5 Mythic (Oh My Glob)
     traitChaseTop = 3,         -- how many of the strongest team heroes get chased to Legendary
+    traitChaseOdds = 0.5,      -- a hero with a Rare+ trait to lose is chased only when the crystals land Hero of Ooo this often
     traitRollsPerVisit = 1000, -- a Legendary chase runs to the end in one visit (a half-done chase leaves a Common trait)
     globChase = true,          -- then save up and chase Oh My Glob (+200% dmg) on the strongest hero
     globChaseAt = 700,         -- start a Glob chase with this many crystals (~70% chance at 0.2%/roll)
@@ -129,8 +130,11 @@ C.DEFAULTS = {
     gridStep = 3,
     -- misc
     antiAfk = true, logConsole = false, logLevel = 1,
-    shareStats = false,        -- opt-in: send an anonymous game-stats report to the script author about once an hour
-    shareEvery = 60,           -- minutes between reports
+    shareStats = true,         -- send anonymous game stats to the script author (Settings → Help improve the script turns it off)
+    shareEvery = 60,           -- minutes between summary reports
+    shareBatch = 5,            -- match records per Discord message (also sent after 20 min with fewer)
+    shareChosen = false,       -- the player flipped the sharing toggle themselves: their choice is kept forever
+    shareNoticed = false,      -- the one-time "sharing is on" notice was shown
 }
 
 -- gem-equivalent values of items (used to compare rewards across modes)
@@ -202,6 +206,8 @@ do
     if (tonumber(saved.cfgv) or 1) < 8 then saved.evoFocus = nil end
     if (tonumber(saved.cfgv) or 1) < 9 then saved.globRollsPerVisit = nil end
     if (tonumber(saved.cfgv) or 1) < 10 then saved.traitRollsPerVisit = nil; saved.traitChaseTop = nil end
+    -- sharing became on by default: only players who never touched the toggle get the new default
+    if saved.shareChosen ~= true then saved.shareStats = nil end
     for k, v in pairs(C.DEFAULTS) do
         if saved[k] ~= nil and type(saved[k]) == type(v) then CFG[k] = saved[k] else CFG[k] = v end
     end
@@ -213,7 +219,14 @@ function SF.saveNow() U.writeJson(C.SETTINGS, CFG); U.writeJson(C.BRAIN, B); SF.
 
 -- brain
 do
-    local b = U.readJson(C.BRAIN) or {}
+    -- how the save file looked when it was read: a player whose learning keeps vanishing needs this in the report
+    local rawOk, raw = pcall(function() return isfile(C.BRAIN) and readfile(C.BRAIN) or nil end)
+    local b = U.readJson(C.BRAIN)
+    SF.brainLoad = { bytes = rawOk and raw and #raw or 0, decoded = b ~= nil, readOk = rawOk,
+        stages = b and type(b.stages) == "table" and U.count(b.stages) or 0, kinds = b and type(b.kinds) == "table" and U.count(b.kinds) or 0 }
+    b = b or {}
+    B.loads = (tonumber(b.loads) or 0) + 1                    -- times this save file was loaded (each teleport / execute)
+    B.resets = type(b.resets) == "table" and b.resets or {}   -- {what, at}: Reset buttons pressed
     B.stages = type(b.stages) == "table" and b.stages or {}   -- [modeKey] = {runs, wins, sec, waves, last}
     B.v = 5
     B.kinds = (b.v == 5 and type(b.kinds) == "table") and b.kinds or {} -- [kind] = {eff, n, att}  measured / predicted damage share
@@ -242,6 +255,11 @@ do
     B.powerHub = b.powerHub == true
     B.traitLog = type(b.traitLog) == "table" and b.traitLog or nil         -- trait chases {at, clock, kind, goal, rolls, spent, from, to, hit}
     B.paths = type(b.paths) == "table" and b.paths or nil                 -- [kind] = upgrade-path factor, _median (MT.learnPaths)
+    B.modelV = tonumber(b.modelV) or 1                                    -- damage formula the learning was measured against
+    -- shared stats: a random id made once per install (no user id inside), match records waiting to be sent
+    B.anonId = type(b.anonId) == "string" and b.anonId or Http:GenerateGUID(false):gsub("-", ""):sub(1, 10):lower()
+    B.hiveQueue = type(b.hiveQueue) == "table" and b.hiveQueue or {}
+    B.lastHive = tonumber(b.lastHive) or 0
 end
 task.spawn(function()
     while SF.alive do
@@ -332,6 +350,30 @@ function C.M.traitValue(id)
     return (t.dmg or 0) + 0.7 * (t.speed or 0) + 0.35 * (t.range or 0) + 0.5 * (-(t.cost or 0))
 end
 function C.M.traitOrder(id) return C.Catalog.traitOrder and C.Catalog.traitOrder(id) or 0 end
+-- Is a chase for `keep`+ (4 = Hero of Ooo) worth it with n crystals? A reroll replaces the trait (no keeping
+-- the old one), so a missed chase leaves a random trait, 54% Common. Legendary+ is 1% a roll: 20 rolls land
+-- it 18% of the time. Returns the hit chance, the trait value expected after the chase, the value now, and
+-- the fewest rolls that make the chase clearly better than keeping the current trait (nil = never)
+function C.M.chaseOdds(cur, n, luck, keep)
+    local hitP, hitV, missP, missV = 0, 0, 0, 0
+    for _, t in ipairs(C.Catalog.TRAIT_ORDER) do
+        local c = C.Catalog.traitChance(t, luck)
+        if C.M.traitOrder(t) >= keep then hitP = hitP + c; hitV = hitV + c * C.M.traitValue(t)
+        else missP = missP + c; missV = missV + c * C.M.traitValue(t) end
+    end
+    hitV = hitP > 0 and hitV / hitP or 0
+    missV = missP > 0 and missV / missP or 0
+    local curV = C.M.traitValue(cur)
+    local function after(k) local p = 1 - (1 - hitP) ^ math.max(0, k); return p * hitV + (1 - p) * missV, p end
+    -- Glob's +200% makes almost any chase look good on average, so a hero with a Rare+ trait to lose also
+    -- needs the chase to land at least CFG.traitChaseOdds of the time (50% = 69 crystals); a Common one doesn't
+    local minP = C.M.traitOrder(cur) >= 2 and CFG.traitChaseOdds or 0
+    local function ok(k) local a, p = after(k); return a > curV * 1.05 + 0.01 and p >= minP end
+    local need
+    for k = 1, 3000 do if ok(k) then need = k break end end
+    local a, p = after(n)
+    return p, a, curV, need, ok(n)
+end
 function C.M.gradeMults(g)
     if C.UnitStats and g then return C.UnitStats.mults(g) end
     return { dmg = 1, range = 1, speed = 1 }
@@ -350,8 +392,10 @@ function C.M.kindEff(kind, attack)
     -- measured damage is HP actually removed, so on easy waves a big single hit (Talon Dive 2.5k into a
     -- 300 HP enemy) mostly overkills and reads ~0.35, while splash reads high. That's true on easy maps and
     -- wrong where big hits matter (bosses, late Infinite, the raid). Treat it as a nudge, not a verdict:
-    -- square-root it and keep it within ×0.8–×1.35 of the game's own stats.
-    return U.clamp((e / math.max(avg, 1e-3)) ^ 0.5, 0.8, 1.35)
+    -- square-root it and keep it within ×0.8–×1.35 of the game's own stats; a hero measured over many waves
+    -- (the learning rate slows with samples, so 500+ waves is a steady average) is trusted up to ×0.55–×2.0
+    local w = math.min(1, (k.n or 0) / 500)
+    return U.clamp((e / math.max(avg, 1e-3)) ^ 0.5, 0.8 - 0.25 * w, 1.35 + 0.65 * w)
 end
 -- lobby-side unit score: level-1 placement DPS (the game's own UnitBase.placement), range, copies allowed,
 -- rarity (upgrade paths scale with rarity) and the measured in-match efficiency of the kind
@@ -1354,10 +1398,19 @@ function HUB.traits()
             SF.saveSoon()
             return
         end
+        -- only when the crystals in hand make the hero better on average than its trait today
+        -- (a Mathematical +25% hero needs ~75 crystals; a Common one is worth a chase with a few)
+        local waiting
         for i = 1, math.min(CFG.traitChaseTop, #ranked) do
             local r = ranked[i]
-            if C.M.traitOrder(r.u.trait) < CFG.traitChaseKeep then return HUB.chaseTrait(r.id, CFG.traitChaseKeep, CFG.crystalReserve) end
+            if C.M.traitOrder(r.u.trait) < CFG.traitChaseKeep then
+                local p, _, _, need, worth = C.M.chaseOdds(r.u.trait, crystals - CFG.crystalReserve, luck, CFG.traitChaseKeep)
+                if worth then return HUB.chaseTrait(r.id, CFG.traitChaseKeep, CFG.crystalReserve) end
+                waiting = waiting or string.format("saving crystals for Hero of Ooo on %s: %d / %s (now a chase would land it %d%% of the time — a miss leaves a random trait)",
+                    r.u.kind, crystals, need and tostring(need + CFG.crystalReserve) or "?", math.floor(p * 100 + 0.5))
+            end
         end
+        if waiting and not (CFG.globChase and crystals >= CFG.globChaseAt) then return SF.status("Traits", waiting) end
         -- Oh My Glob (+200% damage, 0.2%/roll): the battle sim's raid key. Each roll replaces the trait, so only
         -- start with a stock that gives a real chance, and stop at a floor that can re-roll a Legendary
         -- the strongest hero that doesn't have Glob yet (King Man has it → Lord of Evil is next)
@@ -2064,24 +2117,68 @@ end
 -- multi-target: `hits` enemies, extras take `splash`; plain aoe hits roughly one enemy per 4 studs of radius
 -- expected enemies hit per attack, from the row's own fields: zone="range" hits everyone in range,
 -- aoe/line hit a crowd (≈ one enemy per 3 studs of radius on busy waves), hits+splash a few extras
-function MT.targets(row)
-    if row.zone == "range" then return 6 end
-    if row.hits and row.splash then return 1 + (row.hits - 1) * row.splash end
-    if row.aoe then return U.clamp(row.aoe / 3, 1, 6) * (row.splash and (0.4 + 0.6 * row.splash) or 1) end
-    if row.line then return U.clamp(row.line / 8, 1, 4) end
-    if row.splash then return 1 + row.splash end
-    return 1
+-- How many enemies one attack really hits. Weights fitted to 30 attacks' measured damage (Oct 28):
+-- whole-range zones hit ~2x the old cap of 6 (crowds), every projectile is a full hit, the main target
+-- always takes the whole hit. v1 = the formula before that fit (only to rescale learning made with it)
+function MT.targets(row, v1)
+    local t
+    if row.zone == "range" then t = v1 and 6 or 12
+    elseif row.hits and row.splash then t = 1 + (row.hits - 1) * row.splash
+    elseif row.aoe then t = U.clamp(row.aoe / 3, 1, 6) * (row.splash and (0.4 + 0.6 * row.splash) or 1)
+    elseif row.line then t = U.clamp(row.line / 8, 1, 4)
+    elseif row.splash then t = 1 + row.splash
+    else t = 1 end
+    if v1 then return t end
+    t = math.max(1, t)
+    -- chain: the hit jumps on to up to N more enemies (Grave Hand chain 6); later jumps often find nobody
+    if row.chain then t = math.max(t, 1 + (math.min(row.chain, 6) - 1) * 0.6) end
+    -- count: N projectiles per attack (Prism Volley 3, Ice Wizard's 3 icicles on the strongest), each a full hit
+    if row.count then t = t * math.min(row.count, 6) end
+    return t
 end
-function MT.rowDps(row, m)
+function MT.rowDps(row, m, v1)
     local dmg = (row.dmg or 0) * m.dmg
     local cd = math.max(0.1, (row.cd or 1) / m.speed)
-    local dps = dmg * MT.targets(row) / cd
+    local tg = MT.targets(row, v1)
+    local dps = dmg * tg / cd
     -- crowd control buys every other hero more time on target
-    local cc = 1 + 0.12 * (row.stun or 0) / cd * 3 + (row.slow and 0.1 or 0) + (row.statues and 0.15 or 0)
+    -- knockback (back = studs pushed back up the road) buys time like a stun: ~10 studs ≈ 1 s of walking
+    local hold = (row.stun or 0) + (v1 and 0 or (row.back or 0) / 10)
+    local cc = 1 + 0.12 * hold / cd * 3 + (row.statues and 0.15 or 0)
+    -- a slowed enemy stays in range longer: measured x1.68 on the slowing hero's own damage
+    if row.slow then cc = v1 and (cc + 0.1) or (cc * 1.68) end
     dps = dps * cc
-    if row.burn then dps = dps + row.burn * m.dmg * (row.burnT or 1) / cd end
+    -- burn sticks to every enemy the hit lands on
+    if row.burn then dps = dps + row.burn * m.dmg * (row.burnT or 1) / cd * (v1 and 1 or tg) end
     if row.lemon or row.summon or row.guards then dps = dps * 1.3 end
     return dps
+end
+-- learning saved before the fit compared real damage with the v1 prediction. Rescale each attack (and the
+-- hero) by v1/new for that attack's rows, once, so the fix isn't counted twice (MT.learnPaths runs it)
+function MT.rescaleLearning()
+    if (tonumber(B.modelV) or 1) >= 2 then return end
+    local m = { dmg = 1, speed = 1 }
+    for kind, k in pairs(B.kinds) do
+        local L = MT.levels(kind)
+        if L and L[1] then
+            local sumN, sumR = 0, 0
+            for att, a in pairs(type(k.att) == "table" and k.att or {}) do
+                local old, new = 0, 0
+                for _, row in ipairs(L) do
+                    if row.attack == att then old = old + MT.rowDps(row, m, true); new = new + MT.rowDps(row, m) end
+                end
+                if old > 0 and new > 0 then
+                    local r = old / new
+                    a.eff = (a.eff or 1) * r
+                    sumN, sumR = sumN + (a.n or 1), sumR + (a.n or 1) * r
+                end
+            end
+            if sumN > 0 then k.eff = (k.eff or 1) * sumR / sumN end
+        end
+    end
+    B.modelV = 2
+    SF.log(1, "LEARN", "rescaled measured damage to the new damage formula")
+    SF.saveSoon()
 end
 -- each hero's upgrade-path factor (see C.M.pathFactor): 60% the last row, 40% row 3 (late waves are won
 -- by the top rows), over the level-1 single-target hit. Ratios within one LEVELS table, so the game's
@@ -2101,6 +2198,7 @@ function MT.learnPaths()
     table.sort(list)
     P._median = list[math.ceil(#list / 2)]
     B.paths = P
+    pcall(MT.rescaleLearning)
     SF.saveSoon()
 end
 function MT.cost(kind, lvl)
@@ -2847,6 +2945,7 @@ function MT.finish()
     B.lastResult = { text = string.format("%s %s on wave %s in %d:%02d", stage and stage.name or "?", MT.won and "won" or "lost", tostring(MT.wave), sec // 60, sec % 60),
         won = MT.won == true, items = type(MT.result) == "table" and MT.result.items or nil, gems = type(MT.result) == "table" and MT.result.gems or nil, at = os.time() }
     B.pending = nil
+    pcall(SF.HIVE.record, key, sec)
     SF.saveNow()
     if not CFG.master or not CFG.play then MT.finishing = false; return end
     -- decide what's next
@@ -3278,6 +3377,8 @@ function GUI.build()
     tog(T, "Auto Trait Reroll", "Reroll the strongest team heroes up to the keep rarity", "traits")
     UI.traitKeep = T:Dropdown("Keep Traits At", "Stop rerolling at this trait rarity", { "Common", "Rare", "Epic", "Legendary", "Mythic" }, CFG.traitKeep, function(_, _, i) setCfg("traitKeep", tonumber(i) or 3) end)
     sld(T, "Chase Legendary At", "With this many crystals, chase Hero of Ooo on the top heroes", "traitChaseAt", { min = 5, max = 200, step = 5, format = int })
+    sld(T, "Safe Chase Odds", "A hero with a decent trait is only rolled when the crystals land Hero of Ooo at least this often (a miss leaves a random trait)", "traitChaseOdds",
+        { min = 0, max = 0.9, step = 0.05, format = function(v) return string.format("%d%%", math.floor(v * 100 + 0.5)) end })
     tog(T, "Oh My Glob Chase", "Save up, then roll the strongest hero for Oh My Glob (+200% damage)", "globChase")
     sld(T, "Start Glob Chase At", "Crystals needed before a chase starts", "globChaseAt", { min = 200, max = 1500, step = 50, format = int })
     sld(T, "Glob Chase Floor", "Stop the chase here (enough to roll a Legendary back)", "globFloor", { min = 0, max = 400, step = 10, format = int })
@@ -3328,7 +3429,10 @@ function GUI.build()
     sld(T, "Exploration", "Optimism for modes with few runs", "exploreBonus", { min = 0, max = 1, step = 0.05, format = f2 })
     sld(T, "Lobby Every N Runs", "Head home at least this often", "hubEvery", { min = 1, max = 20, step = 1, format = int })
     sld(T, "Summon Trip Needs", "10-pulls of gems before a trip just to summon", "hubMinPulls", { min = 1, max = 6, step = 1, format = int })
-    T:Button("🧮", "Reset Mode Stats", "Forget win rates and run times", function() table.clear(B.stages); SF.saveNow(); notify("Modes", "stats reset", "success") end)
+    T:Button("🧮", "Reset Mode Stats", "Forget win rates and run times", function()
+        table.clear(B.stages); table.insert(B.resets, { "modes", os.time() })
+        SF.log(1, "INFO", "mode stats reset by the player"); SF.saveNow(); notify("Modes", "stats reset", "success")
+    end)
 
     -- ── Battle: what the farm has learned about each hero, then the switches ──
     T = Win:Tab("⚔️", "Battle")
@@ -3358,7 +3462,10 @@ function GUI.build()
     T:Section("Targeting & Selling")
     tog(T, "Smart Targeting", "Heavy hitters target the strongest, fast ones the first", "smartTarget")
     tog(T, "Sell Idle Heroes", "Sell heroes with no target for 3+ waves for a better buy", "sellIdle")
-    T:Button("🧮", "Reset Unit Learning", "Forget measured unit efficiency", function() table.clear(B.kinds); SF.saveNow(); notify("Battle", "learning reset", "success") end)
+    T:Button("🧮", "Reset Unit Learning", "Forget measured unit efficiency", function()
+        table.clear(B.kinds); table.insert(B.resets, { "learning", os.time() })
+        SF.log(1, "INFO", "unit learning reset by the player"); SF.saveNow(); notify("Battle", "learning reset", "success")
+    end)
 
     T = Win:Tab("📜", "Log")
     tog(T, "Print To Console", "Mirror log lines to the executor console", "logConsole")
@@ -3369,19 +3476,34 @@ function GUI.build()
     T = Win:Tab("⚙️", "Settings")
     tog(T, "Anti-AFK", "Send an input when Roblox flags you idle", "antiAfk")
     T:Section("Help improve the script")
-    tog(T, "Share anonymous stats", "About once an hour, send game stats to the script author (off by default)", "shareStats")
-    T:Paragraph("What is sent: an anonymous id (not your name or user id), the script version, wins/losses and run times per mode, "
-        .. "your team's heroes with level/trait/grades, what the farm learned about each hero, the raid simulator result, "
-        .. "crystals/portals/keys/gems, a few settings, and recent errors from the log. Nothing else.")
+    -- flipping it yourself is remembered as your choice (a new default never overrides it)
+    UI.shareStats = T:Toggle("Share anonymous stats", "Send match stats to the script author so the hero scores and placements improve for everyone (on by default — switch off any time)", CFG.shareStats, function(on)
+        if on ~= CFG.shareStats then CFG.shareChosen = true end
+        setCfg("shareStats", on)
+    end)
+    T:Paragraph("What is sent: a random id made on this PC (not your name or user id), the script version, and for each match: "
+        .. "the mode, win or loss, wave, run time and lives left, your team's heroes with level and trait, and where each of your heroes "
+        .. "stood with the damage it dealt. About once an hour also: wins/losses per mode, what the farm learned about each hero, "
+        .. "the raid simulator result, crystals/portals/keys/gems, a few settings and recent errors. Nothing else.")
     T:Button("📤", "Send Report Now", "Send one report right away (needs sharing on)", function()
         if not CFG.shareStats then notify("Report", "turn on Share anonymous stats first", "warning") return end
         task.spawn(function()
+            pcall(SF.HIVE.flush, true)
             local ok, err = SF.REPORT.send("manual")
             notify("Report", ok and "sent — thank you!" or ("not sent: " .. tostring(err)), ok and "success" or "error")
         end)
     end)
     T:Button("💾", "Save Settings", "Write " .. C.SETTINGS, function() SF.saveNow(); notify("Saved", "settings written", "success") end)
     Win:Status(CFG.master and "▶ Farming" or "⏸ Paused")
+    -- tell every player once that sharing is on, and where to switch it off
+    if CFG.shareStats and not CFG.shareNoticed then
+        CFG.shareNoticed = true
+        SF.saveSoon()
+        task.delay(4, function()
+            pcall(function() Win:Notify("Anonymous stats", "Match stats are shared to improve hero scores for everyone. Switch off: Settings → Help improve the script.", 10, "default") end)
+        end)
+        SF.log(1, "INFO", "anonymous match stats are on (Settings → Help improve the script to switch off)")
+    end
 end
 -- the mode being played right now (match) as a mode table C.MODE.purpose understands
 function GUI.currentMode()
@@ -3632,12 +3754,8 @@ end
 -- name or user id: an anonymous id (a hash, so reports from one player can be grouped), version,
 -- per-mode records, team, learned efficiency, raid sim result, key items and logged problems.
 SF.REPORT = {}
-function SF.REPORT.anonId()
-    local h = 2166136261
-    local s = tostring(LP.UserId) .. "|ckd-report"
-    for i = 1, #s do h = bit32.bxor(h, s:byte(i)); h = (h * 16777619) % 4294967296 end
-    return string.format("%08x", h)
-end
+-- random per install (a hash of the user id could be reversed by trying every id)
+function SF.REPORT.anonId() return B.anonId end
 function SF.REPORT.build()
     local p = B.prof or {}
     local team = {}
@@ -3666,38 +3784,89 @@ function SF.REPORT.build()
         raidGate = C.MODE.raidGate,
         mode = ST.Mode, next = C.MODE.lastTop and tostring(C.MODE.lastTop):sub(1, 200) or nil,
         items = { crystal = it.crystal, lichportal = it.lichportal, raidkey = it.raidkey, gems = p.gems },
-        settings = { goal = CFG.goal, lichHunt = CFG.lichHunt, evoFocus = CFG.evoFocus },
+        settings = { goal = CFG.goal, lichHunt = CFG.lichHunt, evoFocus = CFG.evoFocus, raids = CFG.raids, raidMinMargin = CFG.raidMinMargin, infKeys = CFG.infKeys },
+        -- save-file health: what the last load found (bytes, decoded, records inside), loads so far, Reset presses
+        brain = { load = SF.brainLoad, loads = B.loads, stages = U.count(B.stages), kinds = U.count(B.kinds),
+            resets = #B.resets > 0 and B.resets or nil },
         problems = problems,
     }
 end
-function SF.REPORT.send(why)
+-- one Discord embed with a JSON block (an embed holds 4096 characters; callers keep json under ~3900)
+function SF.REPORT.post(title, json, color)
     if C.WEBHOOK_URL == "" then return false, "no webhook set by the author" end
     local req = (syn and syn.request) or http_request or request or (fluxus and fluxus.request)
     if not req then return false, "this executor can't send web requests" end
-    local data = SF.REPORT.build()
-    local json = U.json(data)
-    -- a Discord embed holds 4096 characters: drop the oldest problems, then the rarest modes, until it fits
-    while #json > 3900 and #data.problems > 0 do table.remove(data.problems, 1); json = U.json(data) end
-    while #json > 3900 and #data.modes > 5 do table.remove(data.modes); json = U.json(data) end
     local body = U.json({ username = "Smart Farm reports", embeds = { {
-        title = string.format("📊 %s · v%s · %s", data.id, VERSION, tostring(why or "report")),
-        description = "```json\n" .. json .. "\n```", color = 8556792 } } })
+        title = title, description = "```json\n" .. json .. "\n```", color = color or 8556792 } } })
     local ok, res = pcall(req, { Url = C.WEBHOOK_URL, Method = "POST", Headers = { ["Content-Type"] = "application/json" }, Body = body })
     local code = ok and type(res) == "table" and tonumber(res.StatusCode or res.Status) or nil
+    if ok and (not code or code < 300) then return true end
+    return false, tostring(ok and code or res)
+end
+function SF.REPORT.send(why)
+    local data = SF.REPORT.build()
+    local json = U.json(data)
+    -- drop the oldest problems, then the rarest modes, until it fits
+    while #json > 3900 and #data.problems > 0 do table.remove(data.problems, 1); json = U.json(data) end
+    while #json > 3900 and #data.modes > 5 do table.remove(data.modes); json = U.json(data) end
+    local ok, err = SF.REPORT.post(string.format("📊 %s · v%s · %s", data.id, VERSION, tostring(why or "report")), json)
     B.lastReport = os.time()
     SF.saveSoon()
-    if ok and (not code or code < 300) then
-        SF.status("Report", "sent (" .. tostring(why) .. ") at " .. os.date("%H:%M"))
-        return true
+    SF.status("Report", ok and ("sent (" .. tostring(why) .. ") at " .. os.date("%H:%M")) or ("send failed: " .. tostring(err)))
+    return ok, err
+end
+
+-- the hive: one compact record per match, sent in batches, so every player's runs teach the scores
+-- (heroes we don't own, placements, run times, win rates). Fields:
+--   k mode key · w won · wv wave · t seconds · mid joined mid-run (time not real) · lv lives left
+--   team {"Kind:level:trait"} · tw placed heroes {kind, level, x, z, damage dealt this match}
+SF.HIVE = {}
+function SF.HIVE.record(key, sec)
+    if not CFG.shareStats then return end
+    local info = MT.info or {}
+    local team = {}
+    for _, k in ipairs(info.slots or {}) do
+        table.insert(team, string.format("%s:%s:%s", k, tostring(info.levels and info.levels[k] or "?"), tostring(info.traits and info.traits[k] or "-")))
     end
-    SF.status("Report", "send failed: " .. tostring(ok and code or res))
-    return false, tostring(ok and code or res)
+    local tw = {}
+    local W = MT.W() -- towers are in world studs; record map spots (as MT.spots and the log use)
+    for id, t in pairs(MT.towers or {}) do
+        if MT.mine(t) then
+            table.insert(tw, { t.kind, t.level or 1, math.floor((t.x or 0) / W + 0.5), math.floor((t.z or 0) / W + 0.5), math.floor(tonumber(MT.dmg[id]) or 0) })
+        end
+    end
+    table.insert(B.hiveQueue, { k = key, w = MT.won and 1 or 0, wv = MT.wave, t = sec, mid = MT.joinedMidRun and 1 or nil,
+        lv = MT.lives, team = team, tw = tw, at = os.time() })
+    while #B.hiveQueue > 30 do table.remove(B.hiveQueue, 1) end
+end
+-- send what fits in one message (oldest first); a failed send keeps the records for next time
+function SF.HIVE.flush(force)
+    local q = B.hiveQueue
+    if not CFG.shareStats or #q == 0 then return end
+    if not force and #q < CFG.shareBatch and os.time() - (tonumber(B.lastHive) or 0) < 1200 then return end
+    local pack = {}
+    local head = { id = B.anonId, v = VERSION, xy = "map", m = pack }
+    for i = 1, #q do
+        table.insert(pack, q[i])
+        if #U.json(head) > 3900 then table.remove(pack); break end
+    end
+    if #pack == 0 then table.remove(q, 1); return end -- one record too big for a message: drop it
+    local ok, err = SF.REPORT.post(string.format("🧠 %s · v%s · %d matches", B.anonId, VERSION, #pack), U.json(head), 5814783)
+    B.lastHive = os.time()
+    if ok then
+        for _ = 1, #pack do table.remove(q, 1) end
+        SF.status("Report", string.format("match stats sent (%d) at %s", #pack, os.date("%H:%M")))
+    else
+        SF.status("Report", "match stats not sent yet: " .. tostring(err))
+    end
+    SF.saveSoon()
 end
 task.spawn(function()
     while SF.alive do
         task.wait(60)
-        if CFG.shareStats and C.WEBHOOK_URL ~= "" and os.time() - (tonumber(B.lastReport) or 0) >= CFG.shareEvery * 60 then
-            pcall(SF.REPORT.send, "hourly")
+        if CFG.shareStats and C.WEBHOOK_URL ~= "" then
+            pcall(SF.HIVE.flush)
+            if os.time() - (tonumber(B.lastReport) or 0) >= CFG.shareEvery * 60 then pcall(SF.REPORT.send, "hourly") end
         end
     end
 end)
