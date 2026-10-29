@@ -41,6 +41,9 @@ C.SELF = "CandyKingdom_SmartFarm.lua"
 -- it (and the raid simulator) from the repo instead
 C.SELF_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/Candy%20Kingdom%20Defense"
 C.SIM_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/sim.lua"
+-- every player's combined measurements (CKD_Research/hive/combine.py → hive.json in the repo)
+C.HIVE_URL = "https://raw.githubusercontent.com/headshot7535-png/Candy-Kingdom-Defense/main/hive.json"
+C.HIVE_CACHE = C.FOLDER .. "/hive.json"
 -- community Discord (Main tab → "Join Discord" copies it)
 C.DISCORD_INVITE = "https://discord.gg/q2VsNj6xi"
 -- author's Discord webhook for the opt-in anonymous stats report (empty = reporting unavailable)
@@ -132,6 +135,7 @@ C.DEFAULTS = {
     antiAfk = true, logConsole = false, logLevel = 1,
     shareStats = true,         -- send anonymous game stats to the script author (Settings → Help improve the script turns it off)
     shareEvery = 60,           -- minutes between summary reports
+    useHive = true,            -- blend the hive's hero measurements (GitHub hive.json) into the scores
     shareBatch = 5,            -- match records per Discord message (also sent after 20 min with fewer)
     shareChosen = false,       -- the player flipped the sharing toggle themselves: their choice is kept forever
     shareNoticed = false,      -- the one-time "sharing is on" notice was shown
@@ -381,15 +385,40 @@ function C.M.gradeMults(g)
 end
 -- measured / predicted damage, per kind and per attack (punch vs tornado...), relative to the average
 -- so one global scale (overkill on easy waves) doesn't matter
+-- the hive's view of a hero: measured / predicted damage relative to each player's own average (median over
+-- players, CKD_Research/hive/combine.py), and how many waves it's worth next to our own measurements: at most
+-- 150, ×0.3 per hive wave, scaled down when fewer than 3 players back it. nil = nothing usable
+function C.M.hiveRel(kind)
+    local d = SF.HIVE and SF.HIVE.data
+    local h = d and type(d.kinds) == "table" and d.kinds[kind]
+    local rel, waves, players = h and tonumber(h.rel), h and tonumber(h.waves) or 0, h and tonumber(h.players) or 0
+    if not (rel and rel > 0 and waves >= 30 and CFG.useHive) then return nil end
+    return rel, math.min(150, waves * 0.3) * math.min(1, players / 3)
+end
 function C.M.kindEff(kind, attack)
     local k = B.kinds[kind]
-    if not k or (k.n or 0) < 1 then return 1 end
+    local hRel, hW = C.M.hiveRel(kind)
+    if (not k or (k.n or 0) < 1) and not hRel then return 1 end
+    if not k or (k.n or 0) < 1 then
+        -- never measured here: the hive alone, eased in against a neutral 150-wave prior (one player's 300
+        -- waves moves a hero a little, many players' thousands most of the way)
+        local w = math.min(1, hW / 500)
+        return U.clamp((hRel ^ (hW / (hW + 150))) ^ 0.5, 0.8 - 0.25 * w, 1.35 + 0.65 * w)
+    end
     local sum, n = 0, 0
     for _, v in pairs(B.kinds) do if (v.n or 0) >= 1 then sum = sum + v.eff; n = n + 1 end end
     local avg = n > 0 and sum / n or 1
     local e = k.eff
     local a = attack and type(k.att) == "table" and k.att[attack]
     if a and (a.n or 0) >= 1 then e = a.eff end
+    if hRel then
+        -- blend in log space, weighted by waves: our own count fully, the hive up to its weight
+        local nl = k.n or 0
+        local rl = math.max(e / math.max(avg, 1e-3), 1e-3)
+        local rel = math.exp((nl * math.log(rl) + hW * math.log(hRel)) / (nl + hW))
+        local w = math.min(1, (nl + hW) / 500)
+        return U.clamp(rel ^ 0.5, 0.8 - 0.25 * w, 1.35 + 0.65 * w)
+    end
     -- measured damage is HP actually removed, so on easy waves a big single hit (Talon Dive 2.5k into a
     -- 300 HP enemy) mostly overkills and reads ~0.35, while splash reads high. That's true on easy maps and
     -- wrong where big hits matter (bosses, late Infinite, the raid). Treat it as a nudge, not a verdict:
@@ -3667,6 +3696,7 @@ function GUI.build()
             notify("Report", ok and "sent — thank you!" or ("not sent: " .. tostring(err)), ok and "success" or "error")
         end)
     end)
+    tog(T, "Learn from the hive", "Blend every player's measured hero damage into the scores (most for heroes you've rarely played)", "useHive")
     T:Button("💾", "Save Settings", "Write " .. C.SETTINGS, function() SF.saveNow(); notify("Saved", "settings written", "success") end)
     Win:Status(CFG.master and "▶ Farming" or "⏸ Paused")
     -- tell every player once that sharing is on, and where to switch it off
@@ -3995,6 +4025,30 @@ end
 --   k mode key · w won · wv wave · t seconds · mid joined mid-run (time not real) · lv lives left
 --   team {"Kind:level:trait"} · tw placed heroes {kind, level, x, z, damage dealt this match}
 SF.HIVE = {}
+-- what the hive learned (hive.json in the repo): the local copy at once, a fresh one from GitHub when it's
+-- older than 6 hours. Only hero measurements are used so far (C.M.hiveRel → C.M.kindEff)
+function SF.HIVE.load()
+    local cached = U.readJson(C.HIVE_CACHE)
+    if type(cached) == "table" and type(cached.kinds) == "table" then SF.HIVE.data = cached end
+    local age = os.time() - (tonumber(cached and cached.fetched) or 0)
+    if CFG.useHive and age > 6 * 3600 then
+        local ok, raw = pcall(game.HttpGet, game, C.HIVE_URL)
+        local okJ, d = pcall(function() return ok and Http:JSONDecode(raw) end)
+        if okJ and type(d) == "table" and type(d.kinds) == "table" then
+            d.fetched = os.time()
+            SF.HIVE.data = d
+            pcall(U.writeJson, C.HIVE_CACHE, d)
+        elseif not SF.HIVE.data then
+            return SF.status("Hive", "couldn't fetch the hive: " .. tostring(ok and "bad file" or raw):sub(1, 120))
+        end
+    end
+    local d = SF.HIVE.data
+    if not d then return SF.status("Hive", "no hive data yet") end
+    local used = 0
+    for kind in pairs(d.kinds) do if C.M.hiveRel(kind) then used = used + 1 end end
+    SF.status("Hive", string.format("%s · %d heroes from %s players (%s matches) · updated %s", CFG.useHive and "learning from it" or "off",
+        used, tostring(d.players or "?"), tostring(d.matchRecords or "?"), os.date("%d %b %H:%M", tonumber(d.updated) or 0)))
+end
 function SF.HIVE.record(key, sec)
     if not CFG.shareStats then return end
     local info = MT.info or {}
@@ -4037,8 +4091,11 @@ function SF.HIVE.flush(force)
     SF.saveSoon()
 end
 task.spawn(function()
+    pcall(SF.HIVE.load)
+    local hiveAt = os.time()
     while SF.alive do
         task.wait(60)
+        if os.time() - hiveAt > 6 * 3600 then hiveAt = os.time(); pcall(SF.HIVE.load) end
         if CFG.shareStats and C.WEBHOOK_URL ~= "" then
             pcall(SF.HIVE.flush)
             if os.time() - (tonumber(B.lastReport) or 0) >= CFG.shareEvery * 60 then pcall(SF.REPORT.send, "hourly") end
