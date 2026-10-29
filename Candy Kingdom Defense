@@ -250,6 +250,7 @@ do
     B.raidBest = type(b.raidBest) == "string" and b.raidBest or nil  -- sim-picked raid team kinds
     B.tourney = type(b.tourney) == "table" and b.tourney or {}       -- {week, power, at} of the last attempt
     B.tourneyInfo = type(b.tourneyInfo) == "table" and b.tourneyInfo or nil -- last GetTourney {week, mine}
+    B.tourneySim = type(b.tourneySim) == "table" and b.tourneySim or nil   -- planner {week, team, strat, score, sig, at, cal}
     B.lastResult = type(b.lastResult) == "table" and b.lastResult or nil   -- last run's result line (GUI)
     B.lastReport = tonumber(b.lastReport) or 0                              -- last anonymous stats report (opt-in)
     B.powerHub = b.powerHub == true
@@ -659,9 +660,17 @@ function C.MODE.tourneyWanted(prof)
     local power = C.MODE.teamPower(prof)
     local grown = not last.power or power >= last.power * CFG.tourneyRegrow
     if #missing > 0 and (not last.at or grown or os.time() - last.at > 6 * 3600) then return "rewards: " .. table.concat(missing, ",") end
+    -- the planner found a team / placement not tried yet this week that should beat the best on the board
+    local ts = B.tourneySim
+    local best = tonumber(mine.best) or 0
+    if ts and ts.week == week and best > 0 and last.plan ~= C.MODE.tourneyPlan(ts) then
+        local pred = (tonumber(ts.score) or 0) * (tonumber(ts.cal) or 1)
+        if pred > best * 1.05 then return string.format("plan ≈%.0fM > best %.0fM", pred / 1e6, best / 1e6) end
+    end
     if (tonumber(mine.best) or 0) > 0 and last.power and grown then return "team grew x" .. string.format("%.2f", power / last.power) end
     return nil
 end
+function C.MODE.tourneyPlan(ts) return ts and (tostring(ts.team) .. ":" .. tostring(ts.strat)) or nil end
 function C.MODE.teamPower(prof)
     -- power is always measured in the lobby (Hub/UnitBase); the match reuses the last lobby value so
     -- records made in either place compare like for like
@@ -772,7 +781,9 @@ function C.MODE.tier(m)
     if m.kind == "keys" and raidSecretOwned then return 1 end
     -- a held Lich Portal and the tournament's missing rewards rank with challenges
     if m.portal then return 3 end
-    if m.tourney then return (m.why or ""):find("^rewards") and 3 or 2 end
+    -- an untried planner pick that should beat the board best: one 11-minute run, as urgent as a challenge
+    -- (it only comes back once a new plan beats the new best by 5%)
+    if m.tourney then return (m.why or ""):find("^plan") and 4 or ((m.why or ""):find("^rewards") and 3 or 2) end
     -- keys only jump the queue while raids are viable; otherwise they compete on value with farming
     if m.kind == "keys" then
         local s = B.raidSim
@@ -1981,18 +1992,35 @@ function HUB.tourneyTeam()
     local T = C.Catalog.TOURNEY
     local okW, week = pcall(C.Catalog.tourneyAt, os.time())
     if not (okW and type(week) == "table") then return true end
+    -- the planner's pick for this week (MT.tourneyCheck: simulated damage), best copy of each kind; else the
     -- same combination search as the normal team (pair passives), with each hero scaled by the element mult
-    local slots, chosen = HUB.bestTeam(function(kind) return (C.Catalog.tourneyMult(week, kind) or 1) * C.M.tierMult(kind, "Tourney") end)
-    local names = {}
-    for i, v in ipairs(chosen) do names[i] = v.u.kind end
+    local slots, names, src = {}, {}, "planner"
+    local ts = B.tourneySim
+    if ts and ts.week == tostring(week.n) then
+        local bestId = {}
+        for id, u in pairs(p.units or {}) do
+            local s = C.M.unitScore(u)
+            if not bestId[u.kind] or s > bestId[u.kind].s then bestId[u.kind] = { id = id, s = s } end
+        end
+        for k in tostring(ts.team):gmatch("[%w_]+") do
+            if bestId[k] and #slots < C.Catalog.SLOTS then table.insert(slots, bestId[k].id); table.insert(names, k) end
+        end
+    end
+    if #slots < C.Catalog.SLOTS then
+        local chosen
+        slots, chosen = HUB.bestTeam(function(kind) return (C.Catalog.tourneyMult(week, kind) or 1) * C.M.tierMult(kind, "Tourney") end)
+        names, src = {}, "score"
+        for i, v in ipairs(chosen) do names[i] = v.u.kind end
+    end
+    while #slots < C.Catalog.SLOTS do table.insert(slots, "") end
     local same = true
     for i = 1, C.Catalog.SLOTS do if (p.slots[i] or "") ~= slots[i] then same = false end end
     if same then return true end
     local res, err = SF.request("SetSlots", C.R("SetSlots"), slots)
     if type(res) == "table" and res.ok then
         HUB.apply(res)
-        SF.log(1, "TOURNEY", string.format("team for %s week (buff %s ×%s, debuff %s ×%s): %s", tostring(week.world), tostring(week.buff), tostring(T.buff),
-            tostring(week.debuff), tostring(T.debuff), table.concat(names, " ")))
+        SF.log(1, "TOURNEY", string.format("team for %s week (buff %s ×%s, debuff %s ×%s, picked by %s): %s", tostring(week.world), tostring(week.buff), tostring(T.buff),
+            tostring(week.debuff), tostring(T.debuff), src, table.concat(names, " ")))
         return true
     end
     SF.log(1, "TOURNEY", "team refused: " .. tostring(err))
@@ -2008,7 +2036,10 @@ function HUB.launchTourney(m)
         task.wait(1.5)
     end
     if type(st) == "table" and st.ok then
-        B.tourney = { week = tostring(C.tourneyInfo and C.tourneyInfo.week and C.tourneyInfo.week.n or ""), power = m.power or C.MODE.teamPower(HUB.prof), at = os.time() }
+        local wk = tostring(C.tourneyInfo and C.tourneyInfo.week and C.tourneyInfo.week.n or "")
+        local ts = B.tourneySim
+        B.tourney = { week = wk, power = m.power or C.MODE.teamPower(HUB.prof), at = os.time(),
+            plan = ts and ts.week == wk and C.MODE.tourneyPlan(ts) or nil, pred = ts and ts.week == wk and ts.score or nil }
         B.pending = { stage = tonumber(st.stage) or 0, tourney = true, power = m.power, at = os.time() }
         B.sinceHub = 0
         SF.log(1, "TOURNEY", "tournament started (" .. tostring(m.why) .. ")")
@@ -2210,12 +2241,35 @@ end
 -- road coverage of a spot: path samples within range. Earlier samples weigh more (enemies die sooner →
 -- waves clear faster → maps finish faster). Road past where enemies actually get to (MT.reachCut, learned
 -- from live enemy positions) counts only a little: a hero there never gets a target.
+-- placement styles (the same as the battle sim's SIM.STRATS): weight of a road sample by how far down the
+-- road it is (f = 0 entrance … 1 exit). The tournament uses the one its planner scored best
+C.STRATS = {
+    front = function(f) return 1.35 - 0.6 * f end,
+    even = function(f) return 1 end,
+    entrance = function(f) return f < 0.35 and 1.5 or 0.25 end,
+    middle = function(f) return (f > 0.25 and f < 0.65) and 1.5 or 0.4 end,
+    exit = function(f) return 0.4 + 1.2 * f end,
+}
+C.STRAT_ORDER = { "front", "entrance", "middle", "even", "exit" }
+-- "crowd": the planner's measured enemy-HP share per stretch of road (same weights as SIM.crowdWeight)
+function MT.crowdStyle(occ)
+    MT.crowdFns = MT.crowdFns or {}
+    if MT.crowdFns[occ] then return MT.crowdFns[occ] end
+    local fn = function(f)
+        local i = U.clamp(math.floor(f * #occ) + 1, 1, #occ)
+        return 0.2 + 1.3 * (tonumber(occ[i]) or 0)
+    end
+    MT.crowdFns[occ] = fn
+    return fn
+end
 function MT.coverageAt(x, z, range, cut)
     local pts = MT.pathPts
     local n = #pts
     local r2 = range * range
     cut = cut or MT.reachCut or 1
     local s = 0
+    local ts = MT.tourney and B.tourneySim
+    local style = ts and ts.week == tostring(MT.tourneyWeek and MT.tourneyWeek.n or "") and (C.STRATS[ts.strat or ""] or (ts.strat == "crowd" and type(ts.occ) == "table" and #ts.occ > 0 and MT.crowdStyle(ts.occ))) or nil
     for i = 1, n do
         local p = pts[i]
         local dx, dz = p.X - x, p.Z - z
@@ -2224,6 +2278,7 @@ function MT.coverageAt(x, z, range, cut)
             local w = 1.35 - 0.6 * f
             -- raid: stack the entrance (battle sim: fastest final clear at the same safety margin)
             if MT.raid and CFG.raidPlace == "entrance" then w = f < 0.35 and 1.5 or 0.25 end
+            if style then w = style(f) end
             if f > cut then w = w * 0.2 end
             s = s + w
         end
@@ -2944,6 +2999,19 @@ function MT.finish()
     SF.status("Match", string.format("%s %s · %d/%d wins here", stage and stage.name or "?", MT.won and "won" or "lost", rec.wins, rec.runs))
     B.lastResult = { text = string.format("%s %s on wave %s in %d:%02d", stage and stage.name or "?", MT.won and "won" or "lost", tostring(MT.wave), sec // 60, sec % 60),
         won = MT.won == true, items = type(MT.result) == "table" and MT.result.items or nil, gems = type(MT.result) == "table" and MT.result.gems or nil, at = os.time() }
+    -- tournament: the score (damage dealt) against what the planner predicted; the ratio calibrates it
+    if MT.tourney then
+        local score = tonumber(LP:GetAttribute("TourneyScore")) or 0
+        local last, ts = B.tourney or {}, B.tourneySim
+        local pred = tonumber(last.pred)
+        if score > 0 and pred and pred > 0 and not MT.joinedMidRun and ts then
+            local r = U.clamp(score / pred, 0.5, 2)
+            ts.cal = ts.cal and (ts.cal * 0.6 + r * 0.4) or r
+        end
+        MT.tourneyScore = score
+        SF.log(1, "TOURNEY", string.format("score %.1fM damage%s · wave %s · %d leaks", score / 1e6,
+            pred and string.format(" (planner predicted %.1fM with %s)", pred / 1e6, tostring(last.plan)) or "", tostring(MT.wave), MT.runLeaks or 0))
+    end
     B.pending = nil
     pcall(SF.HIVE.record, key, sec)
     SF.saveNow()
@@ -3001,6 +3069,19 @@ function MT.raidNote(text)
     B.raidSimNote = { text = tostring(text):sub(1, 300), at = os.time() }
     SF.saveSoon()
 end
+-- the battle simulator: the local CKD_SmartFarm/sim.lua, else (loadstring users) the copy in the repo.
+-- Returns ok, SIM (or the error), where it came from
+function MT.loadSim()
+    local from = "local file"
+    local ok, SIM = pcall(function()
+        local src = isfile(C.FOLDER .. "/sim.lua") and readfile(C.FOLDER .. "/sim.lua") or nil
+        if not src then from = "GitHub"; src = game:HttpGet(C.SIM_URL) end
+        local fn, cerr = loadstring(src, "=sim")
+        if not fn then error("compile: " .. tostring(cerr)) end
+        return fn()
+    end)
+    return ok and type(SIM) == "table", SIM, from
+end
 function MT.raidCheck()
     local RAID = C.Catalog.RAID
     if not (CFG.raids and RAID and C.Catalog.eventOn and C.Catalog.eventOn()) then
@@ -3026,15 +3107,8 @@ function MT.raidCheck()
     local sig = table.concat(sigT, ",") .. "|" .. tostring(CFG.raidTeam)
     local s = B.raidSim
     if s and s.sig == sig and s.team == C.MODE.raidTeamKey(B.prof) and os.time() - (tonumber(s.at) or 0) < 7200 then return end
-    local from = "local file"
-    local okS, SIM = pcall(function()
-        local src = isfile(C.FOLDER .. "/sim.lua") and readfile(C.FOLDER .. "/sim.lua") or nil
-        if not src then from = "GitHub"; src = game:HttpGet(C.SIM_URL) end -- loadstring users: the copy in the repo
-        local fn, cerr = loadstring(src, "=sim")
-        if not fn then error("compile: " .. tostring(cerr)) end
-        return fn()
-    end)
-    if not okS or type(SIM) ~= "table" then
+    local okS, SIM, from = MT.loadSim()
+    if not okS then
         SF.log(1, "RAID", "simulator problem: couldn't load it from " .. from .. ": " .. tostring(SIM))
         return MT.raidNote("couldn't load the simulator from " .. from .. ": " .. tostring(SIM))
     end
@@ -3103,6 +3177,103 @@ function MT.raidCheck()
     end
 end
 
+-- tournament planner: the board ranks damage dealt in 10 minutes, and a team that survives already gets
+-- every coin it can spend, so the score is how much of the last, biggest waves it chews through before the
+-- clock runs out. The sim plays this week's tournament (its waves, element ×2/×0.5, $4000, 10 lives) for
+-- teams of owned heroes (single swaps, kept while the damage rises) and then each placement style, and
+-- keeps the best: B.tourneySim = {week, team, strat, score, sig, at, cal = real / predicted}.
+-- Runs in ordinary matches (never in the tournament itself); again when the roster or the week changes.
+function MT.tourneyCheck()
+    if not CFG.tourney or MT.tourney then return end
+    local okW, week = pcall(C.Catalog.tourneyAt, os.time())
+    if not (okW and type(week) == "table" and C.Catalog.tourneyWave) then return end
+    local bestOf = {}
+    for _, u in pairs(B.prof.units or {}) do
+        local sc = C.M.unitScore(u, true) * (C.Catalog.tourneyMult(week, u.kind) or 1)
+        if MT.levels(u.kind) and (not bestOf[u.kind] or sc > bestOf[u.kind].s) then bestOf[u.kind] = { s = sc, u = u } end
+    end
+    local pool = {}
+    for k, b in pairs(bestOf) do table.insert(pool, { kind = k, s = b.s }) end
+    table.sort(pool, function(a, b) return a.s > b.s end)
+    while #pool > 12 do table.remove(pool) end
+    if #pool == 0 then return end
+    local sigT = {}
+    for _, c in ipairs(pool) do local u = bestOf[c.kind].u; table.insert(sigT, string.format("%s:%s:%s:%s", c.kind, tostring(u.level), tostring(u.trait), tostring(u.g))) end
+    table.sort(sigT)
+    local sig = tostring(week.n) .. "|" .. table.concat(sigT, ",")
+    local old = B.tourneySim
+    if old and old.sig == sig and os.time() - (tonumber(old.at) or 0) < 6 * 3600 then return end
+    local okS, SIM = MT.loadSim()
+    if not (okS and SIM.tourney) then return SF.log(1, "TOURNEY", "planner: couldn't load the simulator: " .. tostring(SIM)) end
+    SF.status("Tourney", "planning the tournament team (simulating)…")
+    local function entries(kinds)
+        local t = {}
+        for _, k in ipairs(kinds) do local b = bestOf[k]; if b then table.insert(t, { kind = k, level = b.u.level, trait = b.u.trait, g = b.u.g }) end end
+        return t
+    end
+    local runs = 0
+    local function scoreOf(kinds, strat, occ)
+        task.wait()
+        runs = runs + 1
+        local ok, r = pcall(SIM.tourney, week, entries(kinds), { strat = strat or "front", occ = occ })
+        if not ok then SF.log(1, "TOURNEY", "planner sim error: " .. tostring(r)); return 0, {} end
+        return tonumber(r.score) or 0, r
+    end
+    -- start from the last pick (still owned), topped up with the strongest
+    local team, seen = {}, {}
+    for k in tostring(old and old.team or ""):gmatch("[%w_]+") do if bestOf[k] and #team < C.Catalog.SLOTS then table.insert(team, k); seen[k] = true end end
+    for _, c in ipairs(pool) do if #team < C.Catalog.SLOTS and not seen[c.kind] then table.insert(team, c.kind); seen[c.kind] = true end end
+    local function climb(cur, strat, rounds)
+        for _ = 1, rounds do
+            if not SF.alive or MT.tourney then return cur end
+            local bestT, bestS = nil, cur
+            for slot = 1, #team do
+                for _, c in ipairs(pool) do
+                    if not table.find(team, c.kind) then
+                        local trial = table.clone(team)
+                        trial[slot] = c.kind
+                        local s = scoreOf(trial, strat)
+                        if s > bestS * 1.01 then bestT, bestS = trial, s end
+                    end
+                end
+            end
+            if not bestT then break end
+            team, cur = bestT, bestS
+        end
+        return cur
+    end
+    local strat = old and C.STRATS[old.strat or ""] and old.strat or "front"
+    local cur = climb(scoreOf(team, strat), strat, 3)
+    if not SF.alive or MT.tourney then return end
+    local stratS, line = cur, {}
+    for _, st in ipairs(C.STRAT_ORDER) do
+        local s = st == strat and cur or scoreOf(team, st)
+        table.insert(line, string.format("%s %.0fM", st, s / 1e6))
+        if s > stratS * 1.01 then strat, stratS = st, s end
+    end
+    -- the best team for one placement style isn't always the best for another: one more swap round
+    stratS = climb(stratS, strat, 1)
+    -- measured placement: put heroes where the waves' HP really piled up in the best run, re-measure, twice
+    local occ
+    local _, bestR = scoreOf(team, strat)
+    local seed = bestR and bestR.occ
+    for _ = 1, 2 do
+        if not seed then break end
+        local s, r = scoreOf(team, "crowd", seed)
+        table.insert(line, string.format("crowd %.0fM", s / 1e6))
+        if s > stratS * 1.01 then strat, stratS, occ = "crowd", s, seed end
+        seed = r and r.occ
+    end
+    local sorted = table.clone(team)
+    table.sort(sorted)
+    local cal = old and tonumber(old.cal) or nil
+    B.tourneySim = { week = tostring(week.n), team = table.concat(sorted, ","), strat = strat, occ = occ, score = stratS, sig = sig, at = os.time(), cal = cal }
+    SF.saveSoon()
+    SF.log(1, "TOURNEY", string.format("planner (%d sims): %s · %s placement → %.1fM damage predicted%s · placements: %s", runs, table.concat(sorted, " "), strat,
+        stratS / 1e6, cal and string.format(" (≈%.1fM after calibration x%.2f)", stratS * cal / 1e6, cal) or "", table.concat(line, ", ")))
+    SF.status("Tourney", string.format("planned: %s · %s placement · %.1fM predicted", table.concat(sorted, " "), strat, stratS * (cal or 1) / 1e6))
+end
+
 -- match info (team kinds, levels, traits, grades). The server sometimes answers before the team is in:
 -- retry, and fall back to the team cached from the lobby so the run never sits with nothing to place
 function MT.loadInfo()
@@ -3146,6 +3317,7 @@ function MT.run()
     MT.infinite = MT.info.infinite == true
     MT.raid = MT.info.raid == true or (C.Catalog.RAID and MT.stage == C.Catalog.RAID.stage) or false
     MT.tourney = type(MT.info.tourney) == "table" or (B.pending and B.pending.tourney) or false
+    if MT.tourney then MT.tourneyWeek = select(2, pcall(C.Catalog.tourneyAt, os.time())) end
     local wOf = C.Catalog.worldOf(tonumber(MT.stage) or 0)
     MT.portal = (wOf and C.Catalog.PORTAL and wOf.id == C.Catalog.PORTAL.world) or false
     if B.pending and B.pending.challenge and B.pending.stage == MT.stage then
@@ -3170,6 +3342,8 @@ function MT.run()
             SF.log(1, "RAID", "simulator crashed: " .. tostring(err))
             pcall(MT.raidNote, "simulator crashed: " .. tostring(err))
         end
+        local okT, errT = pcall(MT.tourneyCheck)
+        if not okT then SF.log(1, "TOURNEY", "planner crashed: " .. tostring(errT)) end
     end)
     local st = C.Catalog.stage(MT.stage)
     SF.log(1, "BATTLE", string.format("in %s (stage %s)%s · team %s", st and st.name or "?", tostring(MT.stage), MT.challenge and (" challenge " .. MT.challenge) or "", table.concat(MT.info.slots or {}, ",")))
@@ -3836,7 +4010,8 @@ function SF.HIVE.record(key, sec)
         end
     end
     table.insert(B.hiveQueue, { k = key, w = MT.won and 1 or 0, wv = MT.wave, t = sec, mid = MT.joinedMidRun and 1 or nil,
-        lv = MT.lives, team = team, tw = tw, at = os.time() })
+        lv = MT.lives, team = team, tw = tw, at = os.time(), sc = MT.tourney and MT.tourneyScore or nil,
+        st = MT.tourney and B.tourneySim and B.tourneySim.strat or nil })
     while #B.hiveQueue > 30 do table.remove(B.hiveQueue, 1) end
 end
 -- send what fits in one message (oldest first); a failed send keeps the records for next time
