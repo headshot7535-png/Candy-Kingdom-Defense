@@ -3223,11 +3223,13 @@ function MT.finish()
         local cd = MT.cdSum / MT.cdN
         rec.countdown = rec.countdown and (rec.countdown * 0.6 + cd * 0.4) or cd
     end
-    -- game speed: enemies' walking speed where they can be watched, else the waves' spawn times
+    -- game speed = enemies' walking speed against their listed speed. Spawn times run 1/stage.pace faster
+    -- (the stage's own spawn-gap factor, which the sim applies itself), so they're only logged as a check
     local walkP = (MT.paceN or 0) >= 8 and MT.paceSum / MT.paceN or nil
     local spanP = (MT.spanN or 0) >= 3 and MT.spanSum / MT.spanN or nil
-    local p = walkP or spanP
+    local p = walkP
     if p then rec.pace = rec.pace and (rec.pace * 0.6 + p * 0.4) or p end
+    if spanP then rec.spawnPace = spanP end
     if p or (MT.cdN or 0) >= 3 then
         SF.log(1, "PACE", string.format("%s: game speed x%s by walking (%d) · x%s by spawn times (%d; listed/real s %s) · gap after spawning %s s (%d) · stored x%s",
             MT.stageName(), walkP and string.format("%.2f", walkP) or "?", MT.paceN or 0, spanP and string.format("%.2f", spanP) or "?", MT.spanN or 0,
@@ -3607,7 +3609,8 @@ function MT.clearCheck()
     local function timeOf(kinds, strat, hp)
         task.wait()
         runs = runs + 1
-        local ok, r = pcall(SIM.clear, MT.stage, entriesFrom(kinds), { mods = mods, aggr = MT.aggr, strat = strat or "front", hp = hp })
+        -- the same reach cut the farm places with here (MT.updateReachCut: where enemies really get)
+        local ok, r = pcall(SIM.clear, MT.stage, entriesFrom(kinds), { mods = mods, aggr = MT.aggr, strat = strat or "front", hp = hp, cut = MT.reachCut })
         if not ok or not r.won or (r.leaks or 0) > 0 then return math.huge, r end
         return r.t / pace, r
     end
