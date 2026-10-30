@@ -1,5 +1,5 @@
 --[[
-    🍬 Candy Kingdom Defense — Smart Farm v1.2  (NexusLib)
+    🍬 Candy Kingdom Defense — Smart Farm v1.3  (NexusLib)
 
     One script for both places of the game:
       • Lobby (Tree Fort):  rewards → best team → feed → traits/stats → summon → pick the best mode → launch
@@ -13,10 +13,17 @@
 
 -- claim the "running" slot synchronously, before any yield, so two queued loaders can't both start
 if _G.CKD_SF and _G.CKD_SF.alive then return end
-local VERSION = "1.2"
+local VERSION = "1.3"
 -- what changed, newest first (Updates tab; a one-time notice when a player first runs a new version)
 -- items: { icon, title, text, tag = NEW | IMPROVED | FIX }
 local CHANGELOG = {
+    { v = "1.3", date = "Oct 30, 2026", title = "Halloween Banner", items = {
+        { "🎃", "Halloween Banner pulls", "Spends Halloween Candy on the event banner while it has heroes you don't own (Marshall Lee, Belly Demon 9% each).", "NEW" },
+        { "🧛", "Candy for Vampire King first", "Once Marshall Lee is in, the 5,000 candy his Vampire King evolution needs is kept back.", "NEW" },
+        { "🍬", "Raids while candy has a use", "Raids rank right after challenges while candy still buys something (the banner or an evolution).", "IMPROVED" },
+        { "💰", "Smarter gem value", "With a big pile of gems and nothing to buy, gems count for less, so the farm goes after what you still need.", "IMPROVED" },
+        { "🧊", "Ice maps get plans", "The simulator now matches ice maps too (spawn pace and the farm's own placement rule).", "FIX" },
+    } },
     { v = "1.2", date = "Oct 29, 2026", title = "A plan for every map", items = {
         { "🗺️", "Clear planner", "Works out the fastest team and placement for each map. Testing: Goliad's Reign 11% faster, Gumdrop Gauntlet 20% faster.", "NEW" },
         { "✅", "Only plans where it's right", "Plans only on maps where the simulator's times match your real runs, and drops a plan that turns out slower.", "NEW" },
@@ -132,6 +139,10 @@ C.DEFAULTS = {
     sTierItemValue = 1000,     -- ... and their missing items are worth this much (Sandwiches → Ice Kingdom Act 5 for Cosmic Dog)
     teller = true,             -- Teller's candy shop: Elder Vampire + 5 Vampire Essence (→ The Dark Cloud) once 20,000 Halloween Candy is in
     sTierCandyValue = 3,       -- ... until then each Halloween Candy is worth this many gems (raids keep running after the Demon Lord)
+    eventBanner = true,        -- pull the event banner (Halloween Candy) while it has heroes we don't own
+    bannerNewChance = 0.02,    -- ... at least this chance per pull of a new hero (Marshall Lee / Belly Demon 9% each)
+    gemIdle = 30000,           -- gems above this, with nothing to spend them on, count for less in the mode ranking
+    gemIdleValue = 0.3,        -- ... this much each (so the farm goes after portals, candy, crystals instead)
     -- modes
     goal = 1,                  -- 1 Progress (clear maps fast, farm only to break walls) · 2 Gems per minute
     play = true, story = true, farm = true, challenges = true, infinite = false,
@@ -534,9 +545,52 @@ function C.M.ownsAny(kinds)
     end
     return false
 end
--- still saving Halloween Candy for the Teller's Elder Vampire → The Dark Cloud (event running, not owned)
+-- the event banner's heroes we don't own yet (owning one's evolution counts): chance per pull, kinds
+function C.M.bannerNew(p)
+    local Cat = C.Catalog
+    if not (Cat.EVENT_BANNER and Cat.eventPool and Cat.eventOn and Cat.eventOn()) then return 0, {} end
+    local own = {}
+    for _, u in pairs(p and p.units or {}) do own[u.kind] = true end
+    for target, def in pairs(Cat.EVOLUTIONS or {}) do if own[target] then own[def.from] = true end end
+    local ok, pool = pcall(Cat.eventPool)
+    local total, new = 0, {}
+    for _, e in ipairs(ok and type(pool) == "table" and pool or {}) do
+        if e.unit and e.hero and not own[e.hero] then total = total + (tonumber(e.chance) or 0); table.insert(new, e.hero) end
+    end
+    return total, new
+end
+-- Halloween Candy an evolution we can work toward still needs (Marshall Lee → Vampire King: 5,000)
+function C.M.candyReserve(p)
+    local need = 0
+    for _, e in ipairs(C.EVO.list(p)) do
+        local n = e.gain > 0 and tonumber(e.flat and e.flat.hwcandy) or 0
+        if n > need then need = n end
+    end
+    return need
+end
+-- what Halloween Candy is still for while the event runs (nil = nothing): the Teller's Dark Cloud, an
+-- evolution that needs candy, or event-banner heroes we don't own
 function C.M.candyGoal()
-    return CFG.teller and CFG.sTierEvolve and C.Catalog.eventOn and C.Catalog.eventOn() and not C.M.ownsAny({ "VampireKingCloud" })
+    if not (C.Catalog.eventOn and C.Catalog.eventOn()) then return nil end
+    if CFG.teller and CFG.sTierEvolve and not C.M.ownsAny({ "VampireKingCloud" }) then return "The Dark Cloud (bought at the Teller)" end
+    local evo = (B.evoNeeds or {}).hwcandy and (B.evoNeedFor or {}).hwcandy
+    if evo then return (C.Catalog.UNITS[evo] and C.Catalog.UNITS[evo].name or evo) .. " (evolution)" end
+    if CFG.eventBanner then
+        local chance, new = C.M.bannerNew(B.prof)
+        if chance >= CFG.bannerNewChance then return "the Halloween Banner (" .. table.concat(new, ", ") .. ")" end
+    end
+    return nil
+end
+-- gems count for less while there's nothing to spend them on (a big pile, the banner has nothing new, no
+-- evolution waiting on gems): then the ranking prefers modes that pay what's still missing
+function C.M.gemValue(p)
+    p = p or B.prof
+    -- an evolution's gem price (a few thousand) only matters while the pile is close to it
+    local reserved = CFG.evolve and (C.EVO.gemReserve(p) or 0) or 0
+    if (tonumber(p and p.gems) or 0) - reserved < CFG.gemIdle then return 1 end
+    local okS, worth = pcall(C.M.summonNew, p)
+    if CFG.summon and okS and worth then return 1 end
+    return CFG.gemIdleValue
 end
 function C.M.itemsValue(items)
     local v = 0
@@ -555,12 +609,14 @@ function C.M.itemsValue(items)
     for k, n in pairs(items or {}) do
         local each = C.ITEM_VALUE[k] or 20
         if maxed and (k == "candy" or k == "bigcandy") then each = 2 end
+        -- Halloween Candy comes by the thousand: its value is per candy (below), never an evolution item's
+        local mass = k == "hwcandy"
         -- items an evolution we can work toward still needs are worth a lot more
-        if needs[k] then each = math.max(each, k == "page" and CFG.evoItemValue * 0.4 or CFG.evoItemValue) end
+        if needs[k] and not mass then each = math.max(each, k == "page" and CFG.evoItemValue * 0.4 or CFG.evoItemValue) end
         local held = tonumber(B.prof and B.prof.items and B.prof.items[k]) or 0
-        if needs[k] and fItems[k] and held < fItems[k] and k ~= "page" then each = each * 3 end
-        if (B.sTierNeeds or {})[k] then each = math.max(each, CFG.sTierItemValue) end
-        -- saving for The Dark Cloud: candy counts, and a raid key is worth the candy its raid pays
+        if needs[k] and fItems[k] and held < fItems[k] and k ~= "page" and not mass then each = each * 3 end
+        if (B.sTierNeeds or {})[k] and not mass then each = math.max(each, CFG.sTierItemValue) end
+        -- saving candy (The Dark Cloud, an evolution, the banner): candy counts, a raid key is worth its raid's candy
         if C.M.candyGoal() then
             local RAID = C.Catalog.RAID
             if k == "hwcandy" then each = CFG.sTierCandyValue end
@@ -864,7 +920,7 @@ function C.MODE.score(m, prof, power, cap, totalRuns)
         local T = C.Catalog.TOURNEY
         local R = 0
         for _, r in ipairs(T.rewards or {}) do
-            if (m.why or ""):find(r.id, 1, true) then R = R + (r.gems or 0) + C.M.itemsValue(r.items) end
+            if (m.why or ""):find(r.id, 1, true) then R = R + (r.gems or 0) * C.M.gemValue(prof) + C.M.itemsValue(r.items) end
         end
         local lowest = T.places and T.places[#T.places]
         R = R + (lowest and lowest.crystal or 0) * (C.ITEM_VALUE.crystal or 35) * 0.5
@@ -889,11 +945,12 @@ function C.MODE.score(m, prof, power, cap, totalRuns)
     if m.infinite then p = 1 end
     -- the raid's prior comes from the battle simulator (current team wins with ~3x HP margin)
     if m.raid then p = (wins + 2 * 0.9) / (runs + 2) end
-    -- reward in gem-equivalents
+    -- reward in gem-equivalents (gems themselves × C.M.gemValue: less while there's nothing to buy)
     local R
+    local gv = C.M.gemValue(prof)
     if m.challenge then
         local chR = C.Catalog.CHALLENGE.reward or {}
-        R = (chR.gems or 0) + C.M.itemsValue(chR.items) + C.M.itemsValue((C.Catalog.CHALLENGE.first or {}).items)
+        R = (chR.gems or 0) * gv + C.M.itemsValue(chR.items) + C.M.itemsValue((C.Catalog.CHALLENGE.first or {}).items)
         -- an evolution waiting only on pages: each challenge page is a step to a power spike, worth like a map
         local blocked = CFG.evolve and C.EVO.pageBlocked(prof)
         if blocked then R = R + (CFG.goal == 1 and 1500 or 300); m.forEvo = blocked.target end
@@ -910,7 +967,7 @@ function C.MODE.score(m, prof, power, cap, totalRuns)
     elseif m.portal then
         -- Lich Ooze + stage gems, plus the secret Lich Lord's drop chance while we don't own him
         local okW, items = pcall(C.Catalog.winItems, m.stage, false)
-        R = C.Catalog.STAGE_GEMS.again + C.M.itemsValue(okW and items or nil) + C.M.itemsValue(C.Catalog.PORTAL_ITEMS and C.Catalog.PORTAL_ITEMS.lich)
+        R = C.Catalog.STAGE_GEMS.again * gv + C.M.itemsValue(okW and items or nil) + C.M.itemsValue(C.Catalog.PORTAL_ITEMS and C.Catalog.PORTAL_ITEMS.lich)
         local sec = C.Catalog.SECRET_DROPS and C.Catalog.SECRET_DROPS.Lich
         local ownsLich = false
         for _, u in pairs(prof.units or {}) do if u.kind == "Lich" then ownsLich = true end end
@@ -918,7 +975,7 @@ function C.MODE.score(m, prof, power, cap, totalRuns)
     else
         local gems = m.first and C.Catalog.STAGE_GEMS.first or C.Catalog.STAGE_GEMS.again
         local okW, items = pcall(C.Catalog.winItems, m.stage, m.first)
-        R = gems * (C.Catalog.gemsMult and C.Catalog.gemsMult(prof) or 1) + C.M.itemsValue(okW and items or nil)
+        R = gems * (C.Catalog.gemsMult and C.Catalog.gemsMult(prof) or 1) * gv + C.M.itemsValue(okW and items or nil)
         -- the raid pays Halloween Candy per wave cleared (not part of its win items)
         local RAID = C.Catalog.RAID
         if m.raid and RAID then R = R + C.M.itemsValue({ [RAID.candy or "hwcandy"] = (RAID.perWave or 25) * (RAID.waves or 15) }) end
@@ -995,7 +1052,8 @@ function C.MODE.purpose(m)
     local p = B.prof or {}
     if m.tourney then return "Weekly tournament: 10-minute survival for gems, crystals and a spot on the board" .. (m.why and (" (" .. tostring(m.why) .. ")") or "") end
     if m.raid then
-        if C.M.ownsAny({ "Hunson", "HunsonDemon" }) and C.M.candyGoal() then return "Halloween raid: Halloween Candy for The Dark Cloud (bought at the Teller)" end
+        local goal = C.M.ownsAny({ "Hunson", "HunsonDemon" }) and C.M.candyGoal()
+        if goal then return "Halloween raid: Halloween Candy for " .. goal end
         return "Halloween raid: Halloween candy, raid drops and a 3% shot at the Demon Lord"
     end
     if m.portal then
@@ -1870,6 +1928,60 @@ function C.M.summonNew(p)
     end
     if total >= CFG.summonNewChance then return true, table.concat(new, ",") end
     return false, string.format("every hero on the banner is owned (new: %s at %.2f%%/pull)", #new > 0 and table.concat(new, ",") or "none", total * 100)
+end
+
+-- event banner (Halloween: Catalog.EVENT_BANNER, HubRemotes.SummonEvent(n), 50 / 500 candy): pull while it
+-- has heroes we don't own at ≥ CFG.bannerNewChance a pull, with only the candy above what an evolution still
+-- needs (Marshall Lee → Vampire King takes 5,000). 81% of pulls are Night skins; a duplicate skin refunds 30
+function HUB.eventBanner(depth)
+    if not CFG.eventBanner then return SF.status("Banner", "off") end
+    local Cat = C.Catalog
+    local EB = Cat.EVENT_BANNER
+    if not (EB and Cat.eventOn and Cat.eventOn()) then return SF.status("Banner", "no event banner running") end
+    local p = HUB.refresh()
+    if not p then return end
+    local chance, new = C.M.bannerNew(p)
+    if chance < CFG.bannerNewChance then
+        return SF.status("Banner", string.format("%s: nothing new worth pulling (%.1f%% a pull%s)", EB.name, chance * 100, #new > 0 and (": " .. table.concat(new, ", ")) or ""))
+    end
+    local cur = EB.currency or "hwcandy"
+    local reserve = C.M.candyReserve(p)
+    local spare = HUB.items(cur) - reserve
+    local one, ten = tonumber(EB.one) or 50, tonumber(EB.ten) or 500
+    if spare < one then
+        return SF.status("Banner", string.format("%s: %s (%.0f%% a pull) · candy %s%s", EB.name, table.concat(new, ", "), chance * 100,
+            U.fmt(HUB.items(cur)), reserve > 0 and (" · holding " .. U.fmt(reserve) .. " for an evolution") or ""))
+    end
+    local inv, max = Cat.unitCount(p), Cat.inventoryMax(p)
+    if inv + 1 > max then return SF.status("Banner", string.format("backpack %d/%d full (feed will clear spares)", inv, max)) end
+    local n = (spare >= ten and inv + 10 <= max) and 10 or 1
+    local res, err = SF.request("SummonEvent", C.R("SummonEvent"), n)
+    if not (type(res) == "table" and res.ok) then
+        local why = tostring(type(res) == "table" and res.reason or err)
+        SF.log(1, "BANNER", "refused: " .. why)
+        SF.backoff("SummonEvent", 300)
+        return SF.status("Banner", "refused: " .. why)
+    end
+    if type(res.profile) == "table" then HUB.setProfile(res.profile) else HUB.refresh(true) end
+    local got, heroes = {}, {}
+    for _, c in ipairs(type(res.results) == "table" and res.results or {}) do
+        if c.skin then
+            table.insert(got, tostring(c.skin) .. (c.dup and string.format(" (dupe, +%s back)", tostring(c.refund or EB.refund or 30)) or ""))
+        else
+            table.insert(got, tostring(c.kind) .. (c.new and " NEW!" or ""))
+            if c.new or c.secret then table.insert(heroes, Cat.UNITS[c.kind] and Cat.UNITS[c.kind].name or tostring(c.kind)) end
+        end
+    end
+    local msg = string.format("%dx for %d candy → %s", n, n == 10 and ten or one, #got > 0 and table.concat(got, ", ") or "ok")
+    SF.log(1, "BANNER", msg)
+    SF.status("Banner", msg)
+    if #heroes > 0 and SF.notify then SF.notify("Halloween Banner", "New hero: " .. table.concat(heroes, ", ") .. "!", "success") end
+    HUB.busyUntil = U.now() + 2
+    -- keep pulling this visit while it's still worth it (each pull may have changed what's new)
+    if (depth or 0) < 8 then
+        task.wait(0.8)
+        return HUB.eventBanner((depth or 0) + 1)
+    end
 end
 
 -- summon: 10-pulls (cheaper per unit + Epic floor) whenever gems allow; logs odds, featured and pity
@@ -3906,6 +4018,7 @@ HUB.SYSTEMS = {
     { name = "Teller", fn = HUB.teller, every = 30 },
     { name = "Evolve", fn = HUB.evolve, every = 10 },
     { name = "Cleanup", fn = HUB.cleanup, every = 30 },
+    { name = "Banner", fn = HUB.eventBanner, every = 10 },
     { name = "Summon", fn = HUB.summon, every = 6 },
     { name = "Feed", fn = HUB.feed, every = 6 },
     { name = "Traits", fn = HUB.traits, every = 8 },
@@ -3988,13 +4101,15 @@ function GUI.build()
     local function sld(T, label, desc, key, o) o.default = CFG[key]; UI[key] = T:Slider(label, desc, o, function(v) setCfg(key, v) end) end
     local function int(v) return tostring(math.floor(v + 0.5)) end
     local function notify(t, m, k) pcall(function() Win:Notify(t, m, 3, k or "default") end) end
+    -- systems outside the window (a new hero from the banner) pop up through this (SF: declared at the top)
+    SF.notify = function(t, m, k) pcall(function() Win:Notify(t, m, 6, k or "default") end) end
 
     GUI.COL = Lib.Colors or {}
     local T = Win:Tab("🏠", "Main")
     UI.master = T:Toggle("Smart Farm", "Master switch for every system (lobby + match)", CFG.master, function(on)
         setCfg("master", on); Win:Status(on and "▶ Farming" or "⏸ Paused")
     end)
-    GUI.SYSTEMS = { "Mode", "Battle", "Economy", "Placement", "Upgrade", "Abilities", "Match", "Evolve", "Summon", "Team", "Feed", "Traits", "Stats", "Tourney", "Cleanup", "Rewards" }
+    GUI.SYSTEMS = { "Mode", "Battle", "Economy", "Placement", "Upgrade", "Abilities", "Match", "Evolve", "Banner", "Summon", "Team", "Feed", "Traits", "Stats", "Tourney", "Cleanup", "Rewards" }
     if T.StatusCard and T.StatGrid and T.KeyValue then
         -- NexusLib 1.7+: what it's doing and why, goals at a glance, then every system in one compact list
         T:Section("Now")
@@ -4034,6 +4149,7 @@ function GUI.build()
     T:Section("Summon & Storage")
     tog(T, "Auto Summon", "Summon whenever gems allow", "summon")
     tog(T, "Only New Heroes", "Pull only while the banner offers a hero you don't own", "summonOnlyNew")
+    tog(T, "Halloween Banner", "Pull it with Halloween Candy while it has a hero you don't own (keeps candy an evolution needs)", "eventBanner")
     tog(T, "10-Pulls Only", "Cheaper per pull, with an Epic floor", "summonTen")
     sld(T, "Gem Reserve", "Never summon below this", "gemReserve", { min = 0, max = 10000, step = 250, format = int })
     tog(T, "Storage Cleanup", "Delete weak spare copies when the backpack is nearly full (never team, Mythic+, traited)", "cleanup")
