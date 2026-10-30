@@ -1,5 +1,5 @@
 --[[
-    🍬 Candy Kingdom Defense — Smart Farm v1.1  (NexusLib)
+    🍬 Candy Kingdom Defense — Smart Farm v1.2  (NexusLib)
 
     One script for both places of the game:
       • Lobby (Tree Fort):  rewards → best team → feed → traits/stats → summon → pick the best mode → launch
@@ -13,7 +13,7 @@
 
 -- claim the "running" slot synchronously, before any yield, so two queued loaders can't both start
 if _G.CKD_SF and _G.CKD_SF.alive then return end
-local VERSION = "1.1"
+local VERSION = "1.2"
 local SF = { alive = true, conns = {} }
 _G.CKD_SF = SF
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -136,6 +136,7 @@ C.DEFAULTS = {
     shareStats = true,         -- send anonymous game stats to the script author (Settings → Help improve the script turns it off)
     shareEvery = 60,           -- minutes between summary reports
     useHive = true,            -- blend the hive's hero measurements (GitHub hive.json) into the scores
+    clearPlans = true,         -- battle sim plans each map's fastest team + placement (only where it matches real times)
     shareBatch = 5,            -- match records per Discord message (also sent after 20 min with fewer)
     shareChosen = false,       -- the player flipped the sharing toggle themselves: their choice is kept forever
     shareNoticed = false,      -- the one-time "sharing is on" notice was shown
@@ -257,6 +258,7 @@ do
     B.tourneyInfo = type(b.tourneyInfo) == "table" and b.tourneyInfo or nil -- last GetTourney {week, mine}
     B.tourneySim = type(b.tourneySim) == "table" and b.tourneySim or nil   -- planner {week, team, strat, score, sig, at, cal}
     B.blocked = type(b.blocked) == "table" and b.blocked or {}               -- [map] = {"x,z" = runs it refused a hero}
+    B.clearPlan = type(b.clearPlan) == "table" and b.clearPlan or {}         -- [modeKey] = clear plan (MT.clearCheck)
     B.raidAggrReset = b.raidAggrReset                                        -- raid early-call boldness re-learned once
     B.lastResult = type(b.lastResult) == "table" and b.lastResult or nil   -- last run's result line (GUI)
     B.lastReport = tonumber(b.lastReport) or 0                              -- last anonymous stats report (opt-in)
@@ -1910,8 +1912,12 @@ function C.MODE.raidTeamKey(prof)
 end
 -- raid team: the battle-sim pick (CFG.raidTeam kinds, best copy of each), filled up with the normal team
 function HUB.setRaidTeam()
-    local p = HUB.prof
     local want, src = C.MODE.raidWant()
+    return HUB.setKindsTeam(want, "RAID", "raid team set: " .. src)
+end
+-- equip these kinds (best copy of each), filled up with the current slots; true when set or already set
+function HUB.setKindsTeam(want, tag, msg)
+    local p = HUB.prof
     if #want == 0 then return true end
     local bestId = {}
     for id, u in pairs(p.units or {}) do
@@ -1932,11 +1938,30 @@ function HUB.setRaidTeam()
     local res, err = SF.request("SetSlots", C.R("SetSlots"), slots)
     if type(res) == "table" and res.ok then
         HUB.apply(res)
-        SF.log(1, "RAID", "raid team set: " .. src)
+        SF.log(1, tag, msg)
         return true
     end
-    SF.log(1, "RAID", "raid team refused: " .. tostring(err))
+    SF.log(1, tag, "team refused: " .. tostring(err))
     return false
+end
+-- a normal map with a trusted clear plan (MT.clearCheck) plays with the plan's team
+function HUB.setPlanTeam(m)
+    local plan = C.MODE.clearPlan(m)
+    if not plan then return end
+    local want = {}
+    for k in tostring(plan.team):gmatch("[%w_]+") do table.insert(want, k) end
+    HUB.setKindsTeam(want, "PLAN", string.format("team for %s: %s (%s)", C.MODE.describe(m), table.concat(want, " "),
+        plan.inf and string.format("sim wave %d vs ~%d now", plan.wave or 0, math.floor(plan.real or 0))
+        or string.format("sim %ds vs %ds now", math.floor(plan.t or 0), math.floor(plan.real or 0))))
+end
+-- the usable clear plan for a mode: made for this roster's heroes, trusted (the sim matched real times on
+-- this map), not rejected by real runs, fresh
+function C.MODE.clearPlan(m)
+    if not CFG.clearPlans or m.raid or m.tourney then return nil end
+    local plan = B.clearPlan and B.clearPlan[C.MODE.key(m)]
+    if not (plan and plan.trusted and not plan.rejected and plan.team) then return nil end
+    if os.time() - (tonumber(plan.at) or 0) > 24 * 3600 then return nil end
+    return plan
 end
 -- raid: set the raid team, travel to the Raid Gate (the lobby's own area travel moves the character the
 -- same way), OpenRaid (uses a key), StartRaid → teleport
@@ -2120,6 +2145,7 @@ function HUB.play()
     if m.raid then return HUB.launchRaid(m) end
     if m.portal then return HUB.launchPortal(m) end
     if m.tourney then return HUB.launchTourney(m) end
+    pcall(HUB.setPlanTeam, m)
     local res, err = SF.request("CreateMatch", C.R("CreateMatch"), m.stage, m.challenge, m.infinite == true)
     if not (type(res) == "table" and res.ok) then
         HUB.createFails = (HUB.createFails or 0) + 1
@@ -2322,6 +2348,8 @@ function MT.coverageAt(x, z, range, cut)
     local s = 0
     local ts = MT.tourney and B.tourneySim
     local style = ts and ts.week == tostring(MT.tourneyWeek and MT.tourneyWeek.n or "") and (C.STRATS[ts.strat or ""] or (ts.strat == "crowd" and type(ts.occ) == "table" and #ts.occ > 0 and MT.crowdStyle(ts.occ))) or nil
+    -- a normal map with a trusted clear plan places the plan's way
+    if not MT.tourney and MT.planStrat then style = C.STRATS[MT.planStrat] end
     for i = 1, n do
         local p = pts[i]
         local dx, dz = p.X - x, p.Z - z
@@ -2819,6 +2847,73 @@ function MT.scanEnemies()
     return list
 end
 
+-- game speed: the server paces each map toward a target run length (Catalog.WAVE_CLOCK, 0.8×–3×), so long
+-- maps (Ice Kingdom ~×1.8) run faster than their tables say while Infinite runs ~×1.1. Measured here as
+-- how fast enemies really walk, away from every hero (no slows or stuns), against their listed speed
+-- (× the challenge's Speedy); the finished run stores it per mode (rec.pace) and the planners divide the
+-- sim's times by it
+-- a wave's listed spawn time (its last group's delay + count gaps), from the stage or Infinite tables
+function MT.waveSpan(w)
+    w = tonumber(w)
+    if not w or w < 1 then return nil end
+    local groups
+    if MT.infinite then
+        local wo = C.Catalog.worldOf(MT.stage)
+        groups = wo and C.Catalog.infiniteWave(wo.id, w)
+    else
+        local st = C.Catalog.stage(MT.stage)
+        groups = st and C.Catalog.stageWaves(st)[w]
+    end
+    if type(groups) ~= "table" then return nil end
+    local s = 0
+    for _, g in ipairs(groups) do s = math.max(s, (tonumber(g[4]) or 0) + ((tonumber(g[2]) or 1) - 1) * (tonumber(g[3]) or 1)) end
+    return s
+end
+function MT.paceSample(now)
+    if now - (MT.paceAt or 0) < 1.5 then return end
+    local f, pts = MT.enemyFolder, MT.pathPts
+    if not (f and f.Parent and pts) then return end
+    if not MT.typeSpeed then
+        MT.typeSpeed = {}
+        local okE, E = pcall(function() return require(C.root:FindFirstChild("Enemies")) end)
+        for k, v in pairs(okE and type(E) == "table" and E.TYPES or {}) do
+            if type(v) == "table" and tonumber(v.speed) then MT.typeSpeed[v.name or k] = v.speed; MT.typeSpeed[k] = v.speed end
+        end
+    end
+    local W, step, n = MT.W(), MT.pathStep or 3, #pts
+    local tw = {}
+    for _, t in pairs(MT.towers) do tw[#tw + 1] = { x = t.x / W, z = t.z / W } end
+    local function where(m, hint)
+        local ok, cf = pcall(m.GetPivot, m)
+        if not ok then return nil end
+        local x, z = cf.Position.X / W, cf.Position.Z / W
+        for _, t in ipairs(tw) do if (t.x - x) ^ 2 + (t.z - z) ^ 2 < 55 * 55 then return nil end end
+        local lo, hi = hint and math.max(1, hint - 10) or 1, hint and math.min(n, hint + 20) or n
+        local bi, bd = nil, 36
+        for i = lo, hi do local p = pts[i]; local d = (p.X - x) ^ 2 + (p.Z - z) ^ 2; if d < bd then bd, bi = d, i end end
+        return bi
+    end
+    local last = MT.paceLast
+    if last then
+        local dt = now - MT.paceAt
+        for m, i0 in pairs(last) do
+            local listed = MT.typeSpeed[m.Name]
+            local i1 = m.Parent and listed and where(m, i0)
+            if i1 and i1 > i0 then
+                local r = (i1 - i0) * step / dt / (listed * ((MT.mods and MT.mods.speed) or 1))
+                if r > 0.3 and r < 4 then MT.paceSum, MT.paceN = (MT.paceSum or 0) + r, (MT.paceN or 0) + 1 end
+            end
+        end
+    end
+    local snap, cnt = {}, 0
+    for _, m in ipairs(f:GetChildren()) do
+        if cnt >= 12 then break end
+        local i = where(m)
+        if i then snap[m] = i; cnt = cnt + 1 end
+    end
+    MT.paceLast, MT.paceAt = snap, now
+end
+
 -- learning: each tower's measured damage vs the model's damage *while enemies were actually in its range*
 -- (exposure), so a hero standing behind the kill zone isn't blamed for having nothing to hit
 function MT.learnTick(dt)
@@ -2968,7 +3063,9 @@ function MT.resync()
     MT.running = s.running == true
     MT.over = s.over == true
     MT.stage = s.stage or MT.stage
-    MT.infinite = s.infinite == true
+    -- the snapshot says infinite=false even in Infinite (seen Oct 2026): it can only confirm Infinite, never
+    -- undo what the match info / launch said (a match doesn't change mode)
+    if s.infinite == true then MT.infinite = true end
     MT.enemies = #(s.enemies or {})
     table.clear(MT.towers)
     for _, t in ipairs(s.towers or {}) do
@@ -2986,6 +3083,37 @@ end
 -- per-run state (a fresh run starts here and after replay / next)
 function MT.resetRun()
     MT.runLeaks, MT.earlyCalls, MT.runReach, MT.waveReach = 0, 0, 0, 0
+    MT.paceSum, MT.paceN, MT.paceLast, MT.paceAt = 0, 0, nil, 0
+    MT.cdSum, MT.cdN, MT.spanSum, MT.spanN, MT.cdDue, MT.cdStartAt, MT.spanRaw = 0, 0, 0, 0, nil, nil, {}
+    -- WaveNextAt: a wave's start sets a new due time; when it has finished spawning the same due time is set
+    -- again. So start → re-set = the wave's real spawn time (its listed spawn time / real = the game speed,
+    -- for maps where no enemy is ever away from the heroes), and what's left then = the real gap
+    if not MT.cdConn then
+        local mr = game:GetService("ReplicatedStorage"):FindFirstChild("MatchRemotes")
+        if mr then
+            MT.cdConn = mr:GetAttributeChangedSignal("WaveNextAt"):Connect(function()
+                local due = tonumber(mr:GetAttribute("WaveNextAt"))
+                local now = workspace:GetServerTimeNow()
+                if not due or due < now then return end
+                if not MT.cdDue or math.abs(due - MT.cdDue) > 1 then
+                    MT.cdDue, MT.cdStartAt = due, now
+                    return
+                end
+                local left = due - now
+                if left > 1 and left < 60 then MT.cdSum, MT.cdN = (MT.cdSum or 0) + left, (MT.cdN or 0) + 1 end
+                local span = MT.cdStartAt and MT.waveSpan(MT.wave)
+                local real = MT.cdStartAt and now - MT.cdStartAt
+                MT.spanRaw = MT.spanRaw or {}
+                if #MT.spanRaw < 8 then table.insert(MT.spanRaw, string.format("%s/%s", span and string.format("%.0f", span) or "?", real and string.format("%.1f", real) or "?")) end
+                if span and span >= 5 and real and real > 0.5 and ((MT.mods and MT.mods.count) or 1) == 1 then
+                    local r = span / real
+                    if r > 0.3 and r < 8 then MT.spanSum, MT.spanN = (MT.spanSum or 0) + r, (MT.spanN or 0) + 1 end
+                end
+                MT.cdStartAt = nil
+            end)
+            table.insert(SF.conns, MT.cdConn)
+        end
+    end
     table.clear(MT.idleWaves); table.clear(MT.expo); table.clear(MT.pred); table.clear(MT.atkDmg)
     local rec = B.stages[MT.modeKey()] or {}
     -- raid caution learned while the team was weak (losses → x0.36) kept early calls off for good. Once the
@@ -3051,6 +3179,22 @@ function MT.finish()
         local frac = U.clamp((tonumber(MT.lives) or 0) / math.max(1, maxLives), 0, 1)
         rec.livesFrac = rec.livesFrac and math.max(rec.livesFrac * 0.8, frac) or frac
     end
+    -- game speed the server ran this map at (MT.paceSample)
+    if (MT.cdN or 0) >= 3 then
+        local cd = MT.cdSum / MT.cdN
+        rec.countdown = rec.countdown and (rec.countdown * 0.6 + cd * 0.4) or cd
+    end
+    -- game speed: enemies' walking speed where they can be watched, else the waves' spawn times
+    local walkP = (MT.paceN or 0) >= 8 and MT.paceSum / MT.paceN or nil
+    local spanP = (MT.spanN or 0) >= 3 and MT.spanSum / MT.spanN or nil
+    local p = walkP or spanP
+    if p then rec.pace = rec.pace and (rec.pace * 0.6 + p * 0.4) or p end
+    if p or (MT.cdN or 0) >= 3 then
+        SF.log(1, "PACE", string.format("%s: game speed x%s by walking (%d) · x%s by spawn times (%d; listed/real s %s) · gap after spawning %s s (%d) · stored x%s",
+            MT.stageName(), walkP and string.format("%.2f", walkP) or "?", MT.paceN or 0, spanP and string.format("%.2f", spanP) or "?", MT.spanN or 0,
+            table.concat(MT.spanRaw or {}, " "), (MT.cdN or 0) > 0 and string.format("%.1f", MT.cdSum / MT.cdN) or "?", MT.cdN or 0,
+            rec.pace and string.format("%.2f", rec.pace) or "?"))
+    end
     -- where enemies got to (placement next time), and how bold early wave calls can be here
     if (MT.runReach or 0) > 0 then rec.reach = math.max((tonumber(rec.reach) or 0) * 0.85, MT.runReach) end
     B.stages[key] = rec
@@ -3080,6 +3224,27 @@ function MT.finish()
     SF.status("Match", string.format("%s %s · %d/%d wins here", stage and stage.name or "?", MT.won and "won" or "lost", rec.wins, rec.runs))
     B.lastResult = { text = string.format("%s %s on wave %s in %d:%02d", stage and stage.name or "?", MT.won and "won" or "lost", tostring(MT.wave), sec // 60, sec % 60),
         won = MT.won == true, items = type(MT.result) == "table" and MT.result.items or nil, gems = type(MT.result) == "table" and MT.result.gems or nil, at = os.time() }
+    -- clear plan: real runs judge it. Two runs with the plan slower than the old average → rejected
+    local plan = MT.planKey == key and B.clearPlan[key]
+    -- Infinite: a run ends at a death wave (real even after joining mid-run)
+    if MT.infinite and (tonumber(MT.wave) or 0) > 0 then
+        rec.infWave = rec.infWave and (rec.infWave * 0.7 + MT.wave * 0.3) or MT.wave
+        if plan then
+            plan.runs, plan.sum = (plan.runs or 0) + 1, (plan.sum or 0) + MT.wave
+            local avg = plan.sum / plan.runs
+            if plan.runs >= 2 and avg < (tonumber(plan.real) or avg) * 0.97 then plan.rejected = true end
+            SF.log(1, "PLAN", string.format("%s Infinite with the plan: wave %d (avg %.0f over %d runs, before ~%.0f, sim said %s)%s", MT.stageName(), MT.wave, avg, plan.runs,
+                tonumber(plan.real) or 0, tostring(plan.wave), plan.rejected and " → earlier than before, plan dropped" or ""))
+        end
+        plan = nil
+    end
+    if plan and MT.won and not MT.joinedMidRun then
+        plan.runs, plan.sum = (plan.runs or 0) + 1, (plan.sum or 0) + sec
+        local avg = plan.sum / plan.runs
+        if plan.runs >= 2 and avg > (tonumber(plan.real) or avg) * 1.03 then plan.rejected = true end
+        SF.log(1, "PLAN", string.format("%s with the plan: %ds (avg %ds over %d runs, before %ds, sim said %ds)%s", MT.stageName(), sec, math.floor(avg), plan.runs,
+            math.floor(tonumber(plan.real) or 0), math.floor(tonumber(plan.t) or 0), plan.rejected and " → slower than before, plan dropped" or ""))
+    end
     -- tournament: the score (damage dealt) against what the planner predicted; the ratio calibrates it
     if MT.tourney then
         local score = tonumber(LP:GetAttribute("TourneyScore")) or 0
@@ -3355,6 +3520,204 @@ function MT.tourneyCheck()
     SF.status("Tourney", string.format("planned: %s · %s placement · %.1fM predicted", table.concat(sorted, " "), strat, stratS * (cal or 1) / 1e6))
 end
 
+-- clear planner: on a normal map (story, challenge, Lich Lair) the sim plays it the farm's way — early calls,
+-- the server's wave pacing, the challenge's modifiers — for teams of owned heroes and each placement style,
+-- and keeps the fastest that still wins with 30% more enemy HP. It's only trusted where the sim's time for
+-- the team really played matches the real average within 25% (some maps it doesn't model well yet); real
+-- runs with the plan that come out slower than before reject it. B.clearPlan[modeKey] =
+-- {team, strat, t, base, real, sig, at, trusted, rejected, runs, sum}
+function MT.clearCheck()
+    if not CFG.clearPlans or MT.tourney or MT.raid or MT.infinite then return end
+    local key = MT.modeKey()
+    if key:find("^inf:") then return end -- endless: there is no clear to speed up
+    local rec = B.stages[key] or {}
+    local real = tonumber(rec.sec)
+    if not real or (rec.runs or 0) < 2 then return end -- needs a real average to compare against
+    local info = MT.info or {}
+    local mods = MT.mods or {}
+    local modsSig = {}
+    for k, v in pairs(mods) do if v ~= 1 then table.insert(modsSig, k .. "=" .. tostring(v)) end end
+    table.sort(modsSig)
+    local bestOf = {}
+    for _, u in pairs(B.prof.units or {}) do
+        local sc = C.M.unitScore(u, true)
+        if MT.levels(u.kind) and (not bestOf[u.kind] or sc > bestOf[u.kind].s) then bestOf[u.kind] = { s = sc, u = u } end
+    end
+    local pool = {}
+    for k, b in pairs(bestOf) do table.insert(pool, { kind = k, s = b.s }) end
+    table.sort(pool, function(a, b) return a.s > b.s end)
+    while #pool > 10 do table.remove(pool) end
+    local sigT = {}
+    for _, c in ipairs(pool) do local u = bestOf[c.kind].u; table.insert(sigT, string.format("%s:%s:%s", c.kind, tostring(u.level), tostring(u.trait))) end
+    table.sort(sigT)
+    -- the server's game speed on this map (rec.pace): sim seconds / pace = real seconds
+    local pace = U.clamp(tonumber(rec.pace) or 1, 0.5, 4)
+    local sig = table.concat(modsSig, ",") .. "|" .. table.concat(sigT, ",") .. string.format("|x%.1f", pace)
+    local old = B.clearPlan[key]
+    if old and old.sig == sig and os.time() - (tonumber(old.at) or 0) < 12 * 3600 then return end
+    -- this match plays the plan: keep it until real runs have judged it (a re-plan now would get the credit)
+    if old and MT.planKey == key and not old.rejected and os.time() - (tonumber(old.at) or 0) < 12 * 3600 then return end
+    local okS, SIM = MT.loadSim()
+    if not (okS and SIM.clear) then return end
+    local entriesFrom = function(kinds)
+        local t = {}
+        for _, k in ipairs(kinds) do local b = bestOf[k]; if b then table.insert(t, { kind = k, level = b.u.level, trait = b.u.trait, g = b.u.g }) end end
+        return t
+    end
+    local runs = 0
+    local function timeOf(kinds, strat, hp)
+        task.wait()
+        runs = runs + 1
+        local ok, r = pcall(SIM.clear, MT.stage, entriesFrom(kinds), { mods = mods, aggr = MT.aggr, strat = strat or "front", hp = hp })
+        if not ok or not r.won or (r.leaks or 0) > 0 then return math.huge, r end
+        return r.t / pace, r
+    end
+    -- the team really played here, through the sim: does it match the real average?
+    local playing = {}
+    for _, k in ipairs(info.slots or {}) do if bestOf[k] then table.insert(playing, k) end end
+    if #playing == 0 then return end
+    local base = timeOf(playing)
+    local trusted = base < math.huge and math.abs(base - real) / real <= 0.25
+    if not trusted then
+        B.clearPlan[key] = { sig = sig, at = os.time(), trusted = false, base = base < math.huge and base or nil, real = real }
+        SF.saveSoon()
+        return SF.log(1, "PLAN", string.format("%s: the sim says %s for this team (game speed x%.2f%s), real runs take %ds — not trusted on this map yet, keeping the normal team",
+            MT.stageName(), base < math.huge and (math.floor(base) .. "s") or "a loss", pace, rec.pace and "" or " — not measured yet", math.floor(real)))
+    end
+    SF.status("Plan", "planning the fastest clear here (simulating)…")
+    local team = table.clone(playing)
+    while #team < C.Catalog.SLOTS and #team < #pool do
+        for _, c in ipairs(pool) do if not table.find(team, c.kind) then table.insert(team, c.kind) break end end
+    end
+    local cur = timeOf(team)
+    for _ = 1, 2 do
+        if not SF.alive or SF.where ~= "match" then return end
+        local bestT, bestS = nil, cur
+        for slot = 1, #team do
+            for _, c in ipairs(pool) do
+                if not table.find(team, c.kind) then
+                    local trial = table.clone(team)
+                    trial[slot] = c.kind
+                    local s = timeOf(trial)
+                    if s < bestS * 0.97 then bestT, bestS = trial, s end
+                end
+            end
+        end
+        if not bestT then break end
+        team, cur = bestT, bestS
+    end
+    local strat = "front"
+    for _, st in ipairs(C.STRAT_ORDER) do
+        if st ~= "front" then
+            local s = timeOf(team, st)
+            if s < cur * 0.97 then strat, cur = st, s end
+        end
+    end
+    -- worth it (5%+ faster than the team played now) and safe (still a clean win with 30% more enemy HP)?
+    local safe = timeOf(team, strat, 1.3) < math.huge
+    local sorted = table.clone(team)
+    table.sort(sorted)
+    local plan = { sig = sig, at = os.time(), trusted = true, base = base, real = real, t = cur, team = table.concat(sorted, ","), strat = strat, runs = 0, sum = 0 }
+    if not (cur < base * 0.95 and safe) then plan.team, plan.strat = nil, nil end
+    B.clearPlan[key] = plan
+    SF.saveSoon()
+    SF.log(1, "PLAN", string.format("%s (%d sims): sim matches real (%ds vs %ds at x%.2f game speed) · %s", MT.stageName(), runs, math.floor(base), math.floor(real), pace,
+        plan.team and string.format("fastest: %s · %s placement → %ds (%.0f%% faster)", table.concat(sorted, " "), strat, math.floor(cur), (1 - cur / base) * 100)
+        or string.format("the team played now is already about the fastest%s", safe and "" or " (faster options weren't safe)")))
+end
+-- Infinite planner: the same search, but for the deepest wave (Lich Portals drop every 10 waves). Real
+-- Infinite runs end at a death wave; the plan is only trusted where the sim's wave for the team played now
+-- is within 15% of the real average (rec.infWave), and real runs with the plan that die earlier reject it
+function MT.infCheck()
+    if not CFG.clearPlans or not MT.infinite or MT.tourney or MT.raid then return end
+    local key = MT.modeKey()
+    local rec = B.stages[key] or {}
+    local real = tonumber(rec.infWave) or tonumber(rec.lastWave)
+    if not real or real < 5 or (rec.runs or 0) < 2 then return end
+    local bestOf = {}
+    for _, u in pairs(B.prof.units or {}) do
+        local sc = C.M.unitScore(u, true)
+        if MT.levels(u.kind) and (not bestOf[u.kind] or sc > bestOf[u.kind].s) then bestOf[u.kind] = { s = sc, u = u } end
+    end
+    local pool = {}
+    for k, b in pairs(bestOf) do table.insert(pool, { kind = k, s = b.s }) end
+    table.sort(pool, function(a, b) return a.s > b.s end)
+    while #pool > 10 do table.remove(pool) end
+    local sigT = {}
+    for _, c in ipairs(pool) do local u = bestOf[c.kind].u; table.insert(sigT, string.format("%s:%s:%s", c.kind, tostring(u.level), tostring(u.trait))) end
+    table.sort(sigT)
+    local sig = "inf|" .. table.concat(sigT, ",")
+    local old = B.clearPlan[key]
+    if old and old.sig == sig and os.time() - (tonumber(old.at) or 0) < 12 * 3600 then return end
+    if old and MT.planKey == key and not old.rejected and os.time() - (tonumber(old.at) or 0) < 12 * 3600 then return end
+    local okS, SIM = MT.loadSim()
+    if not (okS and SIM.infinite) then return end
+    local function entries(kinds)
+        local t = {}
+        for _, k in ipairs(kinds) do local b = bestOf[k]; if b then table.insert(t, { kind = k, level = b.u.level, trait = b.u.trait, g = b.u.g }) end end
+        return t
+    end
+    local runs = 0
+    -- deepest wave, a little credit for lasting longer on it
+    local function depth(kinds, strat)
+        task.wait()
+        runs = runs + 1
+        local ok, r = pcall(SIM.infinite, MT.stage, entries(kinds), { strat = strat or "front" })
+        if not ok then return 0 end
+        return (tonumber(r.wave) or 0) + math.min(0.9, (tonumber(r.t) or 0) / 1e5)
+    end
+    local playing = {}
+    for _, k in ipairs(MT.info.slots or {}) do if bestOf[k] then table.insert(playing, k) end end
+    if #playing == 0 then return end
+    local base = depth(playing)
+    if math.abs(math.floor(base) - real) / real > 0.15 then
+        B.clearPlan[key] = { sig = sig, at = os.time(), trusted = false, base = math.floor(base), real = real, inf = true }
+        SF.saveSoon()
+        return SF.log(1, "PLAN", string.format("%s Infinite: the sim reaches wave %d with this team, real runs end around wave %d — not trusted here yet",
+            MT.stageName(), math.floor(base), math.floor(real)))
+    end
+    SF.status("Plan", "planning the deepest Infinite run here (simulating)…")
+    local team = table.clone(playing)
+    local cur = base
+    for _ = 1, 2 do
+        if not SF.alive or SF.where ~= "match" then return end
+        local bestT, bestS = nil, cur
+        for slot = 1, #team do
+            for _, c in ipairs(pool) do
+                if not table.find(team, c.kind) then
+                    local trial = table.clone(team)
+                    trial[slot] = c.kind
+                    local s = depth(trial)
+                    if s >= bestS + 1 then bestT, bestS = trial, s end
+                end
+            end
+        end
+        if not bestT then break end
+        team, cur = bestT, bestS
+    end
+    local strat = "front"
+    for _, st in ipairs(C.STRAT_ORDER) do
+        if st ~= "front" then
+            local s = depth(team, st)
+            if s >= cur + 1 then strat, cur = st, s end
+        end
+    end
+    local sorted = table.clone(team)
+    table.sort(sorted)
+    local plan = { sig = sig, at = os.time(), trusted = true, inf = true, base = math.floor(base), real = real, wave = math.floor(cur), team = table.concat(sorted, ","), strat = strat, runs = 0, sum = 0 }
+    -- worth it: at least 3 waves (or 5%) deeper than the team played now
+    if math.floor(cur) < math.floor(base) + math.max(3, base * 0.05) then plan.team, plan.strat = nil, nil end
+    B.clearPlan[key] = plan
+    SF.saveSoon()
+    SF.log(1, "PLAN", string.format("%s Infinite (%d sims): sim wave %d vs real ~%d · %s", MT.stageName(), runs, math.floor(base), math.floor(real),
+        plan.team and string.format("deepest: %s · %s placement → wave %d", table.concat(sorted, " "), strat, math.floor(cur))
+        or "the team played now is already about the deepest"))
+end
+function MT.stageName()
+    local st = C.Catalog.stage(MT.stage)
+    return (st and st.name or ("stage " .. tostring(MT.stage))) .. (MT.challenge and " [challenge]" or "")
+end
+
 -- match info (team kinds, levels, traits, grades). The server sometimes answers before the team is in:
 -- retry, and fall back to the team cached from the lobby so the run never sits with nothing to place
 function MT.loadInfo()
@@ -3395,10 +3758,11 @@ function MT.run()
     MT.dmgDelta = {}
     MT.loadInfo()
     MT.stage = MT.info.stage
-    MT.infinite = MT.info.infinite == true
+    MT.infinite = MT.info.infinite == true or (B.pending and B.pending.infinite and tonumber(B.pending.stage) == tonumber(MT.stage)) or false
     MT.raid = MT.info.raid == true or (C.Catalog.RAID and MT.stage == C.Catalog.RAID.stage) or false
     MT.tourney = type(MT.info.tourney) == "table" or (B.pending and B.pending.tourney) or false
     if MT.tourney then MT.tourneyWeek = select(2, pcall(C.Catalog.tourneyAt, os.time())) end
+    MT.planStrat = nil -- set below once the mode key is known (MT.planFor)
     local wOf = C.Catalog.worldOf(tonumber(MT.stage) or 0)
     MT.portal = (wOf and C.Catalog.PORTAL and wOf.id == C.Catalog.PORTAL.world) or false
     if B.pending and B.pending.challenge and B.pending.stage == MT.stage then
@@ -3415,6 +3779,14 @@ function MT.run()
     MT.runStart = os.time()
     MT.joinedMidRun = (tonumber(MT.wave) or 0) > 1
     MT.teamDmgAt = MT.teamDmg or 0
+    -- the clear plan's placement style, when this match really has the plan's team
+    do
+        local plan = not MT.tourney and not MT.raid and C.MODE.clearPlan({ stage = MT.stage, challenge = MT.challenge, portal = MT.portal, infinite = MT.infinite })
+        local kinds = table.clone(MT.info.slots or {})
+        table.sort(kinds)
+        MT.planKey = plan and table.concat(kinds, ",") == plan.team and MT.modeKey() or nil
+        MT.planStrat = MT.planKey and plan.strat or nil
+    end
     MT.initMap()
     MT.resetRun()
     task.delay(15, function()
@@ -3425,6 +3797,8 @@ function MT.run()
         end
         local okT, errT = pcall(MT.tourneyCheck)
         if not okT then SF.log(1, "TOURNEY", "planner crashed: " .. tostring(errT)) end
+        local okP, errP = pcall(MT.infinite and MT.infCheck or MT.clearCheck)
+        if not okP then SF.log(1, "PLAN", "clear planner crashed: " .. tostring(errP)) end
     end)
     local st = C.Catalog.stage(MT.stage)
     SF.log(1, "BATTLE", string.format("in %s (stage %s)%s · team %s", st and st.name or "?", tostring(MT.stage), MT.challenge and (" challenge " .. MT.challenge) or "", table.concat(MT.info.slots or {}, ",")))
@@ -3457,6 +3831,7 @@ function MT.run()
             SF.request("ReturnToHub", C.R("ReturnToHub"))
         end
         pcall(MT.scanEnemies)
+        pcall(MT.paceSample, t)
         MT.learnTick(dt)
         if CFG.master and CFG.battle and not MT.over then
             if t - lastSync > 8 then lastSync = t; MT.resync() end
