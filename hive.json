@@ -1,33 +1,33 @@
 {
- "updated": 1793345826,
- "players": 21,
- "summaries": 127,
- "matchRecords": 486,
+ "updated": 1793367427,
+ "players": 25,
+ "summaries": 177,
+ "matchRecords": 929,
  "kinds": {
   "PrincessBubblegum": {
    "rel": 0.785,
    "players": 6,
-   "waves": 1553
+   "waves": 1597
   },
   "KingBMO": {
-   "rel": 1.405,
-   "players": 6,
-   "waves": 4228
+   "rel": 1.365,
+   "players": 7,
+   "waves": 4788
   },
   "PrismRainicorn": {
    "rel": 1.074,
    "players": 3,
-   "waves": 2720
+   "waves": 2801
   },
   "HunsonDemon": {
-   "rel": 0.72,
+   "rel": 0.585,
    "players": 7,
-   "waves": 1346
+   "waves": 1572
   },
   "MarcelineBeast": {
-   "rel": 0.614,
-   "players": 3,
-   "waves": 1357
+   "rel": 0.785,
+   "players": 4,
+   "waves": 1476
   },
   "Jake": {
    "rel": 0.352,
@@ -35,292 +35,300 @@
    "waves": 2514
   },
   "Lemongrab": {
-   "rel": 0.28,
-   "players": 4,
-   "waves": 333
+   "rel": 0.306,
+   "players": 5,
+   "waves": 343
   },
   "FlamePrincess": {
-   "rel": 0.241,
-   "players": 6,
-   "waves": 688
+   "rel": 0.695,
+   "players": 7,
+   "waves": 707
   },
   "AlienJake": {
-   "rel": 1.166,
-   "players": 13,
-   "waves": 2974
+   "rel": 1.441,
+   "players": 14,
+   "waves": 4023
   },
   "MagicMan": {
    "rel": 0.66,
-   "players": 3,
-   "waves": 566
+   "players": 5,
+   "waves": 609
   },
   "Rainicorn": {
-   "rel": 0.823,
-   "players": 10,
-   "waves": 1546
+   "rel": 0.672,
+   "players": 11,
+   "waves": 1593
   },
   "Marceline": {
    "rel": 0.713,
-   "players": 9,
-   "waves": 553
+   "players": 10,
+   "waves": 567
   },
   "BMO": {
-   "rel": 0.655,
-   "players": 7,
-   "waves": 312
+   "rel": 0.84,
+   "players": 9,
+   "waves": 390
   },
   "Finn": {
-   "rel": 0.746,
+   "rel": 0.691,
    "players": 6,
    "waves": 194
   },
   "KingMan": {
-   "rel": 0.523,
+   "rel": 0.488,
    "players": 3,
-   "waves": 1336
+   "waves": 1363
   },
   "CandyElemental": {
    "rel": 1.134,
-   "players": 6,
-   "waves": 3335
+   "players": 9,
+   "waves": 3765
   },
   "Billy": {
    "rel": 0.596,
    "players": 9,
-   "waves": 1681
+   "waves": 1789
   },
   "DeathMetal": {
-   "rel": 0.785,
-   "players": 2,
-   "waves": 577
+   "rel": 0.729,
+   "players": 5,
+   "waves": 729
   },
   "JakeSuit": {
-   "rel": 1.158,
+   "rel": 1.209,
    "players": 2,
-   "waves": 175
+   "waves": 233
   },
   "HalfMonsterDemon": {
-   "rel": 1.095,
-   "players": 8,
-   "waves": 2379
+   "rel": 1.087,
+   "players": 9,
+   "waves": 3230
   },
   "MarshallLee": {
-   "rel": 0.711,
-   "players": 11,
-   "waves": 2234
+   "rel": 0.66,
+   "players": 12,
+   "waves": 2651
   },
   "KeeOth": {
-   "rel": 0.88,
-   "players": 6,
-   "waves": 434
+   "rel": 0.968,
+   "players": 7,
+   "waves": 730
   },
   "VampireKingCloud": {
-   "rel": 0.733,
+   "rel": 0.612,
    "players": 3,
-   "waves": 294
+   "waves": 369
   },
   "Hunson": {
-   "rel": 0.649,
+   "rel": 0.948,
    "players": 3,
-   "waves": 109
+   "waves": 193
   },
   "AdultFinn": {
-   "rel": 1.663,
+   "rel": 0.932,
    "players": 4,
-   "waves": 1267
-  },
-  "HanaAbadeer": {
-   "rel": 0.824,
-   "players": 4,
-   "waves": 325
+   "waves": 2030
   },
   "MarshallLeeVampireKing": {
-   "rel": 0.807,
-   "players": 2,
-   "waves": 182
+   "rel": 0.64,
+   "players": 6,
+   "waves": 402
+  },
+  "HanaAbadeer": {
+   "rel": 0.617,
+   "players": 5,
+   "waves": 463
   },
   "JakeTheLich": {
-   "rel": 0.563,
-   "players": 2,
-   "waves": 386
+   "rel": 0.53,
+   "players": 3,
+   "waves": 452
   },
   "Lemongrab3": {
-   "rel": 4.9,
+   "rel": 4.554,
    "players": 1,
    "waves": 93
   },
   "Death": {
-   "rel": 2.056,
-   "players": 2,
-   "waves": 34
+   "rel": 1.307,
+   "players": 1,
+   "waves": 70
   }
  },
  "matchShare": {
   "HunsonDemon": {
-   "share": 0.089,
-   "matches": 208
+   "share": 0.117,
+   "matches": 322
   },
   "KingMan": {
-   "share": 0.212,
-   "matches": 52
+   "share": 0.022,
+   "matches": 76
   },
   "CandyElemental": {
-   "share": 0.058,
-   "matches": 117
+   "share": 0.184,
+   "matches": 282
   },
   "KingBMO": {
    "share": 0.288,
-   "matches": 212
+   "matches": 343
   },
   "PrismRainicorn": {
-   "share": 0.007,
-   "matches": 86
+   "share": 0.001,
+   "matches": 141
   },
   "AlienJake": {
-   "share": 0.176,
-   "matches": 287
+   "share": 0.15,
+   "matches": 612
   },
   "Hunson": {
-   "share": 0.001,
-   "matches": 62
+   "share": 0.003,
+   "matches": 104
   },
   "MarshallLee": {
-   "share": 0.101,
-   "matches": 208
+   "share": 0.061,
+   "matches": 445
   },
   "Rainicorn": {
-   "share": 0.05,
-   "matches": 44
+   "share": 0.056,
+   "matches": 77
   },
   "HalfMonsterDemon": {
-   "share": 0.236,
-   "matches": 151
+   "share": 0.21,
+   "matches": 358
   },
   "Marceline": {
-   "share": 0.086,
-   "matches": 12
+   "share": 0.118,
+   "matches": 24
   },
   "HanaAbadeer": {
-   "share": 0.012,
-   "matches": 86
+   "share": 0.038,
+   "matches": 212
   },
   "JakeTheLich": {
-   "share": 0.094,
-   "matches": 54
+   "share": 0.098,
+   "matches": 90
   },
   "VampireKingCloud": {
-   "share": 0.029,
-   "matches": 116
+   "share": 0.023,
+   "matches": 137
   },
   "DeathMetal": {
-   "share": 0.138,
-   "matches": 44
+   "share": 0.107,
+   "matches": 135
   },
   "MarshallLeeVampireKing": {
-   "share": 0.13,
-   "matches": 55
+   "share": 0.093,
+   "matches": 159
   },
   "Lemongrab": {
-   "share": 0.0,
-   "matches": 13
+   "share": 0.005,
+   "matches": 23
   },
   "PrincessBubblegum": {
-   "share": 0.154,
-   "matches": 56
+   "share": 0.135,
+   "matches": 60
   },
   "Billy": {
    "share": 0.0,
-   "matches": 145
+   "matches": 271
   },
   "MarcelineBeast": {
    "share": 0.0,
-   "matches": 90
+   "matches": 211
   },
   "Finn": {
-   "share": 0.377,
-   "matches": 2
+   "share": 0.65,
+   "matches": 8
   },
   "BMO": {
-   "share": 0.003,
-   "matches": 13
+   "share": 0.053,
+   "matches": 77
   },
   "Jake": {
    "share": 0.096,
    "matches": 21
   },
   "FlamePrincess": {
-   "share": 0.012,
-   "matches": 2
+   "share": 0.023,
+   "matches": 19
   },
   "AdultFinn": {
-   "share": 0.169,
-   "matches": 132
+   "share": 0.142,
+   "matches": 295
   },
   "KeeOth": {
-   "share": 0.068,
-   "matches": 91
+   "share": 0.115,
+   "matches": 236
   },
   "JakeSuit": {
-   "share": 0.64,
-   "matches": 42
+   "share": 0.0,
+   "matches": 122
   },
   "MagicMan": {
-   "share": 0.12,
-   "matches": 11
+   "share": 0.003,
+   "matches": 54
   },
   "Death": {
-   "share": 0.128,
-   "matches": 13
+   "share": 0.004,
+   "matches": 45
+  },
+  "Lich": {
+   "share": 0.0,
+   "matches": 1
+  },
+  "VampireKing": {
+   "share": 0.045,
+   "matches": 1
   }
  },
  "modes": {
   "ch:6": {
-   "runs": 33,
-   "wins": 33,
+   "runs": 54,
+   "wins": 54,
    "winRate": 1.0,
    "medSec": 143
   },
   "st:2": {
-   "runs": 2,
-   "wins": 2,
+   "runs": 3,
+   "wins": 3,
    "winRate": 1.0,
-   "medSec": 148
+   "medSec": 131
   },
   "ch:3": {
-   "runs": 30,
-   "wins": 30,
+   "runs": 42,
+   "wins": 42,
    "winRate": 1.0,
-   "medSec": 198
+   "medSec": 197
   },
   "ch:5": {
-   "runs": 27,
-   "wins": 27,
+   "runs": 49,
+   "wins": 49,
    "winRate": 1.0,
    "medSec": 184
   },
   "ch:2": {
-   "runs": 44,
-   "wins": 44,
+   "runs": 65,
+   "wins": 65,
    "winRate": 1.0,
-   "medSec": 142
+   "medSec": 138
   },
   "st:38": {
-   "runs": 24,
-   "wins": 23,
-   "winRate": 0.958,
-   "medSec": 474
+   "runs": 141,
+   "wins": 139,
+   "winRate": 0.986,
+   "medSec": 471
   },
   "ch:4": {
-   "runs": 44,
-   "wins": 44,
+   "runs": 59,
+   "wins": 59,
    "winRate": 1.0,
-   "medSec": 206
+   "medSec": 204
   },
   "pt:27": {
-   "runs": 42,
-   "wins": 42,
+   "runs": 51,
+   "wins": 51,
    "winRate": 1.0,
-   "medSec": 163
+   "medSec": 164
   },
   "st:35": {
    "runs": 9,
@@ -329,28 +337,28 @@
    "medSec": 219
   },
   "inf:32": {
-   "runs": 21,
+   "runs": 32,
    "wins": 0,
    "winRate": 0.0,
-   "medSec": 1482
+   "medSec": 1588
   },
   "inf:21": {
-   "runs": 1,
+   "runs": 2,
    "wins": 0,
    "winRate": 0.0,
-   "medSec": 1850
+   "medSec": 2021
   },
   "tr": {
-   "runs": 5,
-   "wins": 5,
+   "runs": 7,
+   "wins": 7,
    "winRate": 1.0,
    "medSec": 606
   },
   "st:32": {
-   "runs": 35,
-   "wins": 9,
-   "winRate": 0.257,
-   "medSec": 11879
+   "runs": 40,
+   "wins": 13,
+   "winRate": 0.325,
+   "medSec": 9450
   },
   "inf:22": {
    "runs": 5,
@@ -389,8 +397,8 @@
    "medSec": 1874
   },
   "st:21": {
-   "runs": 66,
-   "wins": 66,
+   "runs": 128,
+   "wins": 128,
    "winRate": 1.0,
    "medSec": 207
   },
@@ -443,40 +451,40 @@
    "medSec": 280
   },
   "st:6": {
-   "runs": 5,
-   "wins": 5,
+   "runs": 8,
+   "wins": 8,
    "winRate": 1.0,
    "medSec": 156
   },
   "st:22": {
-   "runs": 19,
-   "wins": 19,
+   "runs": 59,
+   "wins": 59,
    "winRate": 1.0,
-   "medSec": 229
+   "medSec": 224
   },
   "st:23": {
-   "runs": 16,
-   "wins": 16,
+   "runs": 17,
+   "wins": 17,
    "winRate": 1.0,
-   "medSec": 245
+   "medSec": 263
   },
   "st:4": {
-   "runs": 1,
-   "wins": 1,
+   "runs": 2,
+   "wins": 2,
    "winRate": 1.0,
-   "medSec": 203
+   "medSec": 216
   },
   "st:24": {
-   "runs": 11,
-   "wins": 11,
+   "runs": 22,
+   "wins": 22,
    "winRate": 1.0,
-   "medSec": 230
+   "medSec": 234
   },
   "st:1": {
-   "runs": 4,
-   "wins": 3,
-   "winRate": 0.75,
-   "medSec": 56
+   "runs": 79,
+   "wins": 78,
+   "winRate": 0.987,
+   "medSec": 59
   },
   "st:33": {
    "runs": 3,
@@ -485,10 +493,10 @@
    "medSec": 228
   },
   "st:25": {
-   "runs": 1,
-   "wins": 1,
+   "runs": 2,
+   "wins": 2,
    "winRate": 1.0,
-   "medSec": 366
+   "medSec": 350
   },
   "st:34": {
    "runs": 2,
@@ -497,10 +505,10 @@
    "medSec": 234
   },
   "st:37": {
-   "runs": 6,
-   "wins": 6,
+   "runs": 9,
+   "wins": 9,
    "winRate": 1.0,
-   "medSec": 256
+   "medSec": 293
   },
   "pt:26": {
    "runs": 1,
@@ -509,20 +517,76 @@
    "medSec": 203
   },
   "st:5": {
-   "runs": 4,
-   "wins": 4,
+   "runs": 6,
+   "wins": 6,
    "winRate": 1.0,
-   "medSec": 174
+   "medSec": 178
   },
   "inf:37": {
    "runs": 1,
    "wins": 0,
    "winRate": 0.0,
    "medSec": 1462
+  },
+  "st:3": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 205
+  },
+  "st:7": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 207
+  },
+  "st:8": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 210
+  },
+  "st:9": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 307
+  },
+  "st:10": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 266
+  },
+  "st:11": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 294
+  },
+  "st:12": {
+   "runs": 1,
+   "wins": 1,
+   "winRate": 1.0,
+   "medSec": 310
   }
  },
  "spots": {
   "st:2": [
+   {
+    "kind": "Finn",
+    "x": -116,
+    "z": -44,
+    "share": 0.319,
+    "n": 2
+   },
+   {
+    "kind": "Finn",
+    "x": -120,
+    "z": -48,
+    "share": 0.444,
+    "n": 1
+   },
    {
     "kind": "Finn",
     "x": -124,
@@ -546,10 +610,10 @@
    },
    {
     "kind": "Finn",
-    "x": -116,
-    "z": -44,
-    "share": 0.24,
-    "n": 1
+    "x": -112,
+    "z": -40,
+    "share": 0.105,
+    "n": 2
    },
    {
     "kind": "Rainicorn",
@@ -573,13 +637,6 @@
     "n": 1
    },
    {
-    "kind": "Finn",
-    "x": -112,
-    "z": -40,
-    "share": 0.081,
-    "n": 1
-   },
-   {
     "kind": "Marceline",
     "x": -112,
     "z": -32,
@@ -591,6 +648,13 @@
     "x": -108,
     "z": -32,
     "share": 0.05,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": -112,
+    "z": -32,
+    "share": 0.03,
     "n": 1
    },
    {
@@ -613,20 +677,6 @@
     "z": -28,
     "share": 0.001,
     "n": 1
-   },
-   {
-    "kind": "Hunson",
-    "x": -84,
-    "z": 40,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -72,
-    "z": 40,
-    "share": 0.0,
-    "n": 1
    }
   ],
   "ch:3": [
@@ -634,8 +684,8 @@
     "kind": "KingBMO",
     "x": -120,
     "z": -36,
-    "share": 0.87,
-    "n": 6
+    "share": 0.805,
+    "n": 12
    },
    {
     "kind": "KingBMO",
@@ -643,6 +693,13 @@
     "z": -32,
     "share": 0.725,
     "n": 8
+   },
+   {
+    "kind": "JakeTheLich",
+    "x": -72,
+    "z": 16,
+    "share": 0.445,
+    "n": 5
    },
    {
     "kind": "KingBMO",
@@ -655,8 +712,15 @@
     "kind": "KeeOth",
     "x": -120,
     "z": -40,
-    "share": 0.373,
-    "n": 4
+    "share": 0.303,
+    "n": 6
+   },
+   {
+    "kind": "KingBMO",
+    "x": -120,
+    "z": -40,
+    "share": 0.69,
+    "n": 2
    },
    {
     "kind": "AlienJake",
@@ -666,18 +730,18 @@
     "n": 4
    },
    {
-    "kind": "JakeTheLich",
-    "x": -72,
-    "z": 16,
-    "share": 0.611,
-    "n": 2
-   },
-   {
     "kind": "DeathMetal",
     "x": -64,
     "z": 16,
     "share": 0.373,
     "n": 3
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -128,
+    "z": -24,
+    "share": 0.555,
+    "n": 2
    },
    {
     "kind": "PrincessBubblegum",
@@ -687,25 +751,18 @@
     "n": 7
    },
    {
+    "kind": "MarshallLeeVampireKing",
+    "x": -120,
+    "z": -44,
+    "share": 0.185,
+    "n": 5
+   },
+   {
     "kind": "HunsonDemon",
     "x": -64,
     "z": 20,
     "share": 0.298,
     "n": 3
-   },
-   {
-    "kind": "HunsonDemon",
-    "x": -88,
-    "z": 24,
-    "share": 0.174,
-    "n": 7
-   },
-   {
-    "kind": "KingBMO",
-    "x": -120,
-    "z": -40,
-    "share": 0.797,
-    "n": 1
    },
    {
     "kind": "MarshallLee",
@@ -715,25 +772,18 @@
     "n": 6
    },
    {
-    "kind": "CandyElemental",
-    "x": -128,
-    "z": -24,
-    "share": 0.531,
-    "n": 1
-   },
-   {
-    "kind": "PrincessBubblegum",
-    "x": -120,
-    "z": -40,
-    "share": 0.096,
-    "n": 7
+    "kind": "HunsonDemon",
+    "x": -88,
+    "z": 24,
+    "share": 0.145,
+    "n": 14
    },
    {
     "kind": "AlienJake",
-    "x": -112,
+    "x": -120,
     "z": -36,
-    "share": 0.112,
-    "n": 4
+    "share": 0.239,
+    "n": 3
    }
   ],
   "ch:5": [
@@ -745,11 +795,11 @@
     "n": 3
    },
    {
-    "kind": "KingBMO",
-    "x": -68,
-    "z": -76,
-    "share": 0.315,
-    "n": 7
+    "kind": "VampireKingCloud",
+    "x": -84,
+    "z": -80,
+    "share": 0.305,
+    "n": 5
    },
    {
     "kind": "HunsonDemon",
@@ -759,18 +809,39 @@
     "n": 4
    },
    {
-    "kind": "VampireKingCloud",
-    "x": -84,
+    "kind": "KingBMO",
+    "x": -68,
+    "z": -76,
+    "share": 0.3,
+    "n": 10
+   },
+   {
+    "kind": "KingBMO",
+    "x": -76,
     "z": -80,
-    "share": 0.339,
+    "share": 0.374,
     "n": 4
    },
    {
     "kind": "KingBMO",
     "x": -72,
+    "z": -72,
+    "share": 0.287,
+    "n": 7
+   },
+   {
+    "kind": "KingBMO",
+    "x": -72,
     "z": -80,
-    "share": 0.232,
-    "n": 13
+    "share": 0.224,
+    "n": 21
+   },
+   {
+    "kind": "KingBMO",
+    "x": -68,
+    "z": -72,
+    "share": 0.216,
+    "n": 7
    },
    {
     "kind": "HunsonDemon",
@@ -781,75 +852,61 @@
    },
    {
     "kind": "KingBMO",
+    "x": -72,
+    "z": -76,
+    "share": 0.265,
+    "n": 4
+   },
+   {
+    "kind": "KingBMO",
     "x": -68,
-    "z": -72,
-    "share": 0.208,
+    "z": -80,
+    "share": 0.203,
     "n": 6
    },
    {
-    "kind": "AlienJake",
-    "x": -80,
-    "z": -72,
-    "share": 0.178,
-    "n": 9
+    "kind": "CandyElemental",
+    "x": -72,
+    "z": -80,
+    "share": 0.245,
+    "n": 4
    },
    {
     "kind": "HunsonDemon",
     "x": -92,
     "z": -80,
-    "share": 0.254,
-    "n": 3
+    "share": 0.239,
+    "n": 4
    },
    {
     "kind": "CandyElemental",
-    "x": -80,
+    "x": -76,
     "z": -80,
-    "share": 0.152,
-    "n": 5
-   },
-   {
-    "kind": "KingBMO",
-    "x": -72,
-    "z": -76,
-    "share": 0.249,
-    "n": 3
-   },
-   {
-    "kind": "AlienJake",
-    "x": -84,
-    "z": -80,
-    "share": 0.136,
-    "n": 9
-   },
-   {
-    "kind": "KingBMO",
-    "x": -80,
-    "z": -80,
-    "share": 0.327,
-    "n": 2
-   },
-   {
-    "kind": "KingBMO",
-    "x": -72,
-    "z": -72,
-    "share": 0.298,
-    "n": 2
-   },
-   {
-    "kind": "PrismRainicorn",
-    "x": -72,
-    "z": -68,
-    "share": 0.097,
+    "share": 0.19,
     "n": 8
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -68,
+    "z": -80,
+    "share": 0.211,
+    "n": 4
    }
   ],
   "ch:2": [
    {
     "kind": "KingBMO",
     "x": -120,
+    "z": -40,
+    "share": 0.757,
+    "n": 7
+   },
+   {
+    "kind": "KingBMO",
+    "x": -120,
     "z": -36,
-    "share": 0.783,
-    "n": 10
+    "share": 0.592,
+    "n": 18
    },
    {
     "kind": "DeathMetal",
@@ -859,11 +916,18 @@
     "n": 5
    },
    {
-    "kind": "AlienJake",
-    "x": -116,
-    "z": -32,
-    "share": 0.43,
-    "n": 5
+    "kind": "JakeTheLich",
+    "x": -72,
+    "z": 16,
+    "share": 0.481,
+    "n": 7
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -128,
+    "z": -24,
+    "share": 0.724,
+    "n": 3
    },
    {
     "kind": "KingBMO",
@@ -874,10 +938,10 @@
    },
    {
     "kind": "JakeTheLich",
-    "x": -72,
+    "x": -80,
     "z": 16,
-    "share": 0.487,
-    "n": 4
+    "share": 0.641,
+    "n": 3
    },
    {
     "kind": "KingMan",
@@ -887,18 +951,39 @@
     "n": 5
    },
    {
-    "kind": "JakeTheLich",
-    "x": -80,
-    "z": 16,
-    "share": 0.633,
-    "n": 2
+    "kind": "AlienJake",
+    "x": -116,
+    "z": -32,
+    "share": 0.356,
+    "n": 8
+   },
+   {
+    "kind": "AlienJake",
+    "x": -120,
+    "z": -36,
+    "share": 0.267,
+    "n": 6
+   },
+   {
+    "kind": "HalfMonsterDemon",
+    "x": -120,
+    "z": -48,
+    "share": 0.263,
+    "n": 5
+   },
+   {
+    "kind": "KeeOth",
+    "x": -120,
+    "z": -36,
+    "share": 0.406,
+    "n": 3
    },
    {
     "kind": "HunsonDemon",
     "x": -88,
     "z": 24,
-    "share": 0.224,
-    "n": 11
+    "share": 0.237,
+    "n": 14
    },
    {
     "kind": "Hunson",
@@ -913,41 +998,6 @@
     "z": -48,
     "share": 0.206,
     "n": 8
-   },
-   {
-    "kind": "KeeOth",
-    "x": -120,
-    "z": -36,
-    "share": 0.494,
-    "n": 2
-   },
-   {
-    "kind": "HunsonDemon",
-    "x": -64,
-    "z": 20,
-    "share": 0.941,
-    "n": 1
-   },
-   {
-    "kind": "KingMan",
-    "x": -68,
-    "z": 16,
-    "share": 0.939,
-    "n": 1
-   },
-   {
-    "kind": "VampireKingCloud",
-    "x": -64,
-    "z": 28,
-    "share": 0.182,
-    "n": 11
-   },
-   {
-    "kind": "MarcelineBeast",
-    "x": -120,
-    "z": -36,
-    "share": 0.175,
-    "n": 7
    }
   ],
   "ch:4": [
@@ -955,8 +1005,8 @@
     "kind": "KingBMO",
     "x": -120,
     "z": -36,
-    "share": 0.804,
-    "n": 6
+    "share": 0.737,
+    "n": 10
    },
    {
     "kind": "KingBMO",
@@ -966,6 +1016,13 @@
     "n": 16
    },
    {
+    "kind": "KingBMO",
+    "x": -116,
+    "z": -40,
+    "share": 0.638,
+    "n": 6
+   },
+   {
     "kind": "DeathMetal",
     "x": -64,
     "z": 16,
@@ -973,25 +1030,18 @@
     "n": 5
    },
    {
-    "kind": "KingBMO",
+    "kind": "AlienJake",
     "x": -116,
     "z": -40,
-    "share": 0.658,
-    "n": 4
+    "share": 0.408,
+    "n": 9
    },
    {
-    "kind": "AlienJake",
-    "x": -120,
-    "z": -36,
-    "share": 0.383,
-    "n": 5
-   },
-   {
-    "kind": "JakeTheLich",
-    "x": -72,
-    "z": 16,
-    "share": 0.475,
-    "n": 4
+    "kind": "HunsonDemon",
+    "x": -64,
+    "z": 20,
+    "share": 0.389,
+    "n": 6
    },
    {
     "kind": "KingBMO",
@@ -1002,31 +1052,38 @@
    },
    {
     "kind": "AlienJake",
-    "x": -116,
-    "z": -40,
-    "share": 0.442,
-    "n": 4
+    "x": -120,
+    "z": -36,
+    "share": 0.34,
+    "n": 8
    },
    {
-    "kind": "HunsonDemon",
-    "x": -64,
-    "z": 20,
-    "share": 0.284,
+    "kind": "JakeTheLich",
+    "x": -72,
+    "z": 16,
+    "share": 0.324,
+    "n": 7
+   },
+   {
+    "kind": "MarshallLeeVampireKing",
+    "x": -120,
+    "z": -44,
+    "share": 0.298,
     "n": 5
    },
    {
     "kind": "KeeOth",
     "x": -120,
     "z": -36,
-    "share": 0.292,
-    "n": 4
+    "share": 0.265,
+    "n": 5
    },
    {
-    "kind": "MarshallLeeVampireKing",
+    "kind": "KeeOth",
     "x": -120,
-    "z": -44,
-    "share": 0.426,
-    "n": 2
+    "z": -40,
+    "share": 0.187,
+    "n": 5
    },
    {
     "kind": "PrincessBubblegum",
@@ -1036,25 +1093,18 @@
     "n": 11
    },
    {
+    "kind": "AlienJake",
+    "x": -112,
+    "z": -36,
+    "share": 0.186,
+    "n": 4
+   },
+   {
     "kind": "MarshallLee",
     "x": -120,
     "z": -44,
-    "share": 0.148,
-    "n": 7
-   },
-   {
-    "kind": "CandyElemental",
-    "x": -128,
-    "z": -24,
-    "share": 0.359,
-    "n": 2
-   },
-   {
-    "kind": "AlienJake",
-    "x": -128,
-    "z": -32,
-    "share": 0.316,
-    "n": 2
+    "share": 0.145,
+    "n": 8
    }
   ],
   "pt:27": [
@@ -1062,8 +1112,8 @@
     "kind": "HunsonDemon",
     "x": -112,
     "z": -52,
-    "share": 0.864,
-    "n": 20
+    "share": 0.742,
+    "n": 28
    },
    {
     "kind": "KingMan",
@@ -1071,6 +1121,13 @@
     "z": -48,
     "share": 0.568,
     "n": 17
+   },
+   {
+    "kind": "DeathMetal",
+    "x": -116,
+    "z": -56,
+    "share": 0.524,
+    "n": 8
    },
    {
     "kind": "VampireKingCloud",
@@ -1096,9 +1153,23 @@
    {
     "kind": "AlienJake",
     "x": -100,
+    "z": -60,
+    "share": 0.117,
+    "n": 5
+   },
+   {
+    "kind": "AlienJake",
+    "x": -100,
     "z": -56,
-    "share": 0.127,
-    "n": 16
+    "share": 0.101,
+    "n": 22
+   },
+   {
+    "kind": "JakeSuit",
+    "x": -96,
+    "z": -64,
+    "share": 0.494,
+    "n": 1
    },
    {
     "kind": "CandyElemental",
@@ -1116,13 +1187,6 @@
    },
    {
     "kind": "AlienJake",
-    "x": -100,
-    "z": -60,
-    "share": 0.104,
-    "n": 2
-   },
-   {
-    "kind": "AlienJake",
     "x": -128,
     "z": -56,
     "share": 0.129,
@@ -1136,32 +1200,18 @@
     "n": 1
    },
    {
-    "kind": "AlienJake",
-    "x": -96,
-    "z": -52,
-    "share": 0.014,
-    "n": 18
-   },
-   {
-    "kind": "AlienJake",
-    "x": -136,
-    "z": -48,
-    "share": 0.035,
+    "kind": "JakeSuit",
+    "x": -92,
+    "z": -56,
+    "share": 0.073,
     "n": 1
    },
    {
-    "kind": "PrismRainicorn",
-    "x": -96,
-    "z": -64,
-    "share": 0.005,
-    "n": 12
-   },
-   {
-    "kind": "PrismRainicorn",
-    "x": -96,
-    "z": -60,
-    "share": 0.004,
-    "n": 8
+    "kind": "MarshallLee",
+    "x": -140,
+    "z": -76,
+    "share": 0.071,
+    "n": 1
    }
   ],
   "st:35": [
@@ -1273,11 +1323,18 @@
   ],
   "inf:32": [
    {
+    "kind": "JakeTheLich",
+    "x": -84,
+    "z": -60,
+    "share": 0.447,
+    "n": 7
+   },
+   {
     "kind": "AlienJake",
     "x": -36,
     "z": -68,
-    "share": 0.345,
-    "n": 6
+    "share": 0.335,
+    "n": 7
    },
    {
     "kind": "HalfMonsterDemon",
@@ -1287,11 +1344,25 @@
     "n": 12
    },
    {
-    "kind": "JakeTheLich",
-    "x": -84,
+    "kind": "MarshallLeeVampireKing",
+    "x": -32,
+    "z": -64,
+    "share": 0.197,
+    "n": 5
+   },
+   {
+    "kind": "MarshallLeeVampireKing",
+    "x": -40,
     "z": -60,
-    "share": 0.498,
-    "n": 2
+    "share": 0.158,
+    "n": 5
+   },
+   {
+    "kind": "AlienJake",
+    "x": -28,
+    "z": -68,
+    "share": 0.259,
+    "n": 3
    },
    {
     "kind": "MarshallLee",
@@ -1301,6 +1372,34 @@
     "n": 12
    },
    {
+    "kind": "AdultFinn",
+    "x": -48,
+    "z": -56,
+    "share": 0.13,
+    "n": 5
+   },
+   {
+    "kind": "AdultFinn",
+    "x": -24,
+    "z": -72,
+    "share": 0.156,
+    "n": 4
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -36,
+    "z": -68,
+    "share": 0.204,
+    "n": 3
+   },
+   {
+    "kind": "KingBMO",
+    "x": -32,
+    "z": -60,
+    "share": 0.122,
+    "n": 7
+   },
+   {
     "kind": "AlienJake",
     "x": -24,
     "z": -64,
@@ -1308,83 +1407,55 @@
     "n": 2
    },
    {
-    "kind": "MarshallLee",
-    "x": -40,
-    "z": -60,
-    "share": 0.1,
-    "n": 11
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -56,
-    "z": -80,
-    "share": 0.097,
-    "n": 11
-   },
-   {
-    "kind": "AdultFinn",
-    "x": -24,
-    "z": -72,
-    "share": 0.156,
-    "n": 3
-   },
-   {
-    "kind": "AlienJake",
-    "x": -24,
-    "z": -72,
-    "share": 0.451,
-    "n": 1
-   },
-   {
     "kind": "CandyElemental",
     "x": -92,
     "z": -44,
-    "share": 0.112,
-    "n": 4
-   },
-   {
-    "kind": "KingBMO",
-    "x": -32,
-    "z": -60,
-    "share": 0.121,
-    "n": 3
-   },
-   {
-    "kind": "CandyElemental",
-    "x": -96,
-    "z": -48,
-    "share": 0.09,
-    "n": 4
-   },
-   {
-    "kind": "KeeOth",
-    "x": -32,
-    "z": -60,
-    "share": 0.164,
-    "n": 2
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -36,
-    "z": -56,
-    "share": 0.057,
-    "n": 13
+    "share": 0.106,
+    "n": 7
    },
    {
     "kind": "AlienJake",
     "x": -28,
-    "z": -68,
-    "share": 0.264,
-    "n": 1
+    "z": -64,
+    "share": 0.167,
+    "n": 3
+   },
+   {
+    "kind": "VampireKingCloud",
+    "x": -88,
+    "z": -56,
+    "share": 0.1,
+    "n": 5
    }
   ],
   "st:38": [
    {
+    "kind": "AlienJake",
+    "x": -64,
+    "z": -96,
+    "share": 0.868,
+    "n": 7
+   },
+   {
     "kind": "CandyElemental",
     "x": -64,
     "z": -96,
-    "share": 0.83,
-    "n": 10
+    "share": 0.827,
+    "n": 55
+   },
+   {
+    "kind": "HunsonDemon",
+    "x": -60,
+    "z": -96,
+    "share": 0.726,
+    "n": 11
+   },
+   {
+    "kind": "Hunson",
+    "x": -72,
+    "z": -96,
+    "share": 0.627,
+    "n": 17
    },
    {
     "kind": "MarshallLeeVampireKing",
@@ -1394,98 +1465,84 @@
     "n": 7
    },
    {
-    "kind": "HunsonDemon",
-    "x": -108,
-    "z": -56,
-    "share": 0.172,
-    "n": 5
+    "kind": "DeathMetal",
+    "x": -96,
+    "z": -44,
+    "share": 0.547,
+    "n": 11
    },
    {
-    "kind": "VampireKingCloud",
-    "x": -72,
+    "kind": "KingBMO",
+    "x": -64,
     "z": -96,
-    "share": 0.151,
-    "n": 7
+    "share": 0.464,
+    "n": 9
+   },
+   {
+    "kind": "AlienJake",
+    "x": -64,
+    "z": -92,
+    "share": 0.419,
+    "n": 10
+   },
+   {
+    "kind": "MarshallLeeVampireKing",
+    "x": -64,
+    "z": -92,
+    "share": 0.413,
+    "n": 13
+   },
+   {
+    "kind": "HunsonDemon",
+    "x": -96,
+    "z": -48,
+    "share": 0.268,
+    "n": 16
    },
    {
     "kind": "HunsonDemon",
     "x": -112,
     "z": -56,
-    "share": 0.355,
-    "n": 2
+    "share": 0.259,
+    "n": 9
    },
    {
-    "kind": "JakeTheLich",
-    "x": -96,
-    "z": -44,
-    "share": 0.136,
-    "n": 7
-   },
-   {
-    "kind": "CandyElemental",
+    "kind": "Rainicorn",
     "x": -60,
     "z": -96,
-    "share": 0.607,
-    "n": 1
-   },
-   {
-    "kind": "HunsonDemon",
-    "x": -60,
-    "z": -96,
-    "share": 0.571,
-    "n": 1
-   },
-   {
-    "kind": "AdultFinn",
-    "x": -104,
-    "z": -64,
-    "share": 0.245,
-    "n": 2
+    "share": 0.237,
+    "n": 10
    },
    {
     "kind": "DeathMetal",
     "x": -116,
-    "z": -36,
-    "share": 0.087,
-    "n": 7
+    "z": -52,
+    "share": 0.365,
+    "n": 3
    },
    {
-    "kind": "AlienJake",
+    "kind": "DeathMetal",
     "x": -108,
-    "z": -64,
-    "share": 0.215,
+    "z": -56,
+    "share": 0.541,
     "n": 2
    },
    {
-    "kind": "AdultFinn",
-    "x": -96,
-    "z": -68,
-    "share": 0.181,
-    "n": 2
-   },
-   {
-    "kind": "KingMan",
-    "x": -32,
+    "kind": "MarcelineBeast",
+    "x": -64,
     "z": -92,
-    "share": 0.253,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -92,
-    "z": -68,
-    "share": 0.217,
-    "n": 1
-   },
-   {
-    "kind": "CandyElemental",
-    "x": -116,
-    "z": -60,
-    "share": 0.104,
-    "n": 2
+    "share": 0.212,
+    "n": 8
    }
   ],
   "ch:6": [
+   {
+    "kind": "Death",
+    "x": -24,
+    "z": 52,
+    "share": 0.772,
+    "n": 3
+   },
    {
     "kind": "HunsonDemon",
     "x": -84,
@@ -1494,18 +1551,25 @@
     "n": 11
    },
    {
-    "kind": "KingBMO",
-    "x": -68,
-    "z": -76,
-    "share": 0.262,
-    "n": 7
-   },
-   {
     "kind": "HunsonDemon",
     "x": -92,
     "z": -80,
-    "share": 0.312,
-    "n": 4
+    "share": 0.294,
+    "n": 6
+   },
+   {
+    "kind": "KingBMO",
+    "x": -68,
+    "z": -76,
+    "share": 0.259,
+    "n": 16
+   },
+   {
+    "kind": "KingBMO",
+    "x": -72,
+    "z": -72,
+    "share": 0.243,
+    "n": 7
    },
    {
     "kind": "AlienJake",
@@ -1522,11 +1586,25 @@
     "n": 5
    },
    {
-    "kind": "Death",
-    "x": -24,
-    "z": 52,
-    "share": 0.999,
-    "n": 1
+    "kind": "KingBMO",
+    "x": -72,
+    "z": -80,
+    "share": 0.208,
+    "n": 33
+   },
+   {
+    "kind": "KingBMO",
+    "x": -72,
+    "z": -76,
+    "share": 0.205,
+    "n": 6
+   },
+   {
+    "kind": "KingBMO",
+    "x": -76,
+    "z": -80,
+    "share": 0.245,
+    "n": 4
    },
    {
     "kind": "CandyElemental",
@@ -1536,96 +1614,75 @@
     "n": 8
    },
    {
-    "kind": "KingBMO",
-    "x": -72,
+    "kind": "PrismRainicorn",
+    "x": -80,
     "z": -80,
-    "share": 0.178,
-    "n": 20
+    "share": 0.187,
+    "n": 11
    },
    {
-    "kind": "KingBMO",
-    "x": -72,
-    "z": -72,
-    "share": 0.294,
-    "n": 3
+    "kind": "PrismRainicorn",
+    "x": -76,
+    "z": -76,
+    "share": 0.173,
+    "n": 7
    },
    {
     "kind": "CandyElemental",
     "x": -80,
     "z": -80,
-    "share": 0.168,
-    "n": 13
+    "share": 0.163,
+    "n": 17
    },
    {
-    "kind": "KingBMO",
-    "x": -72,
-    "z": -76,
-    "share": 0.2,
-    "n": 4
-   },
-   {
-    "kind": "KingBMO",
-    "x": -80,
+    "kind": "HunsonDemon",
+    "x": -88,
     "z": -80,
-    "share": 0.246,
-    "n": 3
-   },
-   {
-    "kind": "KingBMO",
-    "x": -68,
-    "z": -72,
-    "share": 0.144,
-    "n": 11
-   },
-   {
-    "kind": "AdultFinn",
-    "x": -72,
-    "z": -68,
-    "share": 0.229,
-    "n": 2
-   },
-   {
-    "kind": "KingBMO",
-    "x": -80,
-    "z": -76,
-    "share": 0.225,
-    "n": 2
+    "share": 0.163,
+    "n": 5
    }
   ],
   "inf:21": [
    {
-    "kind": "KingBMO",
-    "x": -120,
-    "z": -36,
-    "share": 0.235,
-    "n": 1
-   },
-   {
     "kind": "HunsonDemon",
     "x": -64,
     "z": 20,
-    "share": 0.226,
-    "n": 1
+    "share": 0.23,
+    "n": 2
+   },
+   {
+    "kind": "KingBMO",
+    "x": -120,
+    "z": -36,
+    "share": 0.188,
+    "n": 2
    },
    {
     "kind": "KingBMO",
     "x": -120,
     "z": -40,
-    "share": 0.226,
-    "n": 1
+    "share": 0.181,
+    "n": 2
    },
    {
     "kind": "AlienJake",
     "x": -84,
     "z": 40,
-    "share": 0.115,
-    "n": 1
+    "share": 0.122,
+    "n": 2
    },
    {
     "kind": "AlienJake",
     "x": -76,
     "z": 40,
-    "share": 0.099,
+    "share": 0.103,
+    "n": 2
+   },
+   {
+    "kind": "DeathMetal",
+    "x": -72,
+    "z": 16,
+    "share": 0.155,
     "n": 1
    },
    {
@@ -1633,6 +1690,27 @@
     "x": -112,
     "z": -32,
     "share": 0.033,
+    "n": 1
+   },
+   {
+    "kind": "PrismRainicorn",
+    "x": -112,
+    "z": -32,
+    "share": 0.031,
+    "n": 1
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -72,
+    "z": 44,
+    "share": 0.027,
+    "n": 1
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -72,
+    "z": 52,
+    "share": 0.026,
     "n": 1
    },
    {
@@ -1647,6 +1725,13 @@
     "x": -68,
     "z": 44,
     "share": 0.022,
+    "n": 1
+   },
+   {
+    "kind": "PrismRainicorn",
+    "x": -80,
+    "z": 48,
+    "share": 0.017,
     "n": 1
    },
    {
@@ -1665,6 +1750,20 @@
    }
   ],
   "tr": [
+   {
+    "kind": "DeathMetal",
+    "x": 108,
+    "z": -96,
+    "share": 0.419,
+    "n": 2
+   },
+   {
+    "kind": "HunsonDemon",
+    "x": 72,
+    "z": -96,
+    "share": 0.267,
+    "n": 2
+   },
    {
     "kind": "KingMan",
     "x": 72,
@@ -1715,6 +1814,13 @@
     "n": 1
    },
    {
+    "kind": "AlienJake",
+    "x": 100,
+    "z": -88,
+    "share": 0.137,
+    "n": 2
+   },
+   {
     "kind": "MarshallLee",
     "x": 72,
     "z": -92,
@@ -1743,35 +1849,21 @@
     "n": 1
    },
    {
-    "kind": "KeeOth",
-    "x": 104,
-    "z": -92,
-    "share": 0.176,
-    "n": 1
-   },
-   {
     "kind": "AlienJake",
-    "x": 112,
-    "z": -96,
-    "share": 0.155,
-    "n": 1
-   },
-   {
-    "kind": "PrincessBubblegum",
-    "x": 96,
-    "z": -84,
-    "share": 0.06,
+    "x": 104,
+    "z": -88,
+    "share": 0.089,
     "n": 2
-   },
-   {
-    "kind": "MarshallLee",
-    "x": 72,
-    "z": -96,
-    "share": 0.118,
-    "n": 1
    }
   ],
   "st:32": [
+   {
+    "kind": "DeathMetal",
+    "x": -84,
+    "z": -60,
+    "share": 0.544,
+    "n": 4
+   },
    {
     "kind": "HalfMonsterDemon",
     "x": -48,
@@ -1784,6 +1876,20 @@
     "x": -40,
     "z": -60,
     "share": 0.318,
+    "n": 2
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -48,
+    "z": -60,
+    "share": 0.158,
+    "n": 4
+   },
+   {
+    "kind": "AlienJake",
+    "x": -36,
+    "z": -68,
+    "share": 0.268,
     "n": 2
    },
    {
@@ -1855,27 +1961,6 @@
     "z": -76,
     "share": 0.356,
     "n": 1
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -48,
-    "z": -56,
-    "share": 0.055,
-    "n": 6
-   },
-   {
-    "kind": "AlienJake",
-    "x": -36,
-    "z": -68,
-    "share": 0.267,
-    "n": 1
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -40,
-    "z": -64,
-    "share": 0.065,
-    "n": 4
    }
   ],
   "inf:22": [
@@ -2455,22 +2540,22 @@
     "kind": "AdultFinn",
     "x": -124,
     "z": -36,
-    "share": 0.471,
-    "n": 20
+    "share": 0.465,
+    "n": 42
    },
    {
     "kind": "AlienJake",
     "x": -124,
     "z": -36,
-    "share": 0.292,
-    "n": 29
+    "share": 0.317,
+    "n": 67
    },
    {
     "kind": "AlienJake",
     "x": -128,
     "z": -32,
     "share": 0.265,
-    "n": 44
+    "n": 67
    },
    {
     "kind": "HalfMonsterDemon",
@@ -2483,8 +2568,8 @@
     "kind": "AdultFinn",
     "x": -116,
     "z": -32,
-    "share": 0.234,
-    "n": 22
+    "share": 0.235,
+    "n": 23
    },
    {
     "kind": "HalfMonsterDemon",
@@ -2494,6 +2579,20 @@
     "n": 13
    },
    {
+    "kind": "AdultFinn",
+    "x": -112,
+    "z": -40,
+    "share": 0.168,
+    "n": 64
+   },
+   {
+    "kind": "HalfMonsterDemon",
+    "x": -120,
+    "z": -44,
+    "share": 0.144,
+    "n": 112
+   },
+   {
     "kind": "MarshallLee",
     "x": -116,
     "z": -32,
@@ -2501,11 +2600,11 @@
     "n": 13
    },
    {
-    "kind": "HalfMonsterDemon",
-    "x": -120,
-    "z": -44,
-    "share": 0.137,
-    "n": 51
+    "kind": "MarcelineBeast",
+    "x": -124,
+    "z": -36,
+    "share": 0.309,
+    "n": 2
    },
    {
     "kind": "KeeOth",
@@ -2515,18 +2614,18 @@
     "n": 13
    },
    {
-    "kind": "AdultFinn",
-    "x": -112,
-    "z": -40,
-    "share": 0.104,
-    "n": 13
+    "kind": "AlienJake",
+    "x": -116,
+    "z": -32,
+    "share": 0.111,
+    "n": 71
    },
    {
-    "kind": "HalfMonsterDemon",
-    "x": -120,
-    "z": -40,
-    "share": 0.103,
-    "n": 65
+    "kind": "AdultFinn",
+    "x": -112,
+    "z": -36,
+    "share": 0.1,
+    "n": 7
    },
    {
     "kind": "AdultFinn",
@@ -2536,25 +2635,11 @@
     "n": 1
    },
    {
-    "kind": "AdultFinn",
-    "x": -112,
-    "z": -36,
-    "share": 0.086,
-    "n": 6
-   },
-   {
-    "kind": "AlienJake",
-    "x": -116,
-    "z": -32,
-    "share": 0.081,
-    "n": 19
-   },
-   {
-    "kind": "MarcelineBeast",
-    "x": -116,
-    "z": -32,
-    "share": 0.074,
-    "n": 9
+    "kind": "HalfMonsterDemon",
+    "x": -120,
+    "z": -40,
+    "share": 0.096,
+    "n": 126
    }
   ],
   "st:18": [
@@ -3416,6 +3501,13 @@
   "st:6": [
    {
     "kind": "JakeSuit",
+    "x": -72,
+    "z": -80,
+    "share": 0.272,
+    "n": 4
+   },
+   {
+    "kind": "JakeSuit",
     "x": -64,
     "z": -84,
     "share": 0.49,
@@ -3429,6 +3521,13 @@
     "n": 2
    },
    {
+    "kind": "JakeSuit",
+    "x": -68,
+    "z": -72,
+    "share": 0.266,
+    "n": 2
+   },
+   {
     "kind": "Jake",
     "x": -64,
     "z": -80,
@@ -3436,17 +3535,17 @@
     "n": 4
    },
    {
-    "kind": "JakeSuit",
-    "x": -72,
-    "z": -80,
-    "share": 0.248,
-    "n": 2
-   },
-   {
     "kind": "KeeOth",
     "x": -72,
     "z": -80,
     "share": 0.174,
+    "n": 2
+   },
+   {
+    "kind": "AlienJake",
+    "x": -80,
+    "z": -80,
+    "share": 0.162,
     "n": 2
    },
    {
@@ -3464,6 +3563,13 @@
     "n": 4
    },
    {
+    "kind": "HanaAbadeer",
+    "x": -68,
+    "z": -76,
+    "share": 0.241,
+    "n": 1
+   },
+   {
     "kind": "KeeOth",
     "x": -72,
     "z": -76,
@@ -3471,52 +3577,31 @@
     "n": 2
    },
    {
-    "kind": "Jake",
+    "kind": "Marceline",
     "x": -72,
     "z": -68,
-    "share": 0.016,
-    "n": 4
-   },
-   {
-    "kind": "Billy",
-    "x": -80,
-    "z": -72,
-    "share": 0.001,
-    "n": 4
-   },
-   {
-    "kind": "Jake",
-    "x": -124,
-    "z": -36,
-    "share": 0.0,
-    "n": 4
+    "share": 0.195,
+    "n": 1
    },
    {
     "kind": "KeeOth",
-    "x": -116,
-    "z": -40,
-    "share": 0.0,
+    "x": -64,
+    "z": -76,
+    "share": 0.096,
     "n": 2
    },
    {
-    "kind": "HanaAbadeer",
-    "x": -128,
-    "z": -32,
-    "share": 0.0,
+    "kind": "KeeOth",
+    "x": -68,
+    "z": -80,
+    "share": 0.089,
     "n": 2
    },
    {
-    "kind": "MarshallLee",
-    "x": -136,
-    "z": -16,
-    "share": 0.0,
-    "n": 2
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -136,
-    "z": -8,
-    "share": 0.0,
+    "kind": "Marceline",
+    "x": -64,
+    "z": -80,
+    "share": 0.175,
     "n": 1
    }
   ],
@@ -3536,53 +3621,53 @@
     "n": 5
    },
    {
+    "kind": "HalfMonsterDemon",
+    "x": -72,
+    "z": -72,
+    "share": 0.255,
+    "n": 52
+   },
+   {
     "kind": "MarshallLee",
     "x": -64,
     "z": -80,
-    "share": 0.262,
-    "n": 14
+    "share": 0.24,
+    "n": 52
    },
    {
     "kind": "HalfMonsterDemon",
     "x": -72,
-    "z": -72,
-    "share": 0.212,
-    "n": 14
+    "z": -80,
+    "share": 0.142,
+    "n": 52
    },
    {
     "kind": "HalfMonsterDemon",
     "x": -64,
     "z": -76,
-    "share": 0.144,
-    "n": 14
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -72,
-    "z": -80,
-    "share": 0.12,
-    "n": 14
+    "share": 0.138,
+    "n": 52
    },
    {
     "kind": "Billy",
     "x": -76,
     "z": -80,
-    "share": 0.099,
-    "n": 14
+    "share": 0.097,
+    "n": 52
    },
    {
     "kind": "Billy",
     "x": -76,
     "z": -68,
-    "share": 0.097,
-    "n": 14
+    "share": 0.089,
+    "n": 52
    },
    {
-    "kind": "AdultFinn",
-    "x": -116,
-    "z": -40,
-    "share": 0.064,
-    "n": 14
+    "kind": "CandyElemental",
+    "x": -72,
+    "z": -72,
+    "share": 0.32,
+    "n": 1
    },
    {
     "kind": "KeeOth",
@@ -3592,6 +3677,20 @@
     "n": 5
    },
    {
+    "kind": "CandyElemental",
+    "x": -76,
+    "z": -80,
+    "share": 0.308,
+    "n": 1
+   },
+   {
+    "kind": "AdultFinn",
+    "x": -116,
+    "z": -40,
+    "share": 0.058,
+    "n": 29
+   },
+   {
     "kind": "Jake",
     "x": -64,
     "z": -80,
@@ -3599,32 +3698,18 @@
     "n": 5
    },
    {
-    "kind": "Jake",
-    "x": -64,
-    "z": -72,
-    "share": 0.031,
-    "n": 5
-   },
-   {
-    "kind": "Jake",
+    "kind": "HanaAbadeer",
     "x": -72,
-    "z": -68,
-    "share": 0.012,
-    "n": 5
+    "z": -80,
+    "share": 0.267,
+    "n": 1
    },
    {
-    "kind": "Billy",
-    "x": -80,
-    "z": -72,
-    "share": 0.003,
-    "n": 5
-   },
-   {
-    "kind": "AlienJake",
-    "x": -116,
-    "z": -32,
-    "share": 0.001,
-    "n": 14
+    "kind": "MarshallLeeVampireKing",
+    "x": -84,
+    "z": -80,
+    "share": 0.227,
+    "n": 1
    }
   ],
   "st:23": [
@@ -3678,6 +3763,13 @@
     "n": 8
    },
    {
+    "kind": "MarshallLeeVampireKing",
+    "x": 80,
+    "z": 52,
+    "share": 0.399,
+    "n": 1
+   },
+   {
     "kind": "Billy",
     "x": 68,
     "z": 48,
@@ -3692,11 +3784,25 @@
     "n": 8
    },
    {
+    "kind": "MarshallLeeVampireKing",
+    "x": 76,
+    "z": 44,
+    "share": 0.201,
+    "n": 1
+   },
+   {
     "kind": "MarshallLee",
     "x": 56,
     "z": 64,
     "share": 0.035,
     "n": 8
+   },
+   {
+    "kind": "CandyElemental",
+    "x": 60,
+    "z": 52,
+    "share": 0.149,
+    "n": 1
    },
    {
     "kind": "KeeOth",
@@ -3706,32 +3812,11 @@
     "n": 8
    },
    {
-    "kind": "HanaAbadeer",
-    "x": 52,
-    "z": 52,
-    "share": 0.01,
-    "n": 8
-   },
-   {
-    "kind": "AlienJake",
-    "x": 116,
-    "z": -4,
-    "share": 0.007,
-    "n": 8
-   },
-   {
-    "kind": "MarcelineBeast",
-    "x": 104,
-    "z": -8,
-    "share": 0.007,
-    "n": 8
-   },
-   {
-    "kind": "AlienJake",
-    "x": 104,
-    "z": -20,
-    "share": 0.006,
-    "n": 16
+    "kind": "CandyElemental",
+    "x": 68,
+    "z": 48,
+    "share": 0.134,
+    "n": 1
    }
   ],
   "st:4": [
@@ -3743,10 +3828,52 @@
     "n": 1
    },
    {
+    "kind": "Marceline",
+    "x": -120,
+    "z": -44,
+    "share": 0.231,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -120,
+    "z": -36,
+    "share": 0.23,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -112,
+    "z": -36,
+    "share": 0.183,
+    "n": 1
+   },
+   {
     "kind": "HalfMonsterDemon",
     "x": -120,
     "z": -48,
     "share": 0.15,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -124,
+    "z": -48,
+    "share": 0.149,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -112,
+    "z": -40,
+    "share": 0.11,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -108,
+    "z": -32,
+    "share": 0.066,
     "n": 1
    },
    {
@@ -3764,6 +3891,13 @@
     "n": 1
    },
    {
+    "kind": "Lemongrab",
+    "x": -108,
+    "z": -20,
+    "share": 0.028,
+    "n": 1
+   },
+   {
     "kind": "CandyElemental",
     "x": -84,
     "z": 40,
@@ -3778,17 +3912,17 @@
     "n": 1
    },
    {
-    "kind": "KingBMO",
-    "x": -72,
-    "z": 48,
-    "share": 0.0,
+    "kind": "BMO",
+    "x": -96,
+    "z": 16,
+    "share": 0.001,
     "n": 1
    },
    {
-    "kind": "AlienJake",
-    "x": 12,
-    "z": -32,
-    "share": 0.0,
+    "kind": "Lemongrab",
+    "x": -92,
+    "z": 48,
+    "share": 0.001,
     "n": 1
    }
   ],
@@ -3799,6 +3933,13 @@
     "z": -76,
     "share": 0.605,
     "n": 7
+   },
+   {
+    "kind": "MarshallLeeVampireKing",
+    "x": -96,
+    "z": -80,
+    "share": 0.333,
+    "n": 10
    },
    {
     "kind": "AlienJake",
@@ -3815,11 +3956,39 @@
     "n": 4
    },
    {
+    "kind": "DeathMetal",
+    "x": -108,
+    "z": -16,
+    "share": 0.188,
+    "n": 5
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -88,
+    "z": -72,
+    "share": 0.185,
+    "n": 9
+   },
+   {
     "kind": "HalfMonsterDemon",
     "x": -80,
     "z": -72,
     "share": 0.216,
     "n": 4
+   },
+   {
+    "kind": "KingBMO",
+    "x": -84,
+    "z": -80,
+    "share": 0.159,
+    "n": 5
+   },
+   {
+    "kind": "KingBMO",
+    "x": -80,
+    "z": -76,
+    "share": 0.159,
+    "n": 5
    },
    {
     "kind": "MarshallLee",
@@ -3829,90 +3998,125 @@
     "n": 8
    },
    {
+    "kind": "CandyElemental",
+    "x": -88,
+    "z": -80,
+    "share": 0.149,
+    "n": 10
+   },
+   {
+    "kind": "HunsonDemon",
+    "x": -108,
+    "z": -24,
+    "share": 0.105,
+    "n": 5
+   },
+   {
+    "kind": "CandyElemental",
+    "x": -84,
+    "z": -76,
+    "share": 0.476,
+    "n": 1
+   },
+   {
+    "kind": "JakeTheLich",
+    "x": -96,
+    "z": -24,
+    "share": 0.068,
+    "n": 10
+   },
+   {
     "kind": "MarcelineBeast",
     "x": -124,
     "z": -36,
     "share": 0.06,
     "n": 4
-   },
-   {
-    "kind": "Billy",
-    "x": -88,
-    "z": -76,
-    "share": 0.052,
-    "n": 4
-   },
-   {
-    "kind": "KeeOth",
-    "x": -80,
-    "z": -72,
-    "share": 0.039,
-    "n": 7
-   },
-   {
-    "kind": "MarcelineBeast",
-    "x": -132,
-    "z": -40,
-    "share": 0.045,
-    "n": 4
-   },
-   {
-    "kind": "KeeOth",
-    "x": -84,
-    "z": -80,
-    "share": 0.03,
-    "n": 6
-   },
-   {
-    "kind": "Billy",
-    "x": -120,
-    "z": -40,
-    "share": 0.031,
-    "n": 4
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -76,
-    "z": -80,
-    "share": 0.037,
-    "n": 3
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -120,
-    "z": -44,
-    "share": 0.027,
-    "n": 4
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -128,
-    "z": -48,
-    "share": 0.024,
-    "n": 4
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -84,
-    "z": -80,
-    "share": 0.034,
-    "n": 1
    }
   ],
   "st:1": [
    {
+    "kind": "KeeOth",
+    "x": -120,
+    "z": -44,
+    "share": 0.602,
+    "n": 61
+   },
+   {
+    "kind": "AlienJake",
+    "x": -116,
+    "z": -32,
+    "share": 0.331,
+    "n": 15
+   },
+   {
+    "kind": "BMO",
+    "x": -120,
+    "z": -48,
+    "share": 0.318,
+    "n": 9
+   },
+   {
     "kind": "HalfMonsterDemon",
     "x": -120,
     "z": -44,
-    "share": 0.345,
-    "n": 3
+    "share": 0.377,
+    "n": 4
+   },
+   {
+    "kind": "KeeOth",
+    "x": -120,
+    "z": -40,
+    "share": 0.284,
+    "n": 9
+   },
+   {
+    "kind": "BMO",
+    "x": -116,
+    "z": -40,
+    "share": 0.201,
+    "n": 13
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -120,
+    "z": -36,
+    "share": 0.196,
+    "n": 39
+   },
+   {
+    "kind": "BMO",
+    "x": -120,
+    "z": -40,
+    "share": 0.163,
+    "n": 11
    },
    {
     "kind": "HalfMonsterDemon",
     "x": -120,
     "z": -40,
-    "share": 0.257,
-    "n": 2
+    "share": 0.259,
+    "n": 3
+   },
+   {
+    "kind": "Finn",
+    "x": -124,
+    "z": -48,
+    "share": 0.693,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -124,
+    "z": -36,
+    "share": 0.151,
+    "n": 4
+   },
+   {
+    "kind": "MarshallLee",
+    "x": -112,
+    "z": -40,
+    "share": 0.101,
+    "n": 61
    },
    {
     "kind": "AlienJake",
@@ -3922,88 +4126,18 @@
     "n": 2
    },
    {
-    "kind": "AdultFinn",
-    "x": -116,
-    "z": -32,
-    "share": 0.139,
-    "n": 2
-   },
-   {
-    "kind": "AdultFinn",
-    "x": -120,
-    "z": -36,
-    "share": 0.264,
-    "n": 1
-   },
-   {
-    "kind": "KingBMO",
-    "x": -120,
-    "z": -36,
-    "share": 0.236,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -112,
+    "kind": "HanaAbadeer",
+    "x": -124,
     "z": -40,
-    "share": 0.22,
-    "n": 1
+    "share": 0.096,
+    "n": 4
    },
    {
-    "kind": "AdultFinn",
+    "kind": "MarshallLee",
     "x": -116,
     "z": -44,
-    "share": 0.197,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -112,
-    "z": -40,
-    "share": 0.054,
-    "n": 3
-   },
-   {
-    "kind": "AlienJake",
-    "x": -116,
-    "z": -32,
-    "share": 0.161,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -112,
-    "z": -32,
-    "share": 0.158,
-    "n": 1
-   },
-   {
-    "kind": "CandyElemental",
-    "x": -120,
-    "z": -40,
-    "share": 0.101,
-    "n": 1
-   },
-   {
-    "kind": "AdultFinn",
-    "x": -112,
-    "z": -32,
-    "share": 0.085,
-    "n": 1
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -116,
-    "z": -40,
-    "share": 0.068,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -112,
-    "z": -36,
-    "share": 0.024,
-    "n": 2
+    "share": 0.077,
+    "n": 10
    }
   ],
   "st:33": [
@@ -4115,6 +4249,13 @@
   ],
   "st:25": [
    {
+    "kind": "DeathMetal",
+    "x": -72,
+    "z": -56,
+    "share": 0.728,
+    "n": 1
+   },
+   {
     "kind": "KeeOth",
     "x": 72,
     "z": -96,
@@ -4126,6 +4267,13 @@
     "x": 68,
     "z": -88,
     "share": 0.242,
+    "n": 1
+   },
+   {
+    "kind": "JakeTheLich",
+    "x": -68,
+    "z": -48,
+    "share": 0.131,
     "n": 1
    },
    {
@@ -4143,10 +4291,24 @@
     "n": 1
    },
    {
+    "kind": "HunsonDemon",
+    "x": -76,
+    "z": -48,
+    "share": 0.085,
+    "n": 1
+   },
+   {
     "kind": "HanaAbadeer",
     "x": 56,
     "z": -88,
     "share": 0.081,
+    "n": 1
+   },
+   {
+    "kind": "MarshallLeeVampireKing",
+    "x": -64,
+    "z": -44,
+    "share": 0.055,
     "n": 1
    },
    {
@@ -4171,37 +4333,23 @@
     "n": 1
    },
    {
-    "kind": "JakeSuit",
-    "x": 76,
-    "z": 16,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "JakeSuit",
-    "x": -100,
+    "kind": "MarshallLeeVampireKing",
+    "x": -64,
     "z": -40,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "KeeOth",
-    "x": -108,
-    "z": -32,
-    "share": 0.0,
+    "share": 0.001,
     "n": 1
    },
    {
     "kind": "AlienJake",
-    "x": -96,
-    "z": -24,
+    "x": -88,
+    "z": -48,
     "share": 0.0,
     "n": 1
    },
    {
-    "kind": "MarshallLee",
-    "x": -112,
-    "z": -40,
+    "kind": "JakeSuit",
+    "x": 76,
+    "z": 16,
     "share": 0.0,
     "n": 1
    }
@@ -4322,6 +4470,13 @@
     "n": 3
    },
    {
+    "kind": "HalfMonsterDemon",
+    "x": -48,
+    "z": -80,
+    "share": 0.377,
+    "n": 2
+   },
+   {
     "kind": "AlienJake",
     "x": -64,
     "z": -80,
@@ -4334,6 +4489,13 @@
     "z": -80,
     "share": 0.577,
     "n": 1
+   },
+   {
+    "kind": "HalfMonsterDemon",
+    "x": -48,
+    "z": -72,
+    "share": 0.279,
+    "n": 2
    },
    {
     "kind": "AlienJake",
@@ -4357,6 +4519,27 @@
     "n": 1
    },
    {
+    "kind": "CandyElemental",
+    "x": -64,
+    "z": -80,
+    "share": 0.348,
+    "n": 1
+   },
+   {
+    "kind": "JakeTheLich",
+    "x": -88,
+    "z": -20,
+    "share": 0.31,
+    "n": 1
+   },
+   {
+    "kind": "DeathMetal",
+    "x": -88,
+    "z": -12,
+    "share": 0.23,
+    "n": 1
+   },
+   {
     "kind": "HanaAbadeer",
     "x": -56,
     "z": -84,
@@ -4371,53 +4554,18 @@
     "n": 1
    },
    {
+    "kind": "MarshallLee",
+    "x": -56,
+    "z": -72,
+    "share": 0.104,
+    "n": 2
+   },
+   {
     "kind": "HanaAbadeer",
     "x": -48,
     "z": -80,
     "share": 0.069,
     "n": 3
-   },
-   {
-    "kind": "MagicMan",
-    "x": -68,
-    "z": -80,
-    "share": 0.201,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -48,
-    "z": -72,
-    "share": 0.064,
-    "n": 3
-   },
-   {
-    "kind": "KeeOth",
-    "x": -52,
-    "z": -76,
-    "share": 0.063,
-    "n": 3
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -56,
-    "z": -68,
-    "share": 0.057,
-    "n": 3
-   },
-   {
-    "kind": "AlienJake",
-    "x": -64,
-    "z": -76,
-    "share": 0.138,
-    "n": 1
-   },
-   {
-    "kind": "MagicMan",
-    "x": -48,
-    "z": -76,
-    "share": 0.125,
-    "n": 1
    }
   ],
   "pt:26": [
@@ -4455,29 +4603,36 @@
     "kind": "HalfMonsterDemon",
     "x": -68,
     "z": -80,
-    "share": 0.231,
-    "n": 4
+    "share": 0.219,
+    "n": 5
    },
    {
     "kind": "HalfMonsterDemon",
     "x": -64,
     "z": -80,
-    "share": 0.186,
-    "n": 4
+    "share": 0.197,
+    "n": 5
    },
    {
     "kind": "HalfMonsterDemon",
     "x": -64,
     "z": -72,
-    "share": 0.132,
-    "n": 4
+    "share": 0.128,
+    "n": 5
    },
    {
     "kind": "Hunson",
     "x": -84,
     "z": -80,
-    "share": 0.241,
-    "n": 2
+    "share": 0.204,
+    "n": 3
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -76,
+    "z": -80,
+    "share": 0.092,
+    "n": 5
    },
    {
     "kind": "Hunson",
@@ -4487,11 +4642,11 @@
     "n": 2
    },
    {
-    "kind": "HanaAbadeer",
-    "x": -76,
+    "kind": "Marceline",
+    "x": -64,
     "z": -80,
-    "share": 0.099,
-    "n": 4
+    "share": 0.254,
+    "n": 1
    },
    {
     "kind": "MarshallLee",
@@ -4504,57 +4659,50 @@
     "kind": "MarshallLee",
     "x": -72,
     "z": -76,
-    "share": 0.038,
-    "n": 4
+    "share": 0.045,
+    "n": 5
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -68,
+    "z": -84,
+    "share": 0.201,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -72,
+    "z": -80,
+    "share": 0.193,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -72,
+    "z": -68,
+    "share": 0.145,
+    "n": 1
+   },
+   {
+    "kind": "MarcelineBeast",
+    "x": -72,
+    "z": -88,
+    "share": 0.12,
+    "n": 1
    },
    {
     "kind": "MarshallLee",
     "x": -72,
     "z": -68,
-    "share": 0.016,
-    "n": 4
+    "share": 0.022,
+    "n": 5
    },
    {
     "kind": "HanaAbadeer",
-    "x": -80,
+    "x": -68,
     "z": -72,
-    "share": 0.018,
-    "n": 2
-   },
-   {
-    "kind": "HanaAbadeer",
-    "x": -80,
-    "z": -76,
-    "share": 0.016,
-    "n": 2
-   },
-   {
-    "kind": "MarcelineBeast",
-    "x": -84,
-    "z": -68,
-    "share": 0.001,
+    "share": 0.107,
     "n": 1
-   },
-   {
-    "kind": "Marceline",
-    "x": -92,
-    "z": -48,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "Marceline",
-    "x": -72,
-    "z": 60,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "Rainicorn",
-    "x": -116,
-    "z": -40,
-    "share": 0.0,
-    "n": 4
    }
   ],
   "inf:37": [
@@ -4633,6 +4781,755 @@
     "x": -88,
     "z": 40,
     "share": 0.002,
+    "n": 1
+   }
+  ],
+  "st:3": [
+   {
+    "kind": "Marceline",
+    "x": -120,
+    "z": -44,
+    "share": 0.253,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -120,
+    "z": -36,
+    "share": 0.247,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -124,
+    "z": -48,
+    "share": 0.177,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -112,
+    "z": -40,
+    "share": 0.175,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -112,
+    "z": -36,
+    "share": 0.092,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": -108,
+    "z": -20,
+    "share": 0.038,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -108,
+    "z": -32,
+    "share": 0.018,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -96,
+    "z": 16,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -72,
+    "z": 48,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -76,
+    "z": 56,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -68,
+    "z": 56,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -88,
+    "z": 56,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -64,
+    "z": 52,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -96,
+    "z": 36,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -56,
+    "z": 44,
+    "share": 0.0,
+    "n": 1
+   }
+  ],
+  "st:7": [
+   {
+    "kind": "HanaAbadeer",
+    "x": -68,
+    "z": -76,
+    "share": 0.253,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -64,
+    "z": -80,
+    "share": 0.233,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -72,
+    "z": -80,
+    "share": 0.203,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -72,
+    "z": -68,
+    "share": 0.139,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -76,
+    "z": -72,
+    "share": 0.068,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": -64,
+    "z": -84,
+    "share": 0.058,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -112,
+    "z": -40,
+    "share": 0.018,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -124,
+    "z": -36,
+    "share": 0.016,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -116,
+    "z": -40,
+    "share": 0.01,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -128,
+    "z": -32,
+    "share": 0.002,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -136,
+    "z": 8,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": -136,
+    "z": -16,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -128,
+    "z": 16,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -132,
+    "z": 12,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -120,
+    "z": 20,
+    "share": 0.0,
+    "n": 1
+   }
+  ],
+  "st:8": [
+   {
+    "kind": "HanaAbadeer",
+    "x": -68,
+    "z": -76,
+    "share": 0.313,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -64,
+    "z": -80,
+    "share": 0.148,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": -72,
+    "z": -80,
+    "share": 0.139,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -72,
+    "z": -68,
+    "share": 0.117,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -76,
+    "z": -72,
+    "share": 0.081,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": -124,
+    "z": -36,
+    "share": 0.061,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": -64,
+    "z": -84,
+    "share": 0.043,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -128,
+    "z": -32,
+    "share": 0.031,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -112,
+    "z": -40,
+    "share": 0.023,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": -116,
+    "z": -40,
+    "share": 0.021,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": -136,
+    "z": -16,
+    "share": 0.012,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": -136,
+    "z": 8,
+    "share": 0.007,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -132,
+    "z": 12,
+    "share": 0.002,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -128,
+    "z": 16,
+    "share": 0.001,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": -76,
+    "z": 56,
+    "share": 0.0,
+    "n": 1
+   }
+  ],
+  "st:9": [
+   {
+    "kind": "HanaAbadeer",
+    "x": 64,
+    "z": 52,
+    "share": 0.241,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 76,
+    "z": 96,
+    "share": 0.173,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 56,
+    "z": 60,
+    "share": 0.147,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 52,
+    "z": 48,
+    "share": 0.104,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 60,
+    "z": 40,
+    "share": 0.099,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 56,
+    "z": 56,
+    "share": 0.093,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 64,
+    "z": 32,
+    "share": 0.032,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 56,
+    "z": 64,
+    "share": 0.031,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": 72,
+    "z": 92,
+    "share": 0.027,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": 68,
+    "z": 68,
+    "share": 0.023,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 56,
+    "z": 44,
+    "share": 0.022,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": 112,
+    "z": -12,
+    "share": 0.003,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": 112,
+    "z": 0,
+    "share": 0.003,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 120,
+    "z": -16,
+    "share": 0.002,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 120,
+    "z": -8,
+    "share": 0.001,
+    "n": 1
+   }
+  ],
+  "st:10": [
+   {
+    "kind": "Finn",
+    "x": 52,
+    "z": 56,
+    "share": 0.244,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 56,
+    "z": 64,
+    "share": 0.21,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 56,
+    "z": 52,
+    "share": 0.198,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 64,
+    "z": 52,
+    "share": 0.088,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 64,
+    "z": 64,
+    "share": 0.077,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": 72,
+    "z": 92,
+    "share": 0.069,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 56,
+    "z": 44,
+    "share": 0.058,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 60,
+    "z": 56,
+    "share": 0.047,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 60,
+    "z": 40,
+    "share": 0.005,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 64,
+    "z": 32,
+    "share": 0.003,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 116,
+    "z": -12,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 108,
+    "z": -16,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 120,
+    "z": -16,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 120,
+    "z": -8,
+    "share": 0.0,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 116,
+    "z": -24,
+    "share": 0.0,
+    "n": 1
+   }
+  ],
+  "st:11": [
+   {
+    "kind": "Finn",
+    "x": 56,
+    "z": 64,
+    "share": 0.251,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 52,
+    "z": 56,
+    "share": 0.162,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 56,
+    "z": 52,
+    "share": 0.137,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 64,
+    "z": 52,
+    "share": 0.111,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 64,
+    "z": 64,
+    "share": 0.102,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": 72,
+    "z": 92,
+    "share": 0.069,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 60,
+    "z": 56,
+    "share": 0.045,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 56,
+    "z": 44,
+    "share": 0.044,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 60,
+    "z": 40,
+    "share": 0.016,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 64,
+    "z": 32,
+    "share": 0.014,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 116,
+    "z": -12,
+    "share": 0.012,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 108,
+    "z": -16,
+    "share": 0.012,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 120,
+    "z": -8,
+    "share": 0.01,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": 104,
+    "z": 4,
+    "share": 0.005,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 112,
+    "z": -4,
+    "share": 0.005,
+    "n": 1
+   }
+  ],
+  "st:12": [
+   {
+    "kind": "Finn",
+    "x": 52,
+    "z": 56,
+    "share": 0.199,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 56,
+    "z": 52,
+    "share": 0.191,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 56,
+    "z": 64,
+    "share": 0.165,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 64,
+    "z": 52,
+    "share": 0.117,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 64,
+    "z": 64,
+    "share": 0.083,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 56,
+    "z": 44,
+    "share": 0.072,
+    "n": 1
+   },
+   {
+    "kind": "Rainicorn",
+    "x": 72,
+    "z": 92,
+    "share": 0.063,
+    "n": 1
+   },
+   {
+    "kind": "HanaAbadeer",
+    "x": 60,
+    "z": 56,
+    "share": 0.027,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": 116,
+    "z": -12,
+    "share": 0.015,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 120,
+    "z": -8,
+    "share": 0.013,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 60,
+    "z": 40,
+    "share": 0.013,
+    "n": 1
+   },
+   {
+    "kind": "FlamePrincess",
+    "x": 108,
+    "z": -16,
+    "share": 0.012,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 64,
+    "z": 32,
+    "share": 0.01,
+    "n": 1
+   },
+   {
+    "kind": "Marceline",
+    "x": 116,
+    "z": -24,
+    "share": 0.007,
+    "n": 1
+   },
+   {
+    "kind": "BMO",
+    "x": 112,
+    "z": -4,
+    "share": 0.004,
     "n": 1
    }
   ]
