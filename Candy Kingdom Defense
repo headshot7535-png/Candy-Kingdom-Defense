@@ -14,6 +14,37 @@
 -- claim the "running" slot synchronously, before any yield, so two queued loaders can't both start
 if _G.CKD_SF and _G.CKD_SF.alive then return end
 local VERSION = "1.2"
+-- what changed, newest first (Updates tab; a one-time notice when a player first runs a new version)
+-- items: { icon, title, text, tag = NEW | IMPROVED | FIX }
+local CHANGELOG = {
+    { v = "1.2", date = "Oct 29, 2026", title = "A plan for every map", items = {
+        { "🗺️", "Clear planner", "Works out the fastest team and placement for each map. Testing: Goliad's Reign 11% faster, Gumdrop Gauntlet 20% faster.", "NEW" },
+        { "✅", "Only plans where it's right", "Plans only on maps where the simulator's times match your real runs, and drops a plan that turns out slower.", "NEW" },
+        { "♾️", "Infinite planner", "Picks the team and placement that last the most waves.", "NEW" },
+        { "⏱️", "Game speed per map", "Measures how fast each map really runs (the game speeds some up), so plans compare fairly.", "NEW" },
+        { "🌊", "Real wave timing", "The simulator uses the game's real gaps between waves, auto-skip and challenge modifiers.", "IMPROVED" },
+        { "🔧", "Infinite fix", "Infinite runs were sometimes treated as normal maps.", "FIX" },
+    } },
+    { v = "1.1", date = "Oct 29, 2026", title = "Tournament, Brain Hive, faster clears", items = {
+        { "🥇", "Tournament planner", "Picks the team and placement that deal the most damage, and replays when it can beat your best. Testing: 116M → 148M, rank 181 → 87.", "NEW" },
+        { "💥", "Smarter tournament sim", "Counts knockback, abilities and the week's element bonus, and puts heroes where the waves pile up.", "IMPROVED" },
+        { "🎲", "Trait rolls for tournament heroes", "A tournament hero with no trait or a Common one is rolled up to Rare or better (a few crystals).", "NEW" },
+        { "🧠", "Brain Hive", "Shares anonymous match stats so hero scores improve for everyone. Switch off: Settings → Share anonymous stats.", "NEW" },
+        { "📚", "Learn from the hive", "Blends every player's hero data into your scores, mostly for heroes you rarely play.", "NEW" },
+        { "⏩", "Early wave calls on", "Sends the next wave early when it's safe. Gumdrop Gauntlet: ~210s → 130–154s.", "IMPROVED" },
+        { "🧮", "Better hero scores", "Corrected damage math for area attacks, slows, multi-shots and burn.", "IMPROVED" },
+        { "💎", "Safer trait chases", "Rerolls a Rare+ trait only with enough crystals for a 50% shot at Hero of Ooo (Lobby → Safe Chase Odds).", "IMPROVED" },
+        { "🚧", "Blocked spots remembered", "A spot that blocks a hero twice on a map is skipped from then on.", "IMPROVED" },
+        { "🎃", "Raids call waves early again", "Once the simulator says the team wins with room to spare.", "IMPROVED" },
+        { "🔧", "Discord link", "The Join Discord invite works again.", "FIX" },
+    } },
+    { v = "1.0", date = "Oct 26–28, 2026", title = "Latest additions", items = {
+        { "🌩️", "S-tier evolutions", "Buys and evolves The Dark Cloud, and farms Sandwiches for Cosmic Dog.", "NEW" },
+        { "📜", "Trait History", "The Lobby tab shows where every crystal went.", "NEW" },
+        { "📈", "Full upgrade scoring", "Hero scores count every upgrade level, not just level 1.", "IMPROVED" },
+        { "💬", "Join Discord button", "On the Main tab: copies the community invite.", "NEW" },
+    } },
+}
 local SF = { alive = true, conns = {} }
 _G.CKD_SF = SF
 if not game:IsLoaded() then game.Loaded:Wait() end
@@ -4103,6 +4134,20 @@ function GUI.build()
     LIVE.log = T:Paragraph("...")
     LIVE.totals = T:Label("...")
 
+    -- one card per change (bold title, readable text, coloured tag); plain lines on an older NexusLib
+    T = Win:Tab("📰", "Updates")
+    local TAG_COLOR = { NEW = Color3.fromRGB(74, 222, 128), IMPROVED = Color3.fromRGB(96, 165, 250), FIX = Color3.fromRGB(251, 191, 36) }
+    for _, e in ipairs(CHANGELOG) do
+        T:Section(string.format("v%s · %s · %s", e.v, e.title, e.date))
+        for _, it in ipairs(e.items) do
+            if T.StatusCard then
+                T:StatusCard({ icon = it[1], title = it[2], text = it[3], tag = it[4], tagColor = TAG_COLOR[it[4]], color = TAG_COLOR[it[4]] })
+            else
+                T:Label(it[1] .. " " .. it[2] .. " — " .. it[3])
+            end
+        end
+    end
+
     T = Win:Tab("⚙️", "Settings")
     tog(T, "Anti-AFK", "Send an input when Roblox flags you idle", "antiAfk")
     T:Section("Help improve the script")
@@ -4134,6 +4179,15 @@ function GUI.build()
             pcall(function() Win:Notify("Anonymous stats", "Match stats are shared to improve hero scores for everyone. Switch off: Settings → Help improve the script.", 10, "default") end)
         end)
         SF.log(1, "INFO", "anonymous match stats are on (Settings → Help improve the script to switch off)")
+    end
+    -- once per new version: point at the Updates tab
+    if CFG.seenVersion ~= VERSION then
+        local first = CFG.seenVersion == nil
+        CFG.seenVersion = VERSION
+        SF.saveSoon()
+        task.delay(first and 15 or 6, function()
+            pcall(function() Win:Notify("Updated to v" .. VERSION, CHANGELOG[1].title .. " — see the 📰 Updates tab for what's new.", 10, "default") end)
+        end)
     end
 end
 -- the mode being played right now (match) as a mode table C.MODE.purpose understands
