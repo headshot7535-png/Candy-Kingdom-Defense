@@ -69,11 +69,15 @@ function SIM.crowdWeight(occ)
         return 0.2 + 1.3 * (occ[i] or 0)
     end
 end
-local function covOrder(E, r, strat, occ)
+-- cut: how far down the road enemies really get on this map (the farm's MT.reachCut); road past it counts
+-- ×0.2, as in the farm's own placement (ice maps: everything dies at the entrance, so heroes pile up there)
+local function covOrder(E, r, strat, occ, cut)
     strat = strat or "even"
-    local key = math.floor(r + 0.5) .. ":" .. strat .. (strat == "crowd" and occ and (":" .. tostring(occ)) or "")
+    cut = cut and math.floor(cut * 10 + 0.5) / 10 or 1
+    local key = math.floor(r + 0.5) .. ":" .. strat .. (strat == "crowd" and occ and (":" .. tostring(occ)) or "") .. ":" .. cut
     if E.cov[key] then return E.cov[key] end
-    local wf = strat == "crowd" and occ and SIM.crowdWeight(occ) or SIM.STRATS[strat] or SIM.STRATS.even
+    local base = strat == "crowd" and occ and SIM.crowdWeight(occ) or SIM.STRATS[strat] or SIM.STRATS.even
+    local wf = cut < 1 and function(f) return base(f) * (f > cut and 0.2 or 1) end or base
     local t = {}
     for i, s in ipairs(E.spots) do t[i] = coverage(E, s.x, s.z, math.floor(r + 0.5), wf); if i % 500 == 0 then task.wait() end end
     local order = {}
@@ -166,10 +170,13 @@ function SIM.run(stageId, team, opts)
     for w, groups in ipairs(waves) do
         local t0 = 3 + (w - 1) * FAR
         local hpW = (INF and Cat.infiniteHp(INF.id, w) or Cat.stageWaveHp(stage, w)) * (opts.hp or 1) * (M.hp or 1)
+        -- stage.pace (0.8–1) shortens a map's spawn gaps: measured Well of Power 0.8 → spawns 1.25× faster,
+        -- Frozen Lake 0.85 → 1.18× (enemies still walk at their listed speed)
+        local sp = (not INF and tonumber(stage.pace)) or 1
         for _, g in ipairs(groups) do
             local T = Enemies.TYPES[g[1]]
             if T then
-                local delay, interval = tonumber(g[4]) or 0, tonumber(g[3]) or 1
+                local delay, interval = (tonumber(g[4]) or 0) * sp, (tonumber(g[3]) or 1) * sp
                 local count = math.max(1, math.floor((tonumber(g[2]) or 1) * (M.count or 1) + 0.5))
                 for i = 1, count do
                     table.insert(spawns, { t = t0 + delay + (i - 1) * interval, type = T, hp = T.hp * hpW * (tonumber(g[5]) or 1), w = w })
@@ -281,8 +288,18 @@ function SIM.run(stageId, team, opts)
     -- where enemy HP sits along the road (enemy-HP-seconds per bin): the "crowd" placement style
     local occ = {}
     for i = 1, SIM.OCC_BINS do occ[i] = 0 end
-    local function freeSpot(r)
-        local tab = covOrder(E, r, opts.strat, opts.occ)
+    -- opts.fixedSpots[kind] = { {x, z}, ... }: put that hero exactly there, in order (e.g. a real run's
+    -- placements from the hive), to tell placement apart from everything else when the sim and reality differ
+    local function freeSpot(r, kind)
+        local fixed = opts.fixedSpots and kind and opts.fixedSpots[kind]
+        if fixed then
+            local n = 0
+            for _, tw in ipairs(towers) do if tw.kind == kind then n = n + 1 end end
+            local s = fixed[n + 1]
+            if s then return { x = s[1], z = s[2] }, coverage(E, s[1], s[2], math.floor(r + 0.5)) end
+            return nil
+        end
+        local tab = covOrder(E, r, opts.strat, opts.occ, opts.cut)
         local list = {}
         for _, tw in ipairs(towers) do table.insert(list, { pos = Vector3.new(tw.x, 0.25, tw.z) * W }) end
         for k = 1, math.min(#tab.order, 500) do
@@ -298,7 +315,7 @@ function SIM.run(stageId, team, opts)
                 if U.n < U.cap then
                     local row = U.L[1]
                     local r = (row.range or 20) * U.m.range
-                    local s, cov = freeSpot(r)
+                    local s, cov = freeSpot(r, kind)
                     if s then
                         local cost = math.floor((row.cost or 0) * U.m.cost + 0.5)
                         local norm = cov / math.max(1, 2 * r / E.step)
@@ -507,7 +524,7 @@ function SIM.clear(stageId, team, opts)
         local a = opts.aggr or 1
         calls = { alive = (CFG.callAlive or 8) * a, reach = (CFG.callReach or 0.5) * a }
     end
-    return SIM.run(stageId, team, { strat = opts.strat, occ = opts.occ, mods = opts.mods, calls = calls or nil, hp = opts.hp, dmg = opts.dmg })
+    return SIM.run(stageId, team, { strat = opts.strat, occ = opts.occ, mods = opts.mods, calls = calls or nil, hp = opts.hp, dmg = opts.dmg, fixedSpots = opts.fixedSpots, cut = opts.cut })
 end
 
 -- Infinite for a team: plays until the lives run out; {wave, t, won (= reached maxWaves)}. No early calls
