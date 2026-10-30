@@ -55,6 +55,14 @@ end
 -- "crowd": weight each stretch of road by how much enemy HP sat there in an earlier run (occ = 0..1 per
 -- road bin, SIM.run's result.occ), so heroes go where the waves really pile up
 SIM.OCC_BINS = 40
+-- game seconds from a wave's last spawn to the next wave (measured with WaveNextAt: 9.8 real s at x1.1 game
+-- speed in Infinite = INFINITE.clock 10). The sim runs at x1: real seconds = sim seconds / the map's pace
+SIM.COUNTDOWN = 10
+-- normal maps (WaveNextAt on Frosty Fudge Pass, Oct 2026): the next wave is due ~6 s after a wave's last
+-- spawn, ~19 s after a boss wave's; a cleared road starts it 1.5 s later (the game's Auto skip, on by default)
+SIM.GAP = 6
+SIM.BOSS_GAP = 19
+SIM.CLEAR_SKIP = 1.5
 function SIM.crowdWeight(occ)
     return function(f)
         local i = math.clamp(math.floor(f * #occ) + 1, 1, #occ)
@@ -127,13 +135,23 @@ function SIM.run(stageId, team, opts)
     opts = opts or {}
     -- kills pay reward × STAGE_CASH (measured live: Candy Zombie 5 → 8), plus each wave's clear bonus
     opts.cash = opts.cash or Cat.STAGE_CASH or 1.5
+    -- challenge modifiers (Catalog.challengeMods: hp, speed, count, lives, dmg)
+    local M = opts.mods or {}
+    if M.dmg and not opts.modsApplied then opts.dmg = (opts.dmg or 1) * M.dmg; opts.modsApplied = true end
     local stage = Cat.stage(stageId)
     local E = SIM.layout(stageId)
     local TR = opts.tourney and Cat.TOURNEY
+    -- Infinite (opts.infinite): the world's endless waves (Catalog.infiniteWave: its last two stages' waves
+    -- in turn, the finale every 10th) with HP ×INFINITE.growth a wave (Catalog.infiniteHp), up to maxWaves
+    local INF = opts.infinite and Cat.worldOf(stageId)
     local waves = TR and {} or Cat.stageWaves(stage)
+    if INF then
+        waves = {}
+        for w = 1, opts.maxWaves or 150 do waves[w] = Cat.infiniteWave(INF.id, w) end
+    end
     local nW = #waves
     local clock = TR and TR.every or (stage.minutes or Cat.WAVE_CLOCK.minutes or 5) * 60 / nW
-    local money, lives = TR and TR.money or stage.money or 1000, TR and TR.lives or stage.lives or 10
+    local money, lives = TR and TR.money or stage.money or 1000, TR and TR.lives or math.floor((stage.lives or 10) * (M.lives or 1))
     local dealt = 0 -- tournament score: damage that landed (no overkill)
     local units = {}
     for _, u in ipairs(team) do
@@ -143,14 +161,17 @@ function SIM.run(stageId, team, opts)
     local towers, enemies, spawns = {}, {}, {}
     if TR then spawns, nW = tourneySpawns(opts.tourney, opts.hp) end
     -- spawn schedule from the stage's own wave list
+    -- waves after the first start when the game says so (see advance() below): placeholder starts far apart
+    local FAR = 1e5
     for w, groups in ipairs(waves) do
-        local t0 = 3 + (w - 1) * clock
-        local hpW = Cat.stageWaveHp(stage, w) * (opts.hp or 1)
+        local t0 = 3 + (w - 1) * FAR
+        local hpW = (INF and Cat.infiniteHp(INF.id, w) or Cat.stageWaveHp(stage, w)) * (opts.hp or 1) * (M.hp or 1)
         for _, g in ipairs(groups) do
             local T = Enemies.TYPES[g[1]]
             if T then
                 local delay, interval = tonumber(g[4]) or 0, tonumber(g[3]) or 1
-                for i = 1, tonumber(g[2]) or 1 do
+                local count = math.max(1, math.floor((tonumber(g[2]) or 1) * (M.count or 1) + 0.5))
+                for i = 1, count do
                     table.insert(spawns, { t = t0 + delay + (i - 1) * interval, type = T, hp = T.hp * hpW * (tonumber(g[5]) or 1), w = w })
                 end
             end
@@ -162,6 +183,44 @@ function SIM.run(stageId, team, opts)
     local bonusPaid = {}
     local killDist, kills = 0, 0
     local lastSpawnT = spawns[#spawns] and spawns[#spawns].t or 0
+    -- wave pacing, measured live (WaveNextAt, Oct 2026): once a wave has finished spawning a countdown of
+    -- SIM.COUNTDOWN s starts, and the next wave comes when it ends, or at once if the road is empty. An early
+    -- call (opts.calls = {alive, reach}: the farm's MT.callWave limits × boldness) sends it right away too
+    local waveStart, waveTotal, waveSpawned, doneAt, waveBoss = {}, {}, {}, {}, {}
+    local emptyAt
+    if not TR then
+        for w = 1, nW do waveStart[w] = 3 + (w - 1) * FAR; waveTotal[w] = 0; waveSpawned[w] = 0 end
+        for _, s in ipairs(spawns) do waveTotal[s.w] = waveTotal[s.w] + 1; if s.type.boss then waveBoss[s.w] = true end end
+    end
+    local calls, lastCallT, spawnedT = 0, -99, 0
+    local function advance()
+        local cur = 0
+        for w = 1, nW do if waveStart[w] <= t then cur = w end end
+        local nw = cur + 1
+        if cur < 1 or nw > nW then return end
+        local spawnedAll = waveSpawned[cur] >= waveTotal[cur]
+        if spawnedAll and not doneAt[cur] then doneAt[cur] = t end
+        if spawnedAll and #enemies == 0 then emptyAt = emptyAt or t else emptyAt = nil end
+        local gap = INF and SIM.COUNTDOWN or (waveBoss[cur] and SIM.BOSS_GAP or SIM.GAP)
+        local natural = spawnedAll and ((emptyAt and t >= emptyAt + (INF and 0 or SIM.CLEAR_SKIP)) or t >= doneAt[cur] + gap)
+        if not natural then
+            -- early call: the farm's own conditions
+            if not opts.calls or leaks > 0 or t - waveStart[cur] < 4 or t - lastCallT < 4 then return end
+            if waveSpawned[cur] < waveTotal[cur] * 0.9 or #enemies > opts.calls.alive then return end
+            local front = 0
+            for _, e in ipairs(enemies) do front = math.max(front, e.dist / E.length) end
+            if front > opts.calls.reach then return end
+        end
+        local shift = waveStart[nw] - t
+        if shift <= 0 then return end
+        for w = nw, nW do waveStart[w] = waveStart[w] - shift end
+        for k = si, #spawns do if spawns[k].w >= nw then spawns[k].t = spawns[k].t - shift end end
+        local rest = {}
+        for k = si, #spawns do rest[#rest + 1] = spawns[k] end
+        table.sort(rest, function(a, b) return a.t < b.t end)
+        for k = 1, #rest do spawns[si + k - 1] = rest[k] end
+        if not natural then calls, lastCallT = calls + 1, t end
+    end
     local function kindsNear(x, z, skip)
         local k, r = {}, Cat.PASSIVE_RADIUS or 16
         for _, tw in ipairs(towers) do if tw ~= skip and (tw.x - x) ^ 2 + (tw.z - z) ^ 2 <= r * r then k[tw.kind] = true end end
@@ -311,18 +370,24 @@ function SIM.run(stageId, team, opts)
         steps = steps + 1
         -- wave clear bonus (paid around when the next wave is due)
         local due = math.floor((t - (TR and TR.build or 3)) / clock)
-        for w = 1, math.min(due, nW) do
-            if not bonusPaid[w] then
+        for w = 1, nW do
+            -- a wave's bonus comes when the next one is due (or called)
+            local paidNow = TR and w <= due or (not TR and waveStart[w + 1] ~= nil and waveStart[w + 1] <= t)
+            if paidNow and not bonusPaid[w] then
                 bonusPaid[w] = true
                 -- tournament: TOURNEY.cash = {base, per wave}
-                money = money + (TR and ((TR.cash and TR.cash[1] or 0) + (TR.cash and TR.cash[2] or 0) * (w - 1)) or (Cat.stageBonus(stage, w) or 0))
+                -- Infinite: the stage's bonus list in turn (assumed, like its waves)
+                local bw = INF and stage.bonus and #stage.bonus > 0 and ((w - 1) % #stage.bonus + 1) or w
+                money = money + (TR and ((TR.cash and TR.cash[1] or 0) + (TR.cash and TR.cash[2] or 0) * (w - 1)) or (Cat.stageBonus(stage, bw) or 0))
             end
         end
         economy()
         while spawns[si] and spawns[si].t <= t do
             local s = spawns[si]
-            table.insert(enemies, { hp = s.hp, max = s.hp, speed = s.type.speed, dist = 0, leak = s.type.leak or 1, reward = s.type.reward or 0, w = s.w, boss = s.type.boss })
+            table.insert(enemies, { hp = s.hp, max = s.hp, speed = (s.type.speed or 0) * (M.speed or 1), dist = 0, leak = s.type.leak or 1, reward = s.type.reward or 0, w = s.w, boss = s.type.boss })
             lastWave = math.max(lastWave, s.w)
+            if waveSpawned[s.w] then waveSpawned[s.w] = waveSpawned[s.w] + 1 end
+            spawnedT = s.t
             si = si + 1
         end
         -- move + positions
@@ -347,6 +412,7 @@ function SIM.run(stageId, team, opts)
             end
         end
         abilities()
+        if not TR then advance() end
         if lives <= 0 then return { won = false, lives = lives, leaks = leaks, wave = lastWave, t = t, score = dealt, occ = occOut() } end
         if TR and t >= TR.build + TR.length then
             return { won = true, survived = true, lives = lives, leaks = leaks, wave = lastWave, t = t, score = dealt, left = #enemies, occ = occOut() }
@@ -410,7 +476,7 @@ function SIM.run(stageId, team, opts)
         end
         if not spawns[si] and #enemies == 0 then
             -- tail = seconds from the last spawn to the last kill (the only part of a run placement can shorten)
-            return { won = true, survived = TR and true or nil, lives = lives, leaks = leaks, wave = nW, t = t, tail = t - lastSpawnT, killAt = kills > 0 and killDist / kills or 0, score = dealt, occ = occOut() }
+            return { won = true, survived = TR and true or nil, lives = lives, leaks = leaks, wave = nW, t = t, tail = t - (TR and lastSpawnT or spawnedT), calls = calls, killAt = kills > 0 and killDist / kills or 0, score = dealt, occ = occOut() }
         end
         if t > 3600 then return { won = false, lives = lives, leaks = leaks, wave = lastWave, t = t, timeout = true } end
         if steps % 40 == 0 then task.wait() end
@@ -429,6 +495,26 @@ function SIM.margin(stageId, team, opts)
         if r.won then lo = mid else hi = mid end
     end
     return lo, base
+end
+
+-- a normal map played the farm's way, early wave calls included: {won, t, calls, leaks, lives}.
+-- opts: strat, occ, mods (challenge), calls = {alive, reach} (default: the farm's CFG × boldness 1)
+function SIM.clear(stageId, team, opts)
+    opts = opts or {}
+    local CFG = SF.CFG or {}
+    local calls = opts.calls
+    if calls == nil and CFG.earlyCall then
+        local a = opts.aggr or 1
+        calls = { alive = (CFG.callAlive or 8) * a, reach = (CFG.callReach or 0.5) * a }
+    end
+    return SIM.run(stageId, team, { strat = opts.strat, occ = opts.occ, mods = opts.mods, calls = calls or nil, hp = opts.hp, dmg = opts.dmg })
+end
+
+-- Infinite for a team: plays until the lives run out; {wave, t, won (= reached maxWaves)}. No early calls
+-- (the farm never calls in Infinite). stageId = the world's infinite stage
+function SIM.infinite(stageId, team, opts)
+    opts = opts or {}
+    return SIM.run(stageId, team, { infinite = true, maxWaves = opts.maxWaves or 150, strat = opts.strat, occ = opts.occ, hp = opts.hp })
 end
 
 -- tournament run for a team: {score, survived, wave, leaks}. week = Catalog.tourneyAt(now); the layout is the
