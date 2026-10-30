@@ -23,6 +23,7 @@ local CHANGELOG = {
         { "♾️", "Infinite planner", "Picks the team and placement that last the most waves.", "NEW" },
         { "⏱️", "Game speed per map", "Measures how fast each map really runs (the game speeds some up), so plans compare fairly.", "NEW" },
         { "🌊", "Real wave timing", "The simulator uses the game's real gaps between waves, auto-skip and challenge modifiers.", "IMPROVED" },
+        { "💡", "Suggest box", "Send your ideas for the farm from this tab, anonymously.", "NEW" },
         { "🔧", "Infinite fix", "Infinite runs were sometimes treated as normal maps.", "FIX" },
     } },
     { v = "1.1", date = "Oct 29, 2026", title = "Tournament, Brain Hive, faster clears", items = {
@@ -301,6 +302,7 @@ do
     B.anonId = type(b.anonId) == "string" and b.anonId or Http:GenerateGUID(false):gsub("-", ""):sub(1, 10):lower()
     B.hiveQueue = type(b.hiveQueue) == "table" and b.hiveQueue or {}
     B.lastHive = tonumber(b.lastHive) or 0
+    B.lastSuggest = tonumber(b.lastSuggest) or 0                           -- last suggestion sent (one per 10 min)
 end
 task.spawn(function()
     while SF.alive do
@@ -3126,6 +3128,12 @@ function MT.resetRun()
                 local due = tonumber(mr:GetAttribute("WaveNextAt"))
                 local now = workspace:GetServerTimeNow()
                 if not due or due < now then return end
+                -- Infinite only sets it when a wave has finished spawning: every change is a gap
+                if MT.infinite then
+                    local left = due - now
+                    if left > 1 and left < 60 then MT.cdSum, MT.cdN = (MT.cdSum or 0) + left, (MT.cdN or 0) + 1 end
+                    return
+                end
                 if not MT.cdDue or math.abs(due - MT.cdDue) > 1 then
                     MT.cdDue, MT.cdStartAt = due, now
                     return
@@ -4136,6 +4144,21 @@ function GUI.build()
 
     -- one card per change (bold title, readable text, coloured tag); plain lines on an older NexusLib
     T = Win:Tab("📰", "Updates")
+    T:Section("💡 Suggest something for the farm")
+    local idea = ""
+    local ideaBox = T:Input("Your idea", "Sent anonymously (no Roblox name) · one every 10 min · 500 characters", "e.g. farm the next event's shop…", "", function(text) idea = tostring(text or "") end)
+    T:Button("📨", "Send Suggestion", "Goes straight to the script author", function()
+        local okG, got = pcall(function() return ideaBox._isProxy and ideaBox:Get() or ideaBox.Get() end)
+        if okG and type(got) == "string" and got ~= "" then idea = got end
+        task.spawn(function()
+            local ok, err = SF.REPORT.suggest(idea)
+            notify("Suggestion", ok and "sent — thank you!" or ("not sent: " .. tostring(err)), ok and "success" or "warning")
+            if ok then
+                idea = ""
+                pcall(function() if ideaBox._isProxy then ideaBox:Set("") else ideaBox.Set("") end end)
+            end
+        end)
+    end)
     local TAG_COLOR = { NEW = Color3.fromRGB(74, 222, 128), IMPROVED = Color3.fromRGB(96, 165, 250), FIX = Color3.fromRGB(251, 191, 36) }
     for _, e in ipairs(CHANGELOG) do
         T:Section(string.format("v%s · %s · %s", e.v, e.title, e.date))
@@ -4478,15 +4501,38 @@ function SF.REPORT.build()
 end
 -- one Discord embed with a JSON block (an embed holds 4096 characters; callers keep json under ~3900)
 function SF.REPORT.post(title, json, color)
+    return SF.REPORT.postEmbed(title, "```json\n" .. json .. "\n```", color)
+end
+-- one embed to the author's webhook; mentions are switched off (nothing in it can ping anyone)
+function SF.REPORT.postEmbed(title, description, color)
     if C.WEBHOOK_URL == "" then return false, "no webhook set by the author" end
     local req = (syn and syn.request) or http_request or request or (fluxus and fluxus.request)
     if not req then return false, "this executor can't send web requests" end
-    local body = U.json({ username = "Smart Farm reports", embeds = { {
-        title = title, description = "```json\n" .. json .. "\n```", color = color or 8556792 } } })
+    local body = U.json({ username = "Smart Farm reports", allowed_mentions = { parse = {} }, embeds = { {
+        title = title, description = description, color = color or 8556792 } } })
     local ok, res = pcall(req, { Url = C.WEBHOOK_URL, Method = "POST", Headers = { ["Content-Type"] = "application/json" }, Body = body })
     local code = ok and type(res) == "table" and tonumber(res.StatusCode or res.Status) or nil
     if ok and (not code or code < 300) then return true end
     return false, tostring(ok and code or res)
+end
+-- a player's idea for the farm (Updates tab → Suggest): anonymous (the random install id, no Roblox name),
+-- one every 10 minutes, at most 500 characters, links and @-mentions taken out. Works with sharing off: it's
+-- something the player chose to send
+SF.SUGGEST_GAP = 600
+function SF.REPORT.suggest(text)
+    text = tostring(text or ""):gsub("^%s+", ""):gsub("%s+$", "")
+    if #text < 5 then return false, "write a few words first" end
+    local wait = SF.SUGGEST_GAP - (os.time() - (tonumber(B.lastSuggest) or 0))
+    if wait > 0 then return false, string.format("you can send another in %d min", math.ceil(wait / 60)) end
+    text = text:gsub("https?://%S+", "[link]"):gsub("www%.%S+", "[link]"):gsub("@", "＠"):gsub("`", "'")
+    if #text > 500 then text = text:sub(1, 500) .. "…" end
+    local ok, err = SF.REPORT.postEmbed(string.format("💡 Suggestion · %s · v%s", B.anonId, VERSION), text, 16766720)
+    if ok then
+        B.lastSuggest = os.time()
+        SF.saveSoon()
+        SF.log(1, "INFO", "suggestion sent — thank you!")
+    end
+    return ok, err
 end
 function SF.REPORT.send(why)
     local data = SF.REPORT.build()
