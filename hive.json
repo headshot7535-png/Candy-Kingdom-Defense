@@ -1,8 +1,8 @@
 {
- "updated": 1793643170,
+ "updated": 1793643268,
  "players": 47,
  "summaries": 699,
- "matchRecords": 5680,
+ "matchRecords": 5685,
  "dropped": 128,
  "kinds": {
   "PrincessBubblegum": {
@@ -174,15 +174,15 @@
  "matchShare": {
   "HunsonDemon": {
    "share": 0.079,
-   "matches": 2529
+   "matches": 2534
   },
   "KingMan": {
    "share": 0.015,
-   "matches": 651
+   "matches": 656
   },
   "CandyElemental": {
-   "share": 0.15,
-   "matches": 2045
+   "share": 0.149,
+   "matches": 2050
   },
   "KingBMO": {
    "share": 0.265,
@@ -194,7 +194,7 @@
   },
   "AlienJake": {
    "share": 0.211,
-   "matches": 3415
+   "matches": 3418
   },
   "Hunson": {
    "share": 0.004,
@@ -234,7 +234,7 @@
   },
   "MarshallLeeVampireKing": {
    "share": 0.004,
-   "matches": 1855
+   "matches": 1860
   },
   "Lemongrab": {
    "share": 0.008,
@@ -270,7 +270,7 @@
   },
   "AdultFinn": {
    "share": 0.067,
-   "matches": 1156
+   "matches": 1159
   },
   "KeeOth": {
    "share": 0.398,
@@ -323,20 +323,20 @@
    "medSec": 131
   },
   "ch:3": {
-   "runs": 400,
-   "wins": 400,
+   "runs": 402,
+   "wins": 402,
    "winRate": 1.0,
    "medSec": 196
   },
   "ch:5": {
-   "runs": 343,
-   "wins": 343,
+   "runs": 344,
+   "wins": 344,
    "winRate": 1.0,
    "medSec": 185
   },
   "ch:2": {
-   "runs": 435,
-   "wins": 429,
+   "runs": 436,
+   "wins": 430,
    "winRate": 0.986,
    "medSec": 131
   },
@@ -347,8 +347,8 @@
    "medSec": 459
   },
   "ch:4": {
-   "runs": 383,
-   "wins": 381,
+   "runs": 384,
+   "wins": 382,
    "winRate": 0.995,
    "medSec": 197
   },
@@ -1121,8 +1121,8 @@
     "kind": "AlienJake",
     "x": -120,
     "z": -40,
-    "share": 0.417,
-    "n": 21
+    "share": 0.419,
+    "n": 22
    },
    {
     "kind": "JakeSuit",
