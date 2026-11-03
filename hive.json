@@ -1,8 +1,8 @@
 {
- "updated": 1793730411,
- "players": 47,
- "summaries": 771,
- "matchRecords": 6294,
+ "updated": 1793743825,
+ "players": 48,
+ "summaries": 777,
+ "matchRecords": 6315,
  "dropped": 128,
  "kinds": {
   "PrincessBubblegum": {
@@ -23,7 +23,7 @@
   "HunsonDemon": {
    "rel": 0.599,
    "players": 20,
-   "waves": 5431
+   "waves": 5460
   },
   "MarcelineBeast": {
    "rel": 0.785,
@@ -48,7 +48,7 @@
   "AlienJake": {
    "rel": 1.429,
    "players": 29,
-   "waves": 12147
+   "waves": 12185
   },
   "MagicMan": {
    "rel": 0.596,
@@ -61,14 +61,14 @@
    "waves": 1868
   },
   "Marceline": {
-   "rel": 0.942,
-   "players": 15,
-   "waves": 707
+   "rel": 0.94,
+   "players": 16,
+   "waves": 723
   },
   "BMO": {
-   "rel": 0.906,
+   "rel": 1.125,
    "players": 15,
-   "waves": 1484
+   "waves": 1490
   },
   "Finn": {
    "rel": 0.966,
@@ -77,13 +77,13 @@
   },
   "KingMan": {
    "rel": 0.569,
-   "players": 12,
-   "waves": 2302
+   "players": 13,
+   "waves": 2327
   },
   "CandyElemental": {
    "rel": 0.967,
    "players": 21,
-   "waves": 10073
+   "waves": 10098
   },
   "Billy": {
    "rel": 0.596,
@@ -92,8 +92,8 @@
   },
   "JakeSuit": {
    "rel": 1.253,
-   "players": 6,
-   "waves": 2189
+   "players": 7,
+   "waves": 2214
   },
   "DeathMetal": {
    "rel": 0.546,
@@ -108,7 +108,7 @@
   "HanaAbadeer": {
    "rel": 0.752,
    "players": 14,
-   "waves": 1569
+   "waves": 1570
   },
   "Hunson": {
    "rel": 0.434,
@@ -118,32 +118,32 @@
   "KeeOth": {
    "rel": 0.838,
    "players": 15,
-   "waves": 3146
+   "waves": 3147
   },
   "MarshallLee": {
-   "rel": 0.78,
+   "rel": 0.719,
    "players": 24,
-   "waves": 5683
+   "waves": 5695
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
    "players": 23,
-   "waves": 7201
+   "waves": 7278
   },
   "VampireKingCloud": {
    "rel": 0.937,
    "players": 12,
-   "waves": 4608
+   "waves": 4609
   },
   "MarshallLeeVampireKing": {
-   "rel": 0.596,
-   "players": 13,
-   "waves": 3186
+   "rel": 0.592,
+   "players": 15,
+   "waves": 3218
   },
   "JakeTheLich": {
    "rel": 0.389,
    "players": 11,
-   "waves": 3735
+   "waves": 3761
   },
   "Lemongrab3": {
    "rel": 4.956,
@@ -151,9 +151,9 @@
    "waves": 93
   },
   "HanaDemon": {
-   "rel": 1.363,
+   "rel": 1.967,
    "players": 3,
-   "waves": 84
+   "waves": 119
   },
   "Death": {
    "rel": 0.589,
@@ -173,16 +173,16 @@
  },
  "matchShare": {
   "HunsonDemon": {
-   "share": 0.08,
-   "matches": 2868
+   "share": 0.081,
+   "matches": 2882
   },
   "KingMan": {
-   "share": 0.017,
-   "matches": 727
+   "share": 0.018,
+   "matches": 734
   },
   "CandyElemental": {
    "share": 0.156,
-   "matches": 2335
+   "matches": 2344
   },
   "KingBMO": {
    "share": 0.175,
@@ -194,7 +194,7 @@
   },
   "AlienJake": {
    "share": 0.233,
-   "matches": 3780
+   "matches": 3792
   },
   "Hunson": {
    "share": 0.007,
@@ -202,7 +202,7 @@
   },
   "MarshallLee": {
    "share": 0.111,
-   "matches": 1877
+   "matches": 1879
   },
   "Rainicorn": {
    "share": 0.028,
@@ -210,19 +210,19 @@
   },
   "HalfMonsterDemon": {
    "share": 0.228,
-   "matches": 1629
+   "matches": 1645
   },
   "Marceline": {
-   "share": 0.004,
-   "matches": 278
+   "share": 0.003,
+   "matches": 285
   },
   "HanaAbadeer": {
    "share": 0.115,
    "matches": 940
   },
   "JakeTheLich": {
-   "share": 0.071,
-   "matches": 2637
+   "share": 0.072,
+   "matches": 2644
   },
   "VampireKingCloud": {
    "share": 0.166,
@@ -234,7 +234,7 @@
   },
   "MarshallLeeVampireKing": {
    "share": 0.01,
-   "matches": 2168
+   "matches": 2176
   },
   "Lemongrab": {
    "share": 0.008,
@@ -257,16 +257,16 @@
    "matches": 178
   },
   "BMO": {
-   "share": 0.036,
-   "matches": 667
+   "share": 0.035,
+   "matches": 674
   },
   "Jake": {
    "share": 0.089,
    "matches": 37
   },
   "FlamePrincess": {
-   "share": 0.053,
-   "matches": 302
+   "share": 0.05,
+   "matches": 307
   },
   "AdultFinn": {
    "share": 0.067,
@@ -278,7 +278,7 @@
   },
   "JakeSuit": {
    "share": 0.0,
-   "matches": 1252
+   "matches": 1259
   },
   "MagicMan": {
    "share": 0.012,
@@ -301,8 +301,8 @@
    "matches": 1
   },
   "HanaDemon": {
-   "share": 0.15,
-   "matches": 57
+   "share": 0.165,
+   "matches": 71
   },
   "Lemongrab3": {
    "share": 0.013,
@@ -311,8 +311,8 @@
  },
  "modes": {
   "ch:6": {
-   "runs": 415,
-   "wins": 415,
+   "runs": 417,
+   "wins": 417,
    "winRate": 1.0,
    "medSec": 147
   },
@@ -323,14 +323,14 @@
    "medSec": 131
   },
   "ch:3": {
-   "runs": 461,
-   "wins": 461,
+   "runs": 463,
+   "wins": 463,
    "winRate": 1.0,
    "medSec": 196
   },
   "ch:5": {
-   "runs": 402,
-   "wins": 402,
+   "runs": 404,
+   "wins": 404,
    "winRate": 1.0,
    "medSec": 186
   },
@@ -341,14 +341,14 @@
    "medSec": 131
   },
   "st:38": {
-   "runs": 837,
-   "wins": 825,
+   "runs": 847,
+   "wins": 835,
    "winRate": 0.986,
    "medSec": 459
   },
   "ch:4": {
-   "runs": 428,
-   "wins": 426,
+   "runs": 430,
+   "wins": 428,
    "winRate": 0.995,
    "medSec": 197
   },
@@ -365,10 +365,10 @@
    "medSec": 205
   },
   "inf:32": {
-   "runs": 223,
+   "runs": 226,
    "wins": 1,
    "winRate": 0.004,
-   "medSec": 1979
+   "medSec": 1980
   },
   "inf:21": {
    "runs": 10,
@@ -1372,8 +1372,8 @@
     "kind": "JakeTheLich",
     "x": -84,
     "z": -60,
-    "share": 0.408,
-    "n": 41
+    "share": 0.41,
+    "n": 43
    },
    {
     "kind": "CandyElemental",
@@ -1418,18 +1418,18 @@
     "n": 9
    },
    {
-    "kind": "JakeSuit",
-    "x": -28,
-    "z": -64,
-    "share": 0.23,
-    "n": 9
-   },
-   {
     "kind": "CandyElemental",
     "x": -36,
     "z": -56,
     "share": 0.219,
     "n": 6
+   },
+   {
+    "kind": "JakeSuit",
+    "x": -28,
+    "z": -64,
+    "share": 0.218,
+    "n": 11
    },
    {
     "kind": "AlienJake",
@@ -1563,8 +1563,8 @@
     "kind": "AlienJake",
     "x": -64,
     "z": -92,
-    "share": 0.435,
-    "n": 16
+    "share": 0.456,
+    "n": 17
    },
    {
     "kind": "MarshallLeeVampireKing",
@@ -1664,7 +1664,7 @@
     "x": -72,
     "z": -76,
     "share": 0.32,
-    "n": 17
+    "n": 19
    },
    {
     "kind": "VampireKingCloud",
