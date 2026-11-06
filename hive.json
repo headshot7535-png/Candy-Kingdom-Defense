@@ -1,9 +1,9 @@
 {
- "updated": 1793979129,
+ "updated": 1794000738,
  "players": 54,
- "summaries": 846,
- "matchRecords": 6563,
- "dropped": 139,
+ "summaries": 863,
+ "matchRecords": 6627,
+ "dropped": 170,
  "kinds": {
   "PrincessBubblegum": {
    "rel": 0.867,
@@ -13,17 +13,17 @@
   "KingBMO": {
    "rel": 1.11,
    "players": 15,
-   "waves": 9531
+   "waves": 9534
   },
   "PrismRainicorn": {
    "rel": 0.816,
    "players": 10,
-   "waves": 3841
+   "waves": 3851
   },
   "HunsonDemon": {
    "rel": 0.652,
    "players": 22,
-   "waves": 5944
+   "waves": 5984
   },
   "MarcelineBeast": {
    "rel": 0.785,
@@ -48,12 +48,12 @@
   "AlienJake": {
    "rel": 1.37,
    "players": 31,
-   "waves": 12280
+   "waves": 12317
   },
   "MagicMan": {
    "rel": 0.596,
-   "players": 15,
-   "waves": 1272
+   "players": 14,
+   "waves": 1265
   },
   "Rainicorn": {
    "rel": 0.687,
@@ -78,12 +78,12 @@
   "KingMan": {
    "rel": 0.616,
    "players": 13,
-   "waves": 2854
+   "waves": 2974
   },
   "CandyElemental": {
    "rel": 0.967,
    "players": 22,
-   "waves": 10266
+   "waves": 10264
   },
   "Billy": {
    "rel": 0.596,
@@ -98,12 +98,12 @@
   "DeathMetal": {
    "rel": 0.546,
    "players": 12,
-   "waves": 3311
+   "waves": 3420
   },
   "AdultFinn": {
    "rel": 1.033,
-   "players": 11,
-   "waves": 4889
+   "players": 10,
+   "waves": 4853
   },
   "HanaAbadeer": {
    "rel": 0.752,
@@ -111,34 +111,34 @@
    "waves": 1640
   },
   "Hunson": {
-   "rel": 0.513,
-   "players": 9,
-   "waves": 776
+   "rel": 0.434,
+   "players": 8,
+   "waves": 753
   },
   "KeeOth": {
    "rel": 0.838,
    "players": 16,
-   "waves": 3254
+   "waves": 3350
   },
   "MarshallLee": {
    "rel": 0.719,
-   "players": 28,
-   "waves": 6070
+   "players": 27,
+   "waves": 6056
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
-   "players": 26,
-   "waves": 7798
+   "players": 25,
+   "waves": 7734
   },
   "VampireKingCloud": {
    "rel": 0.937,
-   "players": 11,
-   "waves": 4595
+   "players": 12,
+   "waves": 4614
   },
   "MarshallLeeVampireKing": {
    "rel": 0.596,
-   "players": 15,
-   "waves": 3438
+   "players": 16,
+   "waves": 3522
   },
   "JakeTheLich": {
    "rel": 0.456,
@@ -173,44 +173,44 @@
  },
  "matchShare": {
   "HunsonDemon": {
-   "share": 0.084,
-   "matches": 2978
+   "share": 0.083,
+   "matches": 3040
   },
   "KingMan": {
-   "share": 0.033,
-   "matches": 856
+   "share": 0.03,
+   "matches": 892
   },
   "CandyElemental": {
-   "share": 0.153,
-   "matches": 2419
+   "share": 0.151,
+   "matches": 2467
   },
   "KingBMO": {
-   "share": 0.173,
-   "matches": 1476
+   "share": 0.175,
+   "matches": 1478
   },
   "PrismRainicorn": {
-   "share": 0.016,
-   "matches": 468
+   "share": 0.015,
+   "matches": 478
   },
   "AlienJake": {
-   "share": 0.233,
-   "matches": 3847
+   "share": 0.232,
+   "matches": 3885
   },
   "Hunson": {
    "share": 0.003,
-   "matches": 173
+   "matches": 192
   },
   "MarshallLee": {
    "share": 0.114,
-   "matches": 1972
+   "matches": 1974
   },
   "Rainicorn": {
    "share": 0.03,
    "matches": 361
   },
   "HalfMonsterDemon": {
-   "share": 0.214,
-   "matches": 1799
+   "share": 0.211,
+   "matches": 1817
   },
   "Marceline": {
    "share": 0.002,
@@ -218,7 +218,7 @@
   },
   "HanaAbadeer": {
    "share": 0.114,
-   "matches": 971
+   "matches": 973
   },
   "JakeTheLich": {
    "share": 0.079,
@@ -229,12 +229,12 @@
    "matches": 2777
   },
   "DeathMetal": {
-   "share": 0.132,
-   "matches": 1052
+   "share": 0.136,
+   "matches": 1079
   },
   "MarshallLeeVampireKing": {
-   "share": 0.018,
-   "matches": 2285
+   "share": 0.019,
+   "matches": 2316
   },
   "Lemongrab": {
    "share": 0.008,
@@ -269,12 +269,12 @@
    "matches": 347
   },
   "AdultFinn": {
-   "share": 0.068,
-   "matches": 1207
+   "share": 0.069,
+   "matches": 1232
   },
   "KeeOth": {
-   "share": 0.361,
-   "matches": 1213
+   "share": 0.354,
+   "matches": 1241
   },
   "JakeSuit": {
    "share": 0.002,
@@ -315,8 +315,8 @@
  },
  "modes": {
   "ch:6": {
-   "runs": 426,
-   "wins": 426,
+   "runs": 432,
+   "wins": 432,
    "winRate": 1.0,
    "medSec": 147
   },
@@ -327,38 +327,38 @@
    "medSec": 140
   },
   "ch:3": {
-   "runs": 473,
-   "wins": 473,
+   "runs": 478,
+   "wins": 478,
    "winRate": 1.0,
    "medSec": 196
   },
   "ch:5": {
-   "runs": 414,
-   "wins": 414,
+   "runs": 419,
+   "wins": 419,
    "winRate": 1.0,
    "medSec": 186
   },
   "ch:2": {
-   "runs": 492,
-   "wins": 486,
+   "runs": 495,
+   "wins": 489,
    "winRate": 0.988,
    "medSec": 131
   },
   "st:38": {
-   "runs": 952,
-   "wins": 940,
+   "runs": 986,
+   "wins": 973,
    "winRate": 0.987,
    "medSec": 459
   },
   "ch:4": {
-   "runs": 436,
-   "wins": 434,
+   "runs": 441,
+   "wins": 439,
    "winRate": 0.995,
    "medSec": 197
   },
   "pt:27": {
-   "runs": 98,
-   "wins": 98,
+   "runs": 100,
+   "wins": 100,
    "winRate": 1.0,
    "medSec": 165
   },
@@ -369,22 +369,22 @@
    "medSec": 205
   },
   "inf:32": {
-   "runs": 258,
+   "runs": 260,
    "wins": 1,
    "winRate": 0.004,
-   "medSec": 1972
+   "medSec": 1974
   },
   "inf:21": {
-   "runs": 10,
+   "runs": 11,
    "wins": 0,
    "winRate": 0.0,
-   "medSec": 2200
+   "medSec": 2208
   },
   "tr": {
-   "runs": 67,
-   "wins": 48,
-   "winRate": 0.716,
-   "medSec": 605
+   "runs": 68,
+   "wins": 49,
+   "winRate": 0.721,
+   "medSec": 606
   },
   "st:32": {
    "runs": 47,
@@ -1215,6 +1215,13 @@
     "n": 23
    },
    {
+    "kind": "KingMan",
+    "x": -112,
+    "z": -56,
+    "share": 0.547,
+    "n": 2
+   },
+   {
     "kind": "CandyElemental",
     "x": -132,
     "z": -80,
@@ -1243,25 +1250,18 @@
     "n": 7
    },
    {
+    "kind": "DeathMetal",
+    "x": -112,
+    "z": -52,
+    "share": 0.435,
+    "n": 2
+   },
+   {
     "kind": "VampireKingCloud",
     "x": -116,
     "z": -56,
     "share": 0.862,
     "n": 1
-   },
-   {
-    "kind": "VampireKingCloud",
-    "x": -112,
-    "z": -64,
-    "share": 0.172,
-    "n": 6
-   },
-   {
-    "kind": "DeathMetal",
-    "x": -116,
-    "z": -52,
-    "share": 0.402,
-    "n": 2
    }
   ],
   "st:35": [
@@ -1401,6 +1401,13 @@
     "n": 7
    },
    {
+    "kind": "DeathMetal",
+    "x": -88,
+    "z": -56,
+    "share": 0.334,
+    "n": 6
+   },
+   {
     "kind": "AlienJake",
     "x": -36,
     "z": -64,
@@ -1427,13 +1434,6 @@
     "z": -68,
     "share": 0.246,
     "n": 9
-   },
-   {
-    "kind": "DeathMetal",
-    "x": -88,
-    "z": -56,
-    "share": 0.303,
-    "n": 4
    },
    {
     "kind": "CandyElemental",
@@ -1571,11 +1571,11 @@
     "n": 9
    },
    {
-    "kind": "DeathMetal",
-    "x": -96,
-    "z": -44,
-    "share": 0.441,
-    "n": 41
+    "kind": "HunsonDemon",
+    "x": -64,
+    "z": -96,
+    "share": 0.727,
+    "n": 3
    },
    {
     "kind": "MarshallLeeVampireKing",
@@ -1697,8 +1697,8 @@
     "kind": "HunsonDemon",
     "x": -64,
     "z": 20,
-    "share": 0.308,
-    "n": 6
+    "share": 0.282,
+    "n": 7
    },
    {
     "kind": "KingBMO",
@@ -1708,18 +1708,18 @@
     "n": 5
    },
    {
+    "kind": "DeathMetal",
+    "x": -72,
+    "z": 16,
+    "share": 0.179,
+    "n": 6
+   },
+   {
     "kind": "CandyElemental",
     "x": -120,
     "z": -36,
     "share": 0.443,
     "n": 2
-   },
-   {
-    "kind": "DeathMetal",
-    "x": -72,
-    "z": 16,
-    "share": 0.171,
-    "n": 5
    },
    {
     "kind": "CandyElemental",
@@ -1786,17 +1786,17 @@
    },
    {
     "kind": "AlienJake",
-    "x": -76,
-    "z": 40,
-    "share": 0.103,
-    "n": 2
+    "x": -116,
+    "z": -32,
+    "share": 0.217,
+    "n": 1
    },
    {
-    "kind": "HalfMonsterDemon",
-    "x": -112,
-    "z": -40,
-    "share": 0.101,
-    "n": 2
+    "kind": "AlienJake",
+    "x": -120,
+    "z": -36,
+    "share": 0.207,
+    "n": 1
    }
   ],
   "tr": [
@@ -1892,18 +1892,18 @@
     "n": 8
    },
    {
-    "kind": "AlienJake",
-    "x": -120,
-    "z": -36,
-    "share": 0.161,
-    "n": 8
-   },
-   {
     "kind": "JakeTheLich",
     "x": 68,
     "z": -96,
     "share": 0.38,
     "n": 2
+   },
+   {
+    "kind": "AlienJake",
+    "x": -128,
+    "z": -24,
+    "share": 0.152,
+    "n": 7
    }
   ],
   "st:32": [
