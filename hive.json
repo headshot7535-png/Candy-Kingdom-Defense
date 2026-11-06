@@ -1,8 +1,8 @@
 {
- "updated": 1793916665,
+ "updated": 1793935920,
  "players": 51,
- "summaries": 826,
- "matchRecords": 6460,
+ "summaries": 827,
+ "matchRecords": 6465,
  "dropped": 128,
  "kinds": {
   "PrincessBubblegum": {
@@ -63,7 +63,7 @@
   "Marceline": {
    "rel": 0.868,
    "players": 17,
-   "waves": 840
+   "waves": 851
   },
   "BMO": {
    "rel": 1.125,
@@ -76,9 +76,9 @@
    "waves": 922
   },
   "KingMan": {
-   "rel": 0.569,
+   "rel": 0.594,
    "players": 13,
-   "waves": 2801
+   "waves": 2816
   },
   "CandyElemental": {
    "rel": 0.967,
@@ -93,7 +93,7 @@
   "JakeSuit": {
    "rel": 1.099,
    "players": 8,
-   "waves": 2755
+   "waves": 2775
   },
   "DeathMetal": {
    "rel": 0.546,
@@ -116,7 +116,7 @@
    "waves": 753
   },
   "KeeOth": {
-   "rel": 0.888,
+   "rel": 0.838,
    "players": 16,
    "waves": 3245
   },
@@ -128,7 +128,7 @@
   "HalfMonsterDemon": {
    "rel": 1.127,
    "players": 25,
-   "waves": 7651
+   "waves": 7670
   },
   "VampireKingCloud": {
    "rel": 0.937,
@@ -138,12 +138,12 @@
   "MarshallLeeVampireKing": {
    "rel": 0.596,
    "players": 15,
-   "waves": 3362
+   "waves": 3375
   },
   "JakeTheLich": {
    "rel": 0.456,
    "players": 11,
-   "waves": 4280
+   "waves": 4299
   },
   "Lemongrab3": {
    "rel": 4.956,
@@ -151,7 +151,7 @@
    "waves": 93
   },
   "HanaDemon": {
-   "rel": 1.192,
+   "rel": 1.004,
    "players": 4,
    "waves": 132
   },
@@ -173,12 +173,12 @@
  },
  "matchShare": {
   "HunsonDemon": {
-   "share": 0.083,
-   "matches": 2925
+   "share": 0.082,
+   "matches": 2928
   },
   "KingMan": {
    "share": 0.033,
-   "matches": 831
+   "matches": 833
   },
   "CandyElemental": {
    "share": 0.156,
@@ -210,31 +210,31 @@
   },
   "HalfMonsterDemon": {
    "share": 0.214,
-   "matches": 1753
+   "matches": 1755
   },
   "Marceline": {
    "share": 0.002,
-   "matches": 360
+   "matches": 362
   },
   "HanaAbadeer": {
    "share": 0.114,
    "matches": 967
   },
   "JakeTheLich": {
-   "share": 0.078,
-   "matches": 2733
+   "share": 0.079,
+   "matches": 2738
   },
   "VampireKingCloud": {
    "share": 0.166,
    "matches": 2777
   },
   "DeathMetal": {
-   "share": 0.128,
-   "matches": 1027
+   "share": 0.129,
+   "matches": 1030
   },
   "MarshallLeeVampireKing": {
-   "share": 0.017,
-   "matches": 2257
+   "share": 0.018,
+   "matches": 2262
   },
   "Lemongrab": {
    "share": 0.008,
@@ -273,12 +273,12 @@
    "matches": 1174
   },
   "KeeOth": {
-   "share": 0.367,
-   "matches": 1200
+   "share": 0.364,
+   "matches": 1203
   },
   "JakeSuit": {
    "share": 0.002,
-   "matches": 1345
+   "matches": 1347
   },
   "MagicMan": {
    "share": 0.012,
@@ -301,8 +301,8 @@
    "matches": 1
   },
   "HanaDemon": {
-   "share": 0.16,
-   "matches": 72
+   "share": 0.15,
+   "matches": 75
   },
   "Lemongrab3": {
    "share": 0.013,
@@ -341,8 +341,8 @@
    "medSec": 131
   },
   "st:38": {
-   "runs": 915,
-   "wins": 903,
+   "runs": 919,
+   "wins": 907,
    "winRate": 0.987,
    "medSec": 459
   },
@@ -365,10 +365,10 @@
    "medSec": 205
   },
   "inf:32": {
-   "runs": 254,
+   "runs": 255,
    "wins": 1,
    "winRate": 0.004,
-   "medSec": 1972
+   "medSec": 1973
   },
   "inf:21": {
    "runs": 10,
@@ -1372,8 +1372,8 @@
     "kind": "JakeTheLich",
     "x": -84,
     "z": -60,
-    "share": 0.384,
-    "n": 65
+    "share": 0.385,
+    "n": 66
    },
    {
     "kind": "CandyElemental",
@@ -1425,18 +1425,18 @@
     "n": 9
    },
    {
-    "kind": "JakeSuit",
-    "x": -28,
-    "z": -64,
-    "share": 0.22,
-    "n": 38
-   },
-   {
     "kind": "CandyElemental",
     "x": -36,
     "z": -56,
     "share": 0.219,
     "n": 6
+   },
+   {
+    "kind": "JakeSuit",
+    "x": -28,
+    "z": -64,
+    "share": 0.219,
+    "n": 39
    },
    {
     "kind": "AlienJake",
@@ -1518,18 +1518,18 @@
     "n": 5
    },
    {
+    "kind": "JakeTheLich",
+    "x": -96,
+    "z": -44,
+    "share": 0.516,
+    "n": 194
+   },
+   {
     "kind": "VampireKing",
     "x": -64,
     "z": -96,
     "share": 0.514,
     "n": 14
-   },
-   {
-    "kind": "JakeTheLich",
-    "x": -96,
-    "z": -44,
-    "share": 0.511,
-    "n": 190
    },
    {
     "kind": "KingMan",
