@@ -1,9 +1,9 @@
 {
- "updated": 1794050666,
- "players": 56,
- "summaries": 894,
- "matchRecords": 7389,
- "dropped": 183,
+ "updated": 1794072277,
+ "players": 57,
+ "summaries": 904,
+ "matchRecords": 7867,
+ "dropped": 184,
  "kinds": {
   "PrincessBubblegum": {
    "rel": 0.867,
@@ -23,7 +23,7 @@
   "HunsonDemon": {
    "rel": 0.599,
    "players": 23,
-   "waves": 7140
+   "waves": 7892
   },
   "MarcelineBeast": {
    "rel": 0.785,
@@ -48,10 +48,10 @@
   "AlienJake": {
    "rel": 1.37,
    "players": 32,
-   "waves": 13486
+   "waves": 14230
   },
   "MagicMan": {
-   "rel": 0.587,
+   "rel": 0.588,
    "players": 14,
    "waves": 1265
   },
@@ -83,7 +83,7 @@
   "CandyElemental": {
    "rel": 0.967,
    "players": 22,
-   "waves": 10287
+   "waves": 10289
   },
   "Billy": {
    "rel": 0.596,
@@ -98,15 +98,15 @@
   "DeathMetal": {
    "rel": 0.519,
    "players": 12,
-   "waves": 4239
+   "waves": 4765
   },
   "AdultFinn": {
    "rel": 1.033,
    "players": 12,
-   "waves": 4906
+   "waves": 4910
   },
   "HanaAbadeer": {
-   "rel": 0.733,
+   "rel": 0.743,
    "players": 16,
    "waves": 1640
   },
@@ -133,17 +133,17 @@
   "VampireKingCloud": {
    "rel": 0.937,
    "players": 12,
-   "waves": 5732
+   "waves": 6476
   },
   "MarshallLeeVampireKing": {
    "rel": 0.596,
    "players": 16,
-   "waves": 3537
+   "waves": 3548
   },
   "JakeTheLich": {
    "rel": 0.458,
    "players": 11,
-   "waves": 5432
+   "waves": 6172
   },
   "Lemongrab3": {
    "rel": 4.956,
@@ -170,21 +170,26 @@
    "players": 1,
    "waves": 81
   },
+  "FlareJiggler": {
+   "rel": 0.899,
+   "players": 1,
+   "waves": 25
+  },
+  "Jiggler": {
+   "rel": 1.049,
+   "players": 2,
+   "waves": 36
+  },
   "Fern": {
    "rel": 1.179,
    "players": 1,
    "waves": 24
-  },
-  "Jiggler": {
-   "rel": 1.06,
-   "players": 1,
-   "waves": 13
   }
  },
  "matchShare": {
   "HunsonDemon": {
-   "share": 0.115,
-   "matches": 3787
+   "share": 0.123,
+   "matches": 4263
   },
   "KingMan": {
    "share": 0.029,
@@ -203,8 +208,8 @@
    "matches": 481
   },
   "AlienJake": {
-   "share": 0.307,
-   "matches": 4620
+   "share": 0.34,
+   "matches": 5096
   },
   "Hunson": {
    "share": 0.005,
@@ -231,16 +236,16 @@
    "matches": 977
   },
   "JakeTheLich": {
-   "share": 0.119,
-   "matches": 3453
+   "share": 0.139,
+   "matches": 3929
   },
   "VampireKingCloud": {
-   "share": 0.168,
-   "matches": 3498
+   "share": 0.171,
+   "matches": 3974
   },
   "DeathMetal": {
-   "share": 0.019,
-   "matches": 1799
+   "share": 0.011,
+   "matches": 2275
   },
   "MarshallLeeVampireKing": {
    "share": 0.02,
@@ -263,8 +268,8 @@
    "matches": 465
   },
   "Finn": {
-   "share": 0.569,
-   "matches": 181
+   "share": 0.572,
+   "matches": 182
   },
   "BMO": {
    "share": 0.031,
@@ -535,10 +540,10 @@
    "medSec": 229
   },
   "st:1": {
-   "runs": 2404,
-   "wins": 2404,
+   "runs": 2882,
+   "wins": 2882,
    "winRate": 1.0,
-   "medSec": 56
+   "medSec": 45
   },
   "st:33": {
    "runs": 12,
@@ -4230,11 +4235,11 @@
     "n": 32
    },
    {
-    "kind": "AlienJake",
-    "x": -128,
-    "z": -24,
-    "share": 0.322,
-    "n": 1124
+    "kind": "Finn",
+    "x": -124,
+    "z": -48,
+    "share": 0.557,
+    "n": 3
    },
    {
     "kind": "VampireKingCloud",
@@ -4242,6 +4247,13 @@
     "z": 16,
     "share": 0.534,
     "n": 3
+   },
+   {
+    "kind": "AlienJake",
+    "x": -128,
+    "z": -24,
+    "share": 0.318,
+    "n": 1600
    },
    {
     "kind": "BMO",
@@ -4256,13 +4268,6 @@
     "z": -48,
     "share": 0.482,
     "n": 3
-   },
-   {
-    "kind": "AlienJake",
-    "x": -116,
-    "z": -32,
-    "share": 0.248,
-    "n": 203
    }
   ],
   "st:33": [
