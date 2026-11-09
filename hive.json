@@ -1,8 +1,8 @@
 {
- "updated": 1794180360,
+ "updated": 1794201980,
  "players": 60,
- "summaries": 939,
- "matchRecords": 8746,
+ "summaries": 947,
+ "matchRecords": 8751,
  "dropped": 185,
  "kinds": {
   "PrincessBubblegum": {
@@ -199,11 +199,11 @@
  "matchShare": {
   "HunsonDemon": {
    "share": 0.129,
-   "matches": 5138
+   "matches": 5143
   },
   "KingMan": {
-   "share": 0.024,
-   "matches": 1010
+   "share": 0.023,
+   "matches": 1015
   },
   "CandyElemental": {
    "share": 0.15,
@@ -255,11 +255,11 @@
   },
   "DeathMetal": {
    "share": 0.009,
-   "matches": 3115
+   "matches": 3120
   },
   "MarshallLeeVampireKing": {
    "share": 0.023,
-   "matches": 2409
+   "matches": 2411
   },
   "Lemongrab": {
    "share": 0.008,
@@ -346,8 +346,8 @@
    "matches": 16
   },
   "FlareJiggler": {
-   "share": 0.626,
-   "matches": 106
+   "share": 0.643,
+   "matches": 110
   },
   "PeppermintButler": {
    "share": 0.022,
@@ -358,8 +358,8 @@
    "matches": 4
   },
   "ZeldronJakeSuit": {
-   "share": 0.276,
-   "matches": 104
+   "share": 0.253,
+   "matches": 109
   }
  },
  "modes": {
@@ -370,8 +370,8 @@
    "medSec": 147
   },
   "st:2": {
-   "runs": 44,
-   "wins": 44,
+   "runs": 45,
+   "wins": 45,
    "winRate": 1.0,
    "medSec": 131
   },
@@ -598,8 +598,8 @@
    "medSec": 186
   },
   "st:5": {
-   "runs": 40,
-   "wins": 40,
+   "runs": 44,
+   "wins": 44,
    "winRate": 1.0,
    "medSec": 194
   },
@@ -4874,15 +4874,15 @@
     "kind": "FlareJiggler",
     "x": -64,
     "z": -76,
-    "share": 0.421,
-    "n": 20
+    "share": 0.47,
+    "n": 24
    },
    {
     "kind": "ZeldronJakeSuit",
     "x": -72,
     "z": -80,
-    "share": 0.263,
-    "n": 17
+    "share": 0.261,
+    "n": 20
    },
    {
     "kind": "ZeldronJakeSuit",
@@ -4920,6 +4920,13 @@
     "n": 1
    },
    {
+    "kind": "ZeldronJakeSuit",
+    "x": -76,
+    "z": -76,
+    "share": 0.221,
+    "n": 4
+   },
+   {
     "kind": "FlamePrincess",
     "x": -64,
     "z": -80,
@@ -4953,13 +4960,6 @@
     "z": -80,
     "share": 0.174,
     "n": 4
-   },
-   {
-    "kind": "ZeldronJakeSuit",
-    "x": -76,
-    "z": -76,
-    "share": 0.228,
-    "n": 3
    },
    {
     "kind": "HalfMonsterDemon",
