@@ -1,8 +1,8 @@
 {
- "updated": 1794201980,
+ "updated": 1794223604,
  "players": 60,
- "summaries": 947,
- "matchRecords": 8751,
+ "summaries": 949,
+ "matchRecords": 8752,
  "dropped": 185,
  "kinds": {
   "PrincessBubblegum": {
@@ -23,7 +23,7 @@
   "HunsonDemon": {
    "rel": 0.652,
    "players": 24,
-   "waves": 9236
+   "waves": 9243
   },
   "MarcelineBeast": {
    "rel": 0.785,
@@ -78,7 +78,7 @@
   "KingMan": {
    "rel": 0.781,
    "players": 14,
-   "waves": 3171
+   "waves": 3175
   },
   "CandyElemental": {
    "rel": 0.967,
@@ -98,7 +98,7 @@
   "DeathMetal": {
    "rel": 0.519,
    "players": 15,
-   "waves": 5750
+   "waves": 5757
   },
   "AdultFinn": {
    "rel": 1.033,
@@ -143,7 +143,7 @@
   "JakeTheLich": {
    "rel": 0.389,
    "players": 12,
-   "waves": 7360
+   "waves": 7368
   },
   "Lemongrab3": {
    "rel": 4.956,
@@ -151,7 +151,7 @@
    "waves": 93
   },
   "HanaDemon": {
-   "rel": 1.304,
+   "rel": 1.381,
    "players": 4,
    "waves": 136
   },
@@ -182,8 +182,8 @@
   },
   "Jiggler": {
    "rel": 0.883,
-   "players": 2,
-   "waves": 36
+   "players": 3,
+   "waves": 42
   },
   "Fern": {
    "rel": 1.179,
@@ -199,7 +199,7 @@
  "matchShare": {
   "HunsonDemon": {
    "share": 0.129,
-   "matches": 5143
+   "matches": 5144
   },
   "KingMan": {
    "share": 0.023,
@@ -247,15 +247,15 @@
   },
   "JakeTheLich": {
    "share": 0.174,
-   "matches": 4701
+   "matches": 4702
   },
   "VampireKingCloud": {
    "share": 0.171,
-   "matches": 4739
+   "matches": 4740
   },
   "DeathMetal": {
    "share": 0.009,
-   "matches": 3120
+   "matches": 3121
   },
   "MarshallLeeVampireKing": {
    "share": 0.023,
@@ -550,10 +550,10 @@
    "medSec": 227
   },
   "st:4": {
-   "runs": 37,
-   "wins": 37,
+   "runs": 38,
+   "wins": 38,
    "winRate": 1.0,
-   "medSec": 203
+   "medSec": 204
   },
   "st:24": {
    "runs": 214,
@@ -4106,18 +4106,18 @@
     "n": 3
    },
    {
+    "kind": "HunsonDemon",
+    "x": -120,
+    "z": -40,
+    "share": 0.471,
+    "n": 1
+   },
+   {
     "kind": "MarshallLee",
     "x": -120,
     "z": -44,
     "share": 0.435,
     "n": 1
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -120,
-    "z": -44,
-    "share": 0.216,
-    "n": 2
    }
   ],
   "st:24": [
