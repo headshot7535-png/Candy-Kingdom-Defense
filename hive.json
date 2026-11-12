@@ -1,8 +1,8 @@
 {
- "updated": 1794464914,
- "players": 60,
- "summaries": 953,
- "matchRecords": 8762,
+ "updated": 1794465192,
+ "players": 61,
+ "summaries": 955,
+ "matchRecords": 8763,
  "dropped": 185,
  "kinds": {
   "PrincessBubblegum": {
@@ -58,22 +58,22 @@
   "Rainicorn": {
    "rel": 0.743,
    "players": 19,
-   "waves": 1932
+   "waves": 1944
   },
   "Marceline": {
    "rel": 0.868,
    "players": 19,
-   "waves": 888
+   "waves": 889
   },
   "BMO": {
    "rel": 0.859,
    "players": 18,
-   "waves": 1541
+   "waves": 1557
   },
   "Finn": {
-   "rel": 1.009,
+   "rel": 1.053,
    "players": 13,
-   "waves": 935
+   "waves": 951
   },
   "KingMan": {
    "rel": 0.781,
@@ -123,7 +123,7 @@
   "MarshallLee": {
    "rel": 0.719,
    "players": 27,
-   "waves": 6062
+   "waves": 6078
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
@@ -227,11 +227,11 @@
   },
   "MarshallLee": {
    "share": 0.114,
-   "matches": 1975
+   "matches": 1976
   },
   "Rainicorn": {
-   "share": 0.027,
-   "matches": 370
+   "share": 0.026,
+   "matches": 371
   },
   "HalfMonsterDemon": {
    "share": 0.21,
@@ -239,7 +239,7 @@
   },
   "Marceline": {
    "share": 0.002,
-   "matches": 390
+   "matches": 391
   },
   "HanaAbadeer": {
    "share": 0.113,
@@ -278,12 +278,12 @@
    "matches": 465
   },
   "Finn": {
-   "share": 0.572,
-   "matches": 182
+   "share": 0.569,
+   "matches": 183
   },
   "BMO": {
    "share": 0.031,
-   "matches": 721
+   "matches": 722
   },
   "Jake": {
    "share": 0.092,
@@ -291,7 +291,7 @@
   },
   "FlamePrincess": {
    "share": 0.054,
-   "matches": 353
+   "matches": 354
   },
   "AdultFinn": {
    "share": 0.073,
@@ -586,9 +586,9 @@
    "medSec": 278
   },
   "st:37": {
-   "runs": 60,
-   "wins": 59,
-   "winRate": 0.983,
+   "runs": 61,
+   "wins": 60,
+   "winRate": 0.984,
    "medSec": 270
   },
   "pt:26": {
