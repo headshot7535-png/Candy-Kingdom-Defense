@@ -1,8 +1,8 @@
 {
- "updated": 1794465192,
+ "updated": 1794470536,
  "players": 61,
- "summaries": 955,
- "matchRecords": 8763,
+ "summaries": 956,
+ "matchRecords": 8766,
  "dropped": 185,
  "kinds": {
   "PrincessBubblegum": {
@@ -58,22 +58,22 @@
   "Rainicorn": {
    "rel": 0.743,
    "players": 19,
-   "waves": 1944
+   "waves": 1945
   },
   "Marceline": {
    "rel": 0.868,
    "players": 19,
-   "waves": 889
+   "waves": 890
   },
   "BMO": {
    "rel": 0.859,
    "players": 18,
-   "waves": 1557
+   "waves": 1558
   },
   "Finn": {
-   "rel": 1.053,
+   "rel": 1.096,
    "players": 13,
-   "waves": 951
+   "waves": 952
   },
   "KingMan": {
    "rel": 0.781,
@@ -123,7 +123,7 @@
   "MarshallLee": {
    "rel": 0.719,
    "players": 27,
-   "waves": 6078
+   "waves": 6079
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
@@ -226,12 +226,12 @@
    "matches": 202
   },
   "MarshallLee": {
-   "share": 0.114,
-   "matches": 1976
+   "share": 0.113,
+   "matches": 1979
   },
   "Rainicorn": {
-   "share": 0.026,
-   "matches": 371
+   "share": 0.027,
+   "matches": 374
   },
   "HalfMonsterDemon": {
    "share": 0.21,
@@ -239,7 +239,7 @@
   },
   "Marceline": {
    "share": 0.002,
-   "matches": 391
+   "matches": 392
   },
   "HanaAbadeer": {
    "share": 0.113,
@@ -278,12 +278,12 @@
    "matches": 465
   },
   "Finn": {
-   "share": 0.569,
-   "matches": 183
+   "share": 0.575,
+   "matches": 186
   },
   "BMO": {
    "share": 0.031,
-   "matches": 722
+   "matches": 725
   },
   "Jake": {
    "share": 0.092,
@@ -338,12 +338,12 @@
    "matches": 1
   },
   "Fern": {
-   "share": 0.097,
-   "matches": 10
+   "share": 0.096,
+   "matches": 12
   },
   "Jiggler": {
-   "share": 0.744,
-   "matches": 16
+   "share": 0.541,
+   "matches": 19
   },
   "FlareJiggler": {
    "share": 0.643,
@@ -634,10 +634,10 @@
    "medSec": 269
   },
   "st:10": {
-   "runs": 7,
-   "wins": 7,
+   "runs": 9,
+   "wins": 9,
    "winRate": 1.0,
-   "medSec": 267
+   "medSec": 266
   },
   "st:11": {
    "runs": 9,
@@ -652,10 +652,10 @@
    "medSec": 281
   },
   "st:13": {
-   "runs": 7,
-   "wins": 7,
+   "runs": 8,
+   "wins": 8,
    "winRate": 1.0,
-   "medSec": 255
+   "medSec": 254
   },
   "st:14": {
    "runs": 6,
@@ -5522,6 +5522,27 @@
    {
     "kind": "Finn",
     "x": 56,
+    "z": 60,
+    "share": 0.293,
+    "n": 3
+   },
+   {
+    "kind": "Finn",
+    "x": 60,
+    "z": 56,
+    "share": 0.248,
+    "n": 2
+   },
+   {
+    "kind": "Finn",
+    "x": 52,
+    "z": 56,
+    "share": 0.098,
+    "n": 5
+   },
+   {
+    "kind": "Finn",
+    "x": 56,
     "z": 64,
     "share": 0.148,
     "n": 3
@@ -5562,11 +5583,11 @@
     "n": 1
    },
    {
-    "kind": "Finn",
-    "x": 52,
-    "z": 56,
-    "share": 0.113,
-    "n": 3
+    "kind": "Jiggler",
+    "x": 72,
+    "z": 92,
+    "share": 0.149,
+    "n": 2
    },
    {
     "kind": "HanaAbadeer",
@@ -5594,27 +5615,6 @@
     "x": 56,
     "z": 56,
     "share": 0.205,
-    "n": 1
-   },
-   {
-    "kind": "Finn",
-    "x": 56,
-    "z": 52,
-    "share": 0.198,
-    "n": 1
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": 56,
-    "z": 56,
-    "share": 0.168,
-    "n": 1
-   },
-   {
-    "kind": "Finn",
-    "x": 56,
-    "z": 48,
-    "share": 0.145,
     "n": 1
    }
   ],
@@ -5869,6 +5869,13 @@
     "n": 1
    },
    {
+    "kind": "Finn",
+    "x": -84,
+    "z": -72,
+    "share": 0.21,
+    "n": 2
+   },
+   {
     "kind": "HalfMonsterDemon",
     "x": -88,
     "z": -80,
@@ -5890,6 +5897,13 @@
     "n": 2
    },
    {
+    "kind": "Finn",
+    "x": -76,
+    "z": -76,
+    "share": 0.294,
+    "n": 1
+   },
+   {
     "kind": "HalfMonsterDemon",
     "x": -80,
     "z": -72,
@@ -5905,9 +5919,16 @@
    },
    {
     "kind": "Finn",
-    "x": -84,
-    "z": -72,
-    "share": 0.222,
+    "x": -80,
+    "z": -80,
+    "share": 0.256,
+    "n": 1
+   },
+   {
+    "kind": "Finn",
+    "x": -88,
+    "z": -80,
+    "share": 0.216,
     "n": 1
    },
    {
@@ -5915,27 +5936,6 @@
     "x": -72,
     "z": -72,
     "share": 0.207,
-    "n": 1
-   },
-   {
-    "kind": "Finn",
-    "x": -76,
-    "z": -80,
-    "share": 0.196,
-    "n": 1
-   },
-   {
-    "kind": "Death",
-    "x": -108,
-    "z": -20,
-    "share": 0.179,
-    "n": 1
-   },
-   {
-    "kind": "Finn",
-    "x": -84,
-    "z": -80,
-    "share": 0.178,
     "n": 1
    }
   ],
