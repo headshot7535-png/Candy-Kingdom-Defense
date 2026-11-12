@@ -1,9 +1,9 @@
 {
- "updated": 1794492190,
+ "updated": 1794513848,
  "players": 61,
- "summaries": 962,
- "matchRecords": 8789,
- "dropped": 185,
+ "summaries": 968,
+ "matchRecords": 8790,
+ "dropped": 188,
  "kinds": {
   "PrincessBubblegum": {
    "rel": 0.867,
@@ -36,9 +36,9 @@
    "waves": 2545
   },
   "Lemongrab": {
-   "rel": 0.466,
+   "rel": 0.533,
    "players": 9,
-   "waves": 406
+   "waves": 583
   },
   "FlamePrincess": {
    "rel": 0.816,
@@ -71,7 +71,7 @@
    "waves": 1686
   },
   "Finn": {
-   "rel": 0.948,
+   "rel": 0.956,
    "players": 13,
    "waves": 1048
   },
@@ -91,9 +91,9 @@
    "waves": 2260
   },
   "JakeSuit": {
-   "rel": 1.099,
-   "players": 8,
-   "waves": 2800
+   "rel": 1.222,
+   "players": 9,
+   "waves": 3043
   },
   "DeathMetal": {
    "rel": 0.519,
@@ -103,7 +103,7 @@
   "AdultFinn": {
    "rel": 1.024,
    "players": 13,
-   "waves": 5077
+   "waves": 5150
   },
   "HanaAbadeer": {
    "rel": 0.734,
@@ -121,9 +121,9 @@
    "waves": 3369
   },
   "MarshallLee": {
-   "rel": 0.603,
+   "rel": 0.69,
    "players": 27,
-   "waves": 6270
+   "waves": 6410
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
@@ -173,7 +173,7 @@
   "FlareJiggler": {
    "rel": 0.375,
    "players": 3,
-   "waves": 409
+   "waves": 553
   },
   "Lich": {
    "rel": 0.556,
@@ -181,12 +181,12 @@
    "waves": 82
   },
   "Fern": {
-   "rel": 1.789,
+   "rel": 1.379,
    "players": 2,
-   "waves": 219
+   "waves": 461
   },
   "Jiggler": {
-   "rel": 0.909,
+   "rel": 0.916,
    "players": 4,
    "waves": 63
   },
@@ -227,7 +227,7 @@
   },
   "MarshallLee": {
    "share": 0.113,
-   "matches": 2002
+   "matches": 2003
   },
   "Rainicorn": {
    "share": 0.027,
@@ -262,8 +262,8 @@
    "matches": 2417
   },
   "Lemongrab": {
-   "share": 0.006,
-   "matches": 73
+   "share": 0.005,
+   "matches": 74
   },
   "PrincessBubblegum": {
    "share": 0.053,
@@ -295,7 +295,7 @@
   },
   "AdultFinn": {
    "share": 0.074,
-   "matches": 1266
+   "matches": 1267
   },
   "KeeOth": {
    "share": 0.356,
@@ -303,7 +303,7 @@
   },
   "JakeSuit": {
    "share": 0.002,
-   "matches": 1353
+   "matches": 1354
   },
   "MagicMan": {
    "share": 0.012,
@@ -338,16 +338,16 @@
    "matches": 1
   },
   "Fern": {
-   "share": 0.072,
-   "matches": 34
+   "share": 0.07,
+   "matches": 35
   },
   "Jiggler": {
    "share": 0.275,
    "matches": 28
   },
   "FlareJiggler": {
-   "share": 0.638,
-   "matches": 113
+   "share": 0.635,
+   "matches": 114
   },
   "PeppermintButler": {
    "share": 0.022,
@@ -592,10 +592,10 @@
    "medSec": 270
   },
   "pt:26": {
-   "runs": 5,
-   "wins": 5,
+   "runs": 6,
+   "wins": 6,
    "winRate": 1.0,
-   "medSec": 186
+   "medSec": 185
   },
   "st:5": {
    "runs": 46,
@@ -4785,10 +4785,24 @@
     "n": 1
    },
    {
+    "kind": "AdultFinn",
+    "x": -96,
+    "z": -64,
+    "share": 0.457,
+    "n": 1
+   },
+   {
     "kind": "VampireKingCloud",
     "x": -112,
     "z": -52,
     "share": 0.416,
+    "n": 1
+   },
+   {
+    "kind": "AdultFinn",
+    "x": -96,
+    "z": -56,
+    "share": 0.412,
     "n": 1
    },
    {
@@ -4848,24 +4862,10 @@
     "n": 2
    },
    {
-    "kind": "CandyElemental",
-    "x": -88,
-    "z": -60,
-    "share": 0.116,
-    "n": 1
-   },
-   {
-    "kind": "JakeSuit",
-    "x": -96,
-    "z": -64,
-    "share": 0.115,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -120,
-    "z": -56,
-    "share": 0.072,
+    "kind": "FlareJiggler",
+    "x": -140,
+    "z": -80,
+    "share": 0.131,
     "n": 1
    }
   ],
