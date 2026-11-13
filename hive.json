@@ -1,8 +1,8 @@
 {
- "updated": 1794513848,
+ "updated": 1794535534,
  "players": 61,
- "summaries": 968,
- "matchRecords": 8790,
+ "summaries": 974,
+ "matchRecords": 8791,
  "dropped": 188,
  "kinds": {
   "PrincessBubblegum": {
@@ -227,7 +227,7 @@
   },
   "MarshallLee": {
    "share": 0.113,
-   "matches": 2003
+   "matches": 2004
   },
   "Rainicorn": {
    "share": 0.027,
@@ -262,8 +262,8 @@
    "matches": 2417
   },
   "Lemongrab": {
-   "share": 0.005,
-   "matches": 74
+   "share": 0.006,
+   "matches": 75
   },
   "PrincessBubblegum": {
    "share": 0.053,
@@ -295,7 +295,7 @@
   },
   "AdultFinn": {
    "share": 0.074,
-   "matches": 1267
+   "matches": 1268
   },
   "KeeOth": {
    "share": 0.356,
@@ -303,7 +303,7 @@
   },
   "JakeSuit": {
    "share": 0.002,
-   "matches": 1354
+   "matches": 1355
   },
   "MagicMan": {
    "share": 0.012,
@@ -338,16 +338,16 @@
    "matches": 1
   },
   "Fern": {
-   "share": 0.07,
-   "matches": 35
+   "share": 0.066,
+   "matches": 36
   },
   "Jiggler": {
    "share": 0.275,
    "matches": 28
   },
   "FlareJiggler": {
-   "share": 0.635,
-   "matches": 114
+   "share": 0.632,
+   "matches": 115
   },
   "PeppermintButler": {
    "share": 0.022,
@@ -406,8 +406,8 @@
    "medSec": 197
   },
   "pt:27": {
-   "runs": 108,
-   "wins": 108,
+   "runs": 109,
+   "wins": 109,
    "winRate": 1.0,
    "medSec": 166
   },
