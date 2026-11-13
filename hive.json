@@ -1,9 +1,9 @@
 {
- "updated": 1794535534,
- "players": 61,
- "summaries": 974,
- "matchRecords": 8791,
- "dropped": 188,
+ "updated": 1794557196,
+ "players": 62,
+ "summaries": 977,
+ "matchRecords": 8805,
+ "dropped": 189,
  "kinds": {
   "PrincessBubblegum": {
    "rel": 0.867,
@@ -36,9 +36,9 @@
    "waves": 2545
   },
   "Lemongrab": {
-   "rel": 0.533,
+   "rel": 0.28,
    "players": 9,
-   "waves": 583
+   "waves": 688
   },
   "FlamePrincess": {
    "rel": 0.816,
@@ -56,7 +56,7 @@
    "waves": 1265
   },
   "Rainicorn": {
-   "rel": 0.687,
+   "rel": 0.743,
    "players": 19,
    "waves": 1951
   },
@@ -66,12 +66,12 @@
    "waves": 890
   },
   "BMO": {
-   "rel": 0.856,
+   "rel": 0.919,
    "players": 18,
    "waves": 1686
   },
   "Finn": {
-   "rel": 0.956,
+   "rel": 1.074,
    "players": 13,
    "waves": 1048
   },
@@ -91,9 +91,9 @@
    "waves": 2260
   },
   "JakeSuit": {
-   "rel": 1.222,
+   "rel": 1.129,
    "players": 9,
-   "waves": 3043
+   "waves": 3203
   },
   "DeathMetal": {
    "rel": 0.519,
@@ -101,9 +101,9 @@
    "waves": 5768
   },
   "AdultFinn": {
-   "rel": 1.024,
+   "rel": 1.033,
    "players": 13,
-   "waves": 5150
+   "waves": 5303
   },
   "HanaAbadeer": {
    "rel": 0.734,
@@ -121,9 +121,9 @@
    "waves": 3369
   },
   "MarshallLee": {
-   "rel": 0.69,
+   "rel": 0.603,
    "players": 27,
-   "waves": 6410
+   "waves": 6488
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
@@ -171,9 +171,9 @@
    "waves": 201
   },
   "FlareJiggler": {
-   "rel": 0.375,
+   "rel": 0.615,
    "players": 3,
-   "waves": 553
+   "waves": 619
   },
   "Lich": {
    "rel": 0.556,
@@ -181,12 +181,12 @@
    "waves": 82
   },
   "Fern": {
-   "rel": 1.379,
+   "rel": 1.417,
    "players": 2,
-   "waves": 461
+   "waves": 585
   },
   "Jiggler": {
-   "rel": 0.916,
+   "rel": 1.029,
    "players": 4,
    "waves": 63
   },
@@ -226,8 +226,8 @@
    "matches": 202
   },
   "MarshallLee": {
-   "share": 0.113,
-   "matches": 2004
+   "share": 0.112,
+   "matches": 2007
   },
   "Rainicorn": {
    "share": 0.027,
@@ -263,7 +263,7 @@
   },
   "Lemongrab": {
    "share": 0.006,
-   "matches": 75
+   "matches": 84
   },
   "PrincessBubblegum": {
    "share": 0.053,
@@ -294,8 +294,8 @@
    "matches": 354
   },
   "AdultFinn": {
-   "share": 0.074,
-   "matches": 1268
+   "share": 0.076,
+   "matches": 1281
   },
   "KeeOth": {
    "share": 0.356,
@@ -303,7 +303,7 @@
   },
   "JakeSuit": {
    "share": 0.002,
-   "matches": 1355
+   "matches": 1369
   },
   "MagicMan": {
    "share": 0.012,
@@ -338,16 +338,16 @@
    "matches": 1
   },
   "Fern": {
-   "share": 0.066,
-   "matches": 36
+   "share": 0.063,
+   "matches": 47
   },
   "Jiggler": {
    "share": 0.275,
    "matches": 28
   },
   "FlareJiggler": {
-   "share": 0.632,
-   "matches": 115
+   "share": 0.608,
+   "matches": 119
   },
   "PeppermintButler": {
    "share": 0.022,
@@ -412,8 +412,8 @@
    "medSec": 166
   },
   "st:35": {
-   "runs": 64,
-   "wins": 64,
+   "runs": 65,
+   "wins": 65,
    "winRate": 1.0,
    "medSec": 205
   },
@@ -448,9 +448,9 @@
    "medSec": 1811
   },
   "st:36": {
-   "runs": 50,
-   "wins": 50,
-   "winRate": 1.0,
+   "runs": 52,
+   "wins": 51,
+   "winRate": 0.981,
    "medSec": 210
   },
   "st:16": {
@@ -532,8 +532,8 @@
    "medSec": 266
   },
   "st:6": {
-   "runs": 46,
-   "wins": 46,
+   "runs": 48,
+   "wins": 48,
    "winRate": 1.0,
    "medSec": 152
   },
@@ -550,10 +550,10 @@
    "medSec": 228
   },
   "st:4": {
-   "runs": 41,
-   "wins": 40,
+   "runs": 42,
+   "wins": 41,
    "winRate": 0.976,
-   "medSec": 201
+   "medSec": 202
   },
   "st:24": {
    "runs": 214,
@@ -568,10 +568,10 @@
    "medSec": 45
   },
   "st:33": {
-   "runs": 12,
-   "wins": 10,
-   "winRate": 0.833,
-   "medSec": 257
+   "runs": 13,
+   "wins": 11,
+   "winRate": 0.846,
+   "medSec": 258
   },
   "st:25": {
    "runs": 21,
@@ -580,16 +580,16 @@
    "medSec": 346
   },
   "st:34": {
-   "runs": 10,
-   "wins": 10,
+   "runs": 11,
+   "wins": 11,
    "winRate": 1.0,
-   "medSec": 278
+   "medSec": 279
   },
   "st:37": {
-   "runs": 61,
-   "wins": 60,
+   "runs": 62,
+   "wins": 61,
    "winRate": 0.984,
-   "medSec": 270
+   "medSec": 271
   },
   "pt:26": {
    "runs": 6,
@@ -670,10 +670,10 @@
    "medSec": 304
   },
   "st:39": {
-   "runs": 3,
-   "wins": 3,
+   "runs": 4,
+   "wins": 4,
    "winRate": 1.0,
-   "medSec": 196
+   "medSec": 228
   },
   "st:45": {
    "runs": 4,
@@ -688,28 +688,28 @@
    "medSec": 250
   },
   "st:42": {
-   "runs": 2,
-   "wins": 2,
+   "runs": 3,
+   "wins": 3,
    "winRate": 1.0,
-   "medSec": 488
+   "medSec": 771
   },
   "st:43": {
+   "runs": 3,
+   "wins": 3,
+   "winRate": 1.0,
+   "medSec": 997
+  },
+  "st:40": {
    "runs": 2,
    "wins": 2,
    "winRate": 1.0,
-   "medSec": 610
-  },
-  "st:40": {
-   "runs": 1,
-   "wins": 1,
-   "winRate": 1.0,
-   "medSec": 376
+   "medSec": 468
   },
   "st:41": {
-   "runs": 1,
-   "wins": 1,
+   "runs": 2,
+   "wins": 2,
    "winRate": 1.0,
-   "medSec": 573
+   "medSec": 690
   },
   "st:46": {
    "runs": 1,
@@ -1424,6 +1424,13 @@
     "n": 5
    },
    {
+    "kind": "AdultFinn",
+    "x": -28,
+    "z": -64,
+    "share": 0.496,
+    "n": 1
+   },
+   {
     "kind": "JakeSuit",
     "x": -60,
     "z": -80,
@@ -1470,13 +1477,6 @@
     "x": -48,
     "z": -80,
     "share": 0.321,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -64,
-    "z": -80,
-    "share": 0.292,
     "n": 1
    }
   ],
@@ -2224,6 +2224,20 @@
     "n": 38
    },
    {
+    "kind": "JakeSuit",
+    "x": -48,
+    "z": -72,
+    "share": 0.715,
+    "n": 1
+   },
+   {
+    "kind": "AdultFinn",
+    "x": -48,
+    "z": -72,
+    "share": 0.677,
+    "n": 1
+   },
+   {
     "kind": "HalfMonsterDemon",
     "x": -60,
     "z": -84,
@@ -2285,20 +2299,6 @@
     "z": -16,
     "share": 0.062,
     "n": 28
-   },
-   {
-    "kind": "PrincessBubblegum",
-    "x": -52,
-    "z": -76,
-    "share": 0.28,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -64,
-    "z": -80,
-    "share": 0.264,
-    "n": 1
    }
   ],
   "st:16": [
@@ -3757,6 +3757,13 @@
     "n": 5
    },
    {
+    "kind": "AdultFinn",
+    "x": -72,
+    "z": -72,
+    "share": 0.896,
+    "n": 1
+   },
+   {
     "kind": "VampireKingCloud",
     "x": -24,
     "z": 40,
@@ -3790,13 +3797,6 @@
     "z": -76,
     "share": 0.676,
     "n": 1
-   },
-   {
-    "kind": "MarshallLeeVampireKing",
-    "x": -76,
-    "z": -72,
-    "share": 0.133,
-    "n": 8
    }
   ],
   "st:22": [
@@ -4057,6 +4057,13 @@
     "n": 1
    },
    {
+    "kind": "AdultFinn",
+    "x": -120,
+    "z": -48,
+    "share": 0.859,
+    "n": 1
+   },
+   {
     "kind": "Finn",
     "x": -124,
     "z": -44,
@@ -4110,13 +4117,6 @@
     "x": -80,
     "z": 16,
     "share": 0.166,
-    "n": 3
-   },
-   {
-    "kind": "KingMan",
-    "x": -112,
-    "z": -28,
-    "share": 0.164,
     "n": 3
    }
   ],
@@ -4357,6 +4357,13 @@
     "n": 1
    },
    {
+    "kind": "AdultFinn",
+    "x": -56,
+    "z": -68,
+    "share": 0.643,
+    "n": 1
+   },
+   {
     "kind": "MarshallLee",
     "x": -48,
     "z": -80,
@@ -4413,6 +4420,13 @@
     "n": 1
    },
    {
+    "kind": "JakeSuit",
+    "x": -48,
+    "z": -72,
+    "share": 0.349,
+    "n": 1
+   },
+   {
     "kind": "Finn",
     "x": -48,
     "z": -72,
@@ -4424,20 +4438,6 @@
     "x": -60,
     "z": -76,
     "share": 0.165,
-    "n": 2
-   },
-   {
-    "kind": "HalfMonsterDemon",
-    "x": -60,
-    "z": -84,
-    "share": 0.324,
-    "n": 1
-   },
-   {
-    "kind": "FlamePrincess",
-    "x": -48,
-    "z": -72,
-    "share": 0.131,
     "n": 2
    }
   ],
@@ -4564,6 +4564,13 @@
     "n": 2
    },
    {
+    "kind": "AdultFinn",
+    "x": -24,
+    "z": -92,
+    "share": 0.626,
+    "n": 1
+   },
+   {
     "kind": "JakeTheLich",
     "x": -92,
     "z": -20,
@@ -4620,6 +4627,13 @@
     "n": 1
    },
    {
+    "kind": "JakeSuit",
+    "x": -24,
+    "z": -80,
+    "share": 0.252,
+    "n": 1
+   },
+   {
     "kind": "Rainicorn",
     "x": -56,
     "z": -80,
@@ -4639,20 +4653,6 @@
     "z": -76,
     "share": 0.121,
     "n": 2
-   },
-   {
-    "kind": "Finn",
-    "x": -48,
-    "z": -80,
-    "share": 0.237,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -64,
-    "z": -84,
-    "share": 0.236,
-    "n": 1
    }
   ],
   "st:37": [
@@ -6162,6 +6162,13 @@
     "n": 1
    },
    {
+    "kind": "AdultFinn",
+    "x": -152,
+    "z": -24,
+    "share": 0.635,
+    "n": 1
+   },
+   {
     "kind": "JakeTheLich",
     "x": -88,
     "z": -40,
@@ -6190,10 +6197,24 @@
     "n": 1
    },
    {
+    "kind": "JakeSuit",
+    "x": -140,
+    "z": -24,
+    "share": 0.249,
+    "n": 1
+   },
+   {
     "kind": "MarshallLee",
     "x": -124,
     "z": -52,
     "share": 0.157,
+    "n": 1
+   },
+   {
+    "kind": "Fern",
+    "x": -120,
+    "z": -28,
+    "share": 0.103,
     "n": 1
    },
    {
@@ -6232,31 +6253,10 @@
     "n": 1
    },
    {
-    "kind": "AlienJake",
-    "x": -44,
-    "z": -56,
-    "share": 0.003,
-    "n": 1
-   },
-   {
-    "kind": "AdultFinn",
-    "x": -48,
-    "z": -64,
-    "share": 0.002,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLee",
-    "x": -40,
-    "z": -64,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "Fern",
-    "x": -40,
-    "z": -56,
-    "share": 0.0,
+    "kind": "Lemongrab",
+    "x": -128,
+    "z": -24,
+    "share": 0.013,
     "n": 1
    }
   ],
@@ -6483,6 +6483,13 @@
     "n": 1
    },
    {
+    "kind": "AdultFinn",
+    "x": -128,
+    "z": -52,
+    "share": 0.385,
+    "n": 1
+   },
+   {
     "kind": "DeathMetal",
     "x": -88,
     "z": -36,
@@ -6497,10 +6504,24 @@
     "n": 1
    },
    {
+    "kind": "FlareJiggler",
+    "x": -152,
+    "z": -64,
+    "share": 0.318,
+    "n": 1
+   },
+   {
     "kind": "DeathMetal",
     "x": -92,
     "z": -36,
     "share": 0.303,
+    "n": 1
+   },
+   {
+    "kind": "JakeSuit",
+    "x": -144,
+    "z": -52,
+    "share": 0.217,
     "n": 1
    },
    {
@@ -6532,6 +6553,20 @@
     "n": 1
    },
    {
+    "kind": "Fern",
+    "x": -120,
+    "z": -60,
+    "share": 0.057,
+    "n": 1
+   },
+   {
+    "kind": "MarshallLee",
+    "x": -120,
+    "z": -68,
+    "share": 0.022,
+    "n": 1
+   },
+   {
     "kind": "HunsonDemon",
     "x": -64,
     "z": -20,
@@ -6539,42 +6574,21 @@
     "n": 1
    },
    {
-    "kind": "AlienJake",
-    "x": -40,
-    "z": -48,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "AlienJake",
-    "x": -44,
-    "z": -56,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLeeVampireKing",
-    "x": -44,
-    "z": -56,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "HunsonDemon",
-    "x": -40,
-    "z": -52,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLeeVampireKing",
-    "x": -40,
-    "z": -44,
+    "kind": "Lemongrab",
+    "x": -112,
+    "z": -68,
     "share": 0.0,
     "n": 1
    }
   ],
   "st:43": [
+   {
+    "kind": "AdultFinn",
+    "x": -108,
+    "z": -36,
+    "share": 0.609,
+    "n": 1
+   },
    {
     "kind": "JakeTheLich",
     "x": -88,
@@ -6611,6 +6625,13 @@
     "n": 1
    },
    {
+    "kind": "JakeSuit",
+    "x": -120,
+    "z": -32,
+    "share": 0.277,
+    "n": 1
+   },
+   {
     "kind": "VampireKingCloud",
     "x": -88,
     "z": -32,
@@ -6622,6 +6643,20 @@
     "x": -84,
     "z": -32,
     "share": 0.094,
+    "n": 1
+   },
+   {
+    "kind": "Fern",
+    "x": -132,
+    "z": -28,
+    "share": 0.066,
+    "n": 1
+   },
+   {
+    "kind": "Lemongrab",
+    "x": -128,
+    "z": -52,
+    "share": 0.048,
     "n": 1
    },
    {
@@ -6651,37 +6686,16 @@
     "z": -40,
     "share": 0.0,
     "n": 1
-   },
-   {
-    "kind": "CandyElemental",
-    "x": -40,
-    "z": -44,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLeeVampireKing",
-    "x": -40,
-    "z": -44,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "MarshallLeeVampireKing",
-    "x": -44,
-    "z": -56,
-    "share": 0.0,
-    "n": 1
-   },
-   {
-    "kind": "HunsonDemon",
-    "x": -40,
-    "z": -52,
-    "share": 0.0,
-    "n": 1
    }
   ],
   "st:40": [
+   {
+    "kind": "AdultFinn",
+    "x": -104,
+    "z": -40,
+    "share": 0.567,
+    "n": 1
+   },
    {
     "kind": "DeathMetal",
     "x": -92,
@@ -6694,6 +6708,20 @@
     "x": -88,
     "z": -40,
     "share": 0.382,
+    "n": 1
+   },
+   {
+    "kind": "JakeSuit",
+    "x": -116,
+    "z": -32,
+    "share": 0.323,
+    "n": 1
+   },
+   {
+    "kind": "Fern",
+    "x": -124,
+    "z": -56,
+    "share": 0.1,
     "n": 1
    },
    {
@@ -6711,6 +6739,13 @@
     "n": 1
    },
    {
+    "kind": "Lemongrab",
+    "x": -116,
+    "z": -60,
+    "share": 0.01,
+    "n": 1
+   },
+   {
     "kind": "MarshallLeeVampireKing",
     "x": -40,
     "z": -44,
@@ -6730,9 +6765,23 @@
     "z": -52,
     "share": 0.0,
     "n": 1
+   },
+   {
+    "kind": "FlareJiggler",
+    "x": -20,
+    "z": -80,
+    "share": 0.0,
+    "n": 1
    }
   ],
   "st:41": [
+   {
+    "kind": "AdultFinn",
+    "x": -124,
+    "z": -28,
+    "share": 0.644,
+    "n": 1
+   },
    {
     "kind": "DeathMetal",
     "x": -92,
@@ -6748,6 +6797,20 @@
     "n": 1
    },
    {
+    "kind": "JakeSuit",
+    "x": -112,
+    "z": -36,
+    "share": 0.241,
+    "n": 1
+   },
+   {
+    "kind": "JakeSuit",
+    "x": -100,
+    "z": -36,
+    "share": 0.108,
+    "n": 1
+   },
+   {
     "kind": "KingMan",
     "x": -84,
     "z": -32,
@@ -6759,6 +6822,13 @@
     "x": -88,
     "z": -32,
     "share": 0.094,
+    "n": 1
+   },
+   {
+    "kind": "Fern",
+    "x": -100,
+    "z": -44,
+    "share": 0.007,
     "n": 1
    },
    {
