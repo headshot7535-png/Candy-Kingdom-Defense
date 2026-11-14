@@ -1,8 +1,8 @@
 {
- "updated": 1794592904,
+ "updated": 1794614559,
  "players": 62,
- "summaries": 977,
- "matchRecords": 8805,
+ "summaries": 978,
+ "matchRecords": 8807,
  "dropped": 189,
  "kinds": {
   "PrincessBubblegum": {
@@ -41,9 +41,9 @@
    "waves": 688
   },
   "FlamePrincess": {
-   "rel": 0.816,
+   "rel": 0.747,
    "players": 17,
-   "waves": 1351
+   "waves": 1355
   },
   "AlienJake": {
    "rel": 1.37,
@@ -83,7 +83,7 @@
   "CandyElemental": {
    "rel": 0.848,
    "players": 22,
-   "waves": 10301
+   "waves": 10308
   },
   "Billy": {
    "rel": 0.596,
@@ -123,12 +123,12 @@
   "MarshallLee": {
    "rel": 0.603,
    "players": 27,
-   "waves": 6488
+   "waves": 6492
   },
   "HalfMonsterDemon": {
    "rel": 1.127,
    "players": 26,
-   "waves": 7775
+   "waves": 7782
   },
   "VampireKingCloud": {
    "rel": 0.937,
@@ -207,7 +207,7 @@
   },
   "CandyElemental": {
    "share": 0.15,
-   "matches": 2495
+   "matches": 2497
   },
   "KingBMO": {
    "share": 0.176,
@@ -227,7 +227,7 @@
   },
   "MarshallLee": {
    "share": 0.112,
-   "matches": 2007
+   "matches": 2009
   },
   "Rainicorn": {
    "share": 0.027,
@@ -235,7 +235,7 @@
   },
   "HalfMonsterDemon": {
    "share": 0.21,
-   "matches": 1830
+   "matches": 1832
   },
   "Marceline": {
    "share": 0.002,
@@ -283,15 +283,15 @@
   },
   "BMO": {
    "share": 0.03,
-   "matches": 745
+   "matches": 747
   },
   "Jake": {
    "share": 0.092,
    "matches": 48
   },
   "FlamePrincess": {
-   "share": 0.054,
-   "matches": 354
+   "share": 0.053,
+   "matches": 356
   },
   "AdultFinn": {
    "share": 0.076,
@@ -376,8 +376,8 @@
    "medSec": 131
   },
   "ch:3": {
-   "runs": 482,
-   "wins": 482,
+   "runs": 483,
+   "wins": 483,
    "winRate": 1.0,
    "medSec": 196
   },
@@ -400,8 +400,8 @@
    "medSec": 459
   },
   "ch:4": {
-   "runs": 443,
-   "wins": 441,
+   "runs": 444,
+   "wins": 442,
    "winRate": 0.995,
    "medSec": 197
   },
@@ -1238,6 +1238,13 @@
     "n": 10
    },
    {
+    "kind": "CandyElemental",
+    "x": -120,
+    "z": -36,
+    "share": 0.423,
+    "n": 8
+   },
+   {
     "kind": "AlienJake",
     "x": -120,
     "z": -40,
@@ -1257,13 +1264,6 @@
     "z": -44,
     "share": 0.395,
     "n": 18
-   },
-   {
-    "kind": "CandyElemental",
-    "x": -120,
-    "z": -36,
-    "share": 0.392,
-    "n": 7
    }
   ],
   "pt:27": [
